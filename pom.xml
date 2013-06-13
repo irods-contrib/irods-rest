@@ -266,7 +266,16 @@
 				<artifactId>spring-webmvc</artifactId>
 				<version>${spring.core.version}</version>
 			</dependency>
-
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context</artifactId>
+				<version>${spring.core.version}</version>
+			</dependency>
+				<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-beans</artifactId>
+				<version>${spring.core.version}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<dependencies>
@@ -337,10 +346,19 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-webmvc</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+		</dependency>
+			<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+		</dependency>
+
 	</dependencies>
 	<build>
 		<plugins>
-		    <plugin>
+			<plugin>
 				<artifactId>maven-antrun-plugin</artifactId>
 				<executions>
 					<execution>
@@ -355,11 +373,18 @@
 								<property name="package.name" value="org.irods.jargon.rest.utils" />
 								<property name="buildtime" value="${maven.build.timestamp}" />
 
-								<echo file="${src.dir}/${package.dir}/RestVersion.java" message="package ${package.name};${line.separator}" />
-								<echo file="${src.dir}/${package.dir}/RestVersion.java" append="true" message="public final class RestVersion {${line.separator}" />
-								<echo file="${src.dir}/${package.dir}/RestVersion.java" append="true" message=" public static String VERSION=&quot;${pom.version}&quot;;${line.separator}" />
-								<echo file="${src.dir}/${package.dir}/RestVersion.java" append="true" message=" public static String BUILD_TIME=&quot;${buildtime}&quot;;${line.separator}" />
-								<echo file="${src.dir}/${package.dir}/RestVersion.java" append="true" message="}${line.separator}" />
+								<echo file="${src.dir}/${package.dir}/RestVersion.java"
+									message="package ${package.name};${line.separator}" />
+								<echo file="${src.dir}/${package.dir}/RestVersion.java"
+									append="true" message="public final class RestVersion {${line.separator}" />
+								<echo file="${src.dir}/${package.dir}/RestVersion.java"
+									append="true"
+									message=" public static String VERSION=&quot;${pom.version}&quot;;${line.separator}" />
+								<echo file="${src.dir}/${package.dir}/RestVersion.java"
+									append="true"
+									message=" public static String BUILD_TIME=&quot;${buildtime}&quot;;${line.separator}" />
+								<echo file="${src.dir}/${package.dir}/RestVersion.java"
+									append="true" message="}${line.separator}" />
 								<echo message="BUILD ${buildtime}" />
 							</tasks>
 						</configuration>
@@ -370,8 +395,10 @@
 						<configuration>
 							<tasks>
 								<delete file="${basedir}/src/test/resources/testing.properties" />
-								<touch file="${basedir}/src/test/resources/testing.properties" mkdirs="true" />
-								<echo file="${basedir}/src/test/resources/testing.properties" append="true">
+								<touch file="${basedir}/src/test/resources/testing.properties"
+									mkdirs="true" />
+								<echo file="${basedir}/src/test/resources/testing.properties"
+									append="true">
 									test.confirm=${jargon.test.confirm}
 									test.data.directory=${jargon.test.data.directory}
 									test.irods.admin=${jargon.test.irods.admin}
@@ -446,7 +473,8 @@
 		</plugins>
 		<pluginManagement>
 			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
