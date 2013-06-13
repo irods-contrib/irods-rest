@@ -2,6 +2,7 @@
 *.pydevproject
 .project
 .metadata
+.springBeans
 bin/**
 tmp/**
 tmp/**/*
@@ -25,3 +26,6 @@ local.properties
 
 # PDT-specific
 .buildpath
+
+#Version file
+src/**/RestVersion.java
