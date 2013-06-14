@@ -46,7 +46,7 @@ public class UserService {
 	}
 	
 	@GET
-	@Path("/{userName}")
+	@Path("{userName}")
 	public User getUser(@PathParam("userName") final String userName) throws JargonException {
 		log.info("getUser()");
 		
@@ -58,7 +58,7 @@ public class UserService {
 	}
 
 	@PUT
-	@Path("/{userName}")
+	@Path("{userName}")
 	public void addUser() throws JargonException {
 		log.info("addUser()");
 	}

@@ -5,28 +5,29 @@
 	version="3.0">
 	<display-name>irods-rest</display-name>
 
-
 	<listener>
-		<listener-class>org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap</listener-class>
-	</listener>
-
-	<listener>
-		<listener-class>org.jboss.resteasy.plugins.spring.SpringContextLoaderListener</listener-class>
+		<listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
 	</listener>
 
 	<servlet>
-		<servlet-name>rest</servlet-name>
-		<servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
+		<servlet-name>Spring</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet;</servlet-class>
 	</servlet>
 
 	<servlet-mapping>
-		<servlet-name>rest</servlet-name>
+		<servlet-name>Spring</servlet-name>
 		<url-pattern>/*</url-pattern>
 	</servlet-mapping>
+
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
 		<param-value>/WEB-INF/rest-servlet.xml</param-value>
 	</context-param>
+	<context-param>
+		<param-name>resteasy.scan</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
 
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>

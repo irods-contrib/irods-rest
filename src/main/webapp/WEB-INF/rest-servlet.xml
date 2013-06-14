@@ -10,5 +10,16 @@
 	<beans:import resource="classpath:springmvc-resteasy.xml" />
 
 	<context:annotation-config />
+	
+	  <!-- override the bean definition for deployment -->
+    <beans:bean id="resteasy.deployment" class="org.jboss.resteasy.spi.ResteasyDeployment" init-method="start" destroy-method="stop">
+        <beans:property name="asyncJobServiceEnabled" value="true"/>
+        <beans:property name="mediaTypeMappings">
+            <beans:map>
+                <beans:entry key="json" value="application/json" />
+                <beans:entry key="xml" value="application/xml" />
+            </beans:map>
+        </beans:property>
+    </beans:bean>
 
 </beans:beans>
