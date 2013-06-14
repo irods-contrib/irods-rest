@@ -11,7 +11,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jargon.version>3.3.2-SNAPSHOT</jargon.version>
-		<resteasy.version>3.0-rc-1</resteasy.version>
+		<resteasy.version>2.3.5.Final</resteasy.version>
 		<spring.core.version>3.2.3.RELEASE</spring.core.version>
 	</properties>
 	<issueManagement>
@@ -274,6 +274,11 @@
 		</dependencies>
 	</dependencyManagement>
 	<dependencies>
+	<dependency>
+			<groupId>javax.inject</groupId>
+			<artifactId>javax.inject</artifactId>
+			<version>1</version>
+		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jdt.core.compiler</groupId>
 			<artifactId>ecj</artifactId>
@@ -340,7 +345,6 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-beans</artifactId>
 		</dependency>
-
 	</dependencies>
 	<build>
 		<plugins>

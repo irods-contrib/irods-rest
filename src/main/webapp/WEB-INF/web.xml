@@ -5,36 +5,40 @@
 	version="3.0">
 	<display-name>irods-rest</display-name>
 
-	<listener>
-		<listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
-	</listener>
 
-	<servlet>
-		<servlet-name>Spring</servlet-name>
-		<servlet-class>org.springframework.web.servlet.DispatcherServlet;</servlet-class>
-	</servlet>
-
-	<servlet-mapping>
-		<servlet-name>Spring</servlet-name>
-		<url-pattern>/*</url-pattern>
-	</servlet-mapping>
-
-	<context-param>
+<context-param>
 		<param-name>contextConfigLocation</param-name>
 		<param-value>/WEB-INF/rest-servlet.xml</param-value>
 	</context-param>
-	<context-param>
+	<!--  <context-param>
 		<param-name>resteasy.scan</param-name>
 		<param-value>true</param-value>
+	</context-param> -->
+	
+	<!-- RESTEasy configuration -->
+	<listener>
+		<listener-class>org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap</listener-class>
+	</listener>
+
+	<!-- RESTEasy <-> Spring connector (RESTEasy can access Spring beans) -->
+	<listener>
+		<listener-class>org.jboss.resteasy.plugins.spring.SpringContextLoaderListener</listener-class>
+	</listener>
+
+	<!-- RESTEasy HTTP Request processor -->
+	<context-param>
+		<param-name>resteasy.servlet.mapping.prefix</param-name>
+		<param-value>/rest</param-value>
 	</context-param>
+	<servlet>
+		<servlet-name>rest</servlet-name>
+		<servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
+	</servlet>
 
-
-	<welcome-file-list>
-		<welcome-file>index.html</welcome-file>
-		<welcome-file>index.htm</welcome-file>
-		<welcome-file>index.jsp</welcome-file>
-		<welcome-file>default.html</welcome-file>
-		<welcome-file>default.htm</welcome-file>
-		<welcome-file>default.jsp</welcome-file>
-	</welcome-file-list>
+	<!-- NEVER map servlet to root context "/*" ! -->
+	<servlet-mapping>
+		<servlet-name>rest</servlet-name>
+		<url-pattern>/rest/*</url-pattern>
+	</servlet-mapping>
+		
 </web-app> 

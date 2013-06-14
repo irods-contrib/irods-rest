@@ -7,19 +7,9 @@
 	http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
 	<!-- Import basic SpringMVC Resteasy integration -->
-	<beans:import resource="classpath:springmvc-resteasy.xml" />
-
-	<context:annotation-config />
+	<!--  <beans:import resource="classpath:springmvc-resteasy.xml" /> -->
+	<beans:import resource="classpath:jargon-beans.xml" />
 	
-	  <!-- override the bean definition for deployment -->
-    <beans:bean id="resteasy.deployment" class="org.jboss.resteasy.spi.ResteasyDeployment" init-method="start" destroy-method="stop">
-        <beans:property name="asyncJobServiceEnabled" value="true"/>
-        <beans:property name="mediaTypeMappings">
-            <beans:map>
-                <beans:entry key="json" value="application/json" />
-                <beans:entry key="xml" value="application/xml" />
-            </beans:map>
-        </beans:property>
-    </beans:bean>
-
+	<context:component-scan base-package="org.irods.jargon.rest" />
+	
 </beans:beans>

@@ -3,6 +3,9 @@
  */
 package org.irods.jargon.rest.commands;
 
+import javax.annotation.Resource;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -21,12 +24,13 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Mike Conway - DICE (www.irods.org)
  * 
  */
+@Named
 @Path("/user")
 public class UserService {
 
 	private Logger log = LoggerFactory.getLogger(this.getClass());
 
-	@Autowired
+    @Inject
 	IRODSAccessObjectFactory irodsAccessObjectFactory;
 
 	/**
@@ -46,7 +50,7 @@ public class UserService {
 	}
 	
 	@GET
-	@Path("{userName}")
+	@Path("/{userName}")
 	public User getUser(@PathParam("userName") final String userName) throws JargonException {
 		log.info("getUser()");
 		
@@ -58,7 +62,7 @@ public class UserService {
 	}
 
 	@PUT
-	@Path("{userName}")
+	@Path("/{userName}")
 	public void addUser() throws JargonException {
 		log.info("addUser()");
 	}
