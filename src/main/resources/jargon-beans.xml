@@ -7,8 +7,8 @@
 
 	<beans:bean id="irodsConnectionManager"
 		class="org.irods.jargon.core.connection.IRODSSimpleProtocolManager"
-		factory-method="instance" init-method="initialize" destroy-method="destroy">
-	</beans:bean>
+		factory-method="instance" init-method="initialize" destroy-method="destroy" />
+
 
 	<beans:bean id="irodsSession"
 		class="org.irods.jargon.core.connection.IRODSSession" factory-method="instance">
@@ -18,7 +18,15 @@
 
 	<beans:bean id="irodsAccessObjectFactory"
 		class="org.irods.jargon.core.pub.IRODSAccessObjectFactoryImpl">
-		<beans:constructor-arg ref="irodsSession"></beans:constructor-arg>
+		<beans:constructor-arg ref="irodsSession" />
+	</beans:bean>
+
+	<beans:bean id="restConfiguration"
+		class="org.irods.jargon.rest.configuration.RestConfiguration">
+		<beans:property name="irodsHost" value="fedZone1" />
+		<beans:property name="irodsPort" value="1247" />
+		<beans:property name="irodsZone" value="fedZone1" />
+		<beans:property name="defaultStorageResource" value="test1-resc" />
 	</beans:bean>
 
 

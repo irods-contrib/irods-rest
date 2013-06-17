@@ -15,6 +15,7 @@ import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.core.pub.UserAO;
+import org.irods.jargon.rest.configuration.RestConfiguration;
 import org.irods.jargon.rest.domain.UserData;
 import org.jboss.resteasy.annotations.providers.jaxb.json.Mapped;
 import org.jboss.resteasy.annotations.providers.jaxb.json.XmlNsMap;
@@ -35,6 +36,10 @@ public class UserService {
 
 	@Inject
 	IRODSAccessObjectFactory irodsAccessObjectFactory;
+	
+	@Inject
+	RestConfiguration restConfiguration;
+
 
 	/**
 	 * @return the irodsAccessObjectFactory
@@ -69,8 +74,8 @@ public class UserService {
 		}
 
 		try {
-			IRODSAccount irodsAccount = IRODSAccount.instance("fedZone1", 1247,
-					"test1", "test", "", "fedZone1", "test1-resc");
+			IRODSAccount irodsAccount = IRODSAccount.instance(restConfiguration.getIrodsHost(), restConfiguration.getIrodsPort(),
+					"test1", "test", "", restConfiguration.getIrodsZone(), restConfiguration.getDefaultStorageResource());
 
 			UserAO userAO = irodsAccessObjectFactory.getUserAO(irodsAccount);
 			
@@ -86,6 +91,20 @@ public class UserService {
 	@Path("/{userName}")
 	public void addUser() throws JargonException {
 		log.info("addUser()");
+	}
+
+	/**
+	 * @return the restConfiguration
+	 */
+	public RestConfiguration getRestConfiguration() {
+		return restConfiguration;
+	}
+
+	/**
+	 * @param restConfiguration the restConfiguration to set
+	 */
+	public void setRestConfiguration(RestConfiguration restConfiguration) {
+		this.restConfiguration = restConfiguration;
 	}
 
 

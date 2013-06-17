@@ -111,7 +111,7 @@ public class UserServiceTest implements ApplicationContextAware {
 		Assert.assertEquals(200, clientCreateResponse.getStatus());
 		String entity = clientCreateResponse.getEntity();
 		Assert.assertNotNull(entity);
-		Assert.assertFalse("did not get json with user name", entity.indexOf("\"@name\":\"test1\"") == -1);
+		Assert.assertFalse("did not get json with user name", entity.indexOf("\"@name\":\"" + testingProperties.get(TestingPropertiesHelper.IRODS_USER_KEY) + "\"") == -1);
 	}
 	
 	@Test
@@ -135,7 +135,7 @@ public class UserServiceTest implements ApplicationContextAware {
 		Assert.assertEquals(200, clientCreateResponse.getStatus());
 		String entity = clientCreateResponse.getEntity();
 		Assert.assertNotNull(entity);
-		Assert.assertFalse("did not get json with user name", entity.indexOf("name=\"test1\"") == -1);
+		Assert.assertFalse("did not get json with user name", entity.indexOf("name=\""+ testingProperties.get(TestingPropertiesHelper.IRODS_USER_KEY) + "\"") == -1);
 	}
 	
 	@Test
