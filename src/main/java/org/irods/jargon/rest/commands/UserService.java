@@ -69,8 +69,8 @@ public class UserService {
 		}
 
 		try {
-			IRODSAccount irodsAccount = IRODSAccount.instance("diamond.ils.unc.edu", 2247,
-					"mconway", "gr4up98w", "", "lifelibZone", "lifelibResc1");
+			IRODSAccount irodsAccount = IRODSAccount.instance("fedZone1", 1247,
+					"test1", "test", "", "fedZone1", "test1-resc");
 
 			UserAO userAO = irodsAccessObjectFactory.getUserAO(irodsAccount);
 			

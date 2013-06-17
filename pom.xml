@@ -449,6 +449,7 @@
 									test.option.gsi.dn=${test.option.gsi.dn}
 									test.option.gsi.user=${test.option.gsi.user}
 									test.option.gsi.file=${test.option.gsi.file}
+									test.rest.port=${test.rest.port}
 								</echo>
 							</tasks>
 						</configuration>

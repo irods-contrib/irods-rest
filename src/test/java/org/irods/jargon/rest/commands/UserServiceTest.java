@@ -1,7 +1,12 @@
 package org.irods.jargon.rest.commands;
 
+import java.util.Properties;
+
 import junit.framework.Assert;
 
+import org.irods.jargon.core.pub.IRODSFileSystem;
+import org.irods.jargon.rest.utils.RestTestingProperties;
+import org.irods.jargon.testutils.TestingPropertiesHelper;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.core.Dispatcher;
@@ -36,9 +41,15 @@ public class UserServiceTest implements ApplicationContextAware {
 
 	private static ApplicationContext applicationContext;
 
+	private static Properties testingProperties = new Properties();
+	private static TestingPropertiesHelper testingPropertiesHelper = new TestingPropertiesHelper();
+	private static IRODSFileSystem irodsFileSystem;
+
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-
+		TestingPropertiesHelper testingPropertiesLoader = new TestingPropertiesHelper();
+		testingProperties = testingPropertiesLoader.getTestProperties();
+		irodsFileSystem = IRODSFileSystem.instance();
 	}
 
 	@AfterClass
@@ -46,6 +57,7 @@ public class UserServiceTest implements ApplicationContextAware {
 		if (server != null) {
 			server.stop();
 		}
+		irodsFileSystem.closeAndEatExceptions();
 	}
 
 	@Before
@@ -54,8 +66,10 @@ public class UserServiceTest implements ApplicationContextAware {
 			return;
 		}
 
+		int port = testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY);
 		server = new TJWSEmbeddedJaxrsServer();
-		server.setPort(8888);
+		server.setPort(port);
 		ResteasyDeployment deployment = server.getDeployment();
 		server.start();
 		Dispatcher dispatcher = deployment.getDispatcher();
@@ -77,8 +91,16 @@ public class UserServiceTest implements ApplicationContextAware {
 	@Test
 	public void testGetUserJSON() throws Exception {
 
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/user/");
+		sb.append(testingProperties.get(TestingPropertiesHelper.IRODS_USER_KEY));
+		sb.append("?contentType=application/json");
+
 		final ClientRequest clientCreateRequest = new ClientRequest(
-				"http://localhost:8888/user/mconway?contentType=application/json");
+				sb.toString());
 
 		final ClientResponse<String> clientCreateResponse = clientCreateRequest
 				.get(String.class);
@@ -86,8 +108,6 @@ public class UserServiceTest implements ApplicationContextAware {
 		String entity = clientCreateResponse.getEntity();
 		Assert.assertNotNull(entity);
 	}
-
-	
 
 	@Override
 	public void setApplicationContext(final ApplicationContext context)
