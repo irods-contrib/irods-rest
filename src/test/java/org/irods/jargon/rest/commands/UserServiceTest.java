@@ -2,6 +2,8 @@ package org.irods.jargon.rest.commands;
 
 import java.util.Properties;
 
+import javax.ws.rs.core.MediaType;
+
 import junit.framework.Assert;
 
 import org.irods.jargon.core.pub.IRODSFileSystem;
@@ -97,17 +99,91 @@ public class UserServiceTest implements ApplicationContextAware {
 				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
 		sb.append("/user/");
 		sb.append(testingProperties.get(TestingPropertiesHelper.IRODS_USER_KEY));
+		// contentType doesn't really work in test container, set in the header
 		sb.append("?contentType=application/json");
 
 		final ClientRequest clientCreateRequest = new ClientRequest(
 				sb.toString());
+		clientCreateRequest.accept(MediaType.APPLICATION_JSON);
 
 		final ClientResponse<String> clientCreateResponse = clientCreateRequest
 				.get(String.class);
 		Assert.assertEquals(200, clientCreateResponse.getStatus());
 		String entity = clientCreateResponse.getEntity();
 		Assert.assertNotNull(entity);
+		Assert.assertFalse("did not get json with user name", entity.indexOf("\"@name\":\"test1\"") == -1);
 	}
+	
+	@Test
+	public void testGetUserXML() throws Exception {
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/user/");
+		sb.append(testingProperties.get(TestingPropertiesHelper.IRODS_USER_KEY));
+		// contentType doesn't really work in test container, set in the header
+		sb.append("?contentType=application/xml");
+
+		final ClientRequest clientCreateRequest = new ClientRequest(
+				sb.toString());
+		clientCreateRequest.accept(MediaType.APPLICATION_XML);
+
+		final ClientResponse<String> clientCreateResponse = clientCreateRequest
+				.get(String.class);
+		Assert.assertEquals(200, clientCreateResponse.getStatus());
+		String entity = clientCreateResponse.getEntity();
+		Assert.assertNotNull(entity);
+		Assert.assertFalse("did not get json with user name", entity.indexOf("name=\"test1\"") == -1);
+	}
+	
+	@Test
+	public void testGetUserNull() throws Exception {
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/user");
+		// contentType doesn't really work in test container, set in the header
+		sb.append("?contentType=application/xml");
+
+		final ClientRequest clientCreateRequest = new ClientRequest(
+				sb.toString());
+		clientCreateRequest.accept(MediaType.APPLICATION_XML);
+
+		final ClientResponse<String> clientCreateResponse = clientCreateRequest
+				.get(String.class);
+		Assert.assertEquals(404, clientCreateResponse.getStatus());
+		
+	}
+	
+	@Test
+	public void testGetUserInvalid() throws Exception {
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/user/");
+		sb.append("iamaninvaliduser");
+		// contentType doesn't really work in test container, set in the header
+		sb.append("?contentType=application/xml");
+
+		final ClientRequest clientCreateRequest = new ClientRequest(
+				sb.toString());
+		clientCreateRequest.accept(MediaType.APPLICATION_XML);
+
+		final ClientResponse<String> clientCreateResponse = clientCreateRequest
+				.get(String.class);
+		Assert.assertEquals(500, clientCreateResponse.getStatus());
+		String entity = clientCreateResponse.getEntity();
+		Assert.assertNotNull(entity);
+		Assert.assertFalse("did not get data not found exception", entity.indexOf("DataNotFoundExeption") != -1);
+
+	}
+
 
 	@Override
 	public void setApplicationContext(final ApplicationContext context)
