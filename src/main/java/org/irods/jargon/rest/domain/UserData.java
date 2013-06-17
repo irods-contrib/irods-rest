@@ -5,13 +5,21 @@ package org.irods.jargon.rest.domain;
 
 import java.util.Date;
 
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.irods.jargon.core.protovalues.UserTypeEnum;
+import org.irods.jargon.core.pub.domain.User;
+import org.jboss.resteasy.annotations.providers.jaxb.json.BadgerFish;
 
 /**
  * Value object wrapping a jargon <code>User</code> object for representation as XML or JSON
  * 
  * @author Mike Conway - DICE (www.irods.org)
  */
+@XmlRootElement(name = "user")
+@BadgerFish
 public class UserData {
 	
 
@@ -29,6 +37,28 @@ public class UserData {
 	 * 
 	 */
 	public UserData() {
+	}
+	
+	/**
+	 * Constructor takes the iRODS domain object <code>User</code> and marshalls it into
+	 * a <code>UserData</code> object
+	 * @param user {@link User}
+	 */
+	public UserData(final User user) {
+		if (user == null) {
+			throw new IllegalArgumentException("null user");
+		}
+		
+		this.comment = user.getComment();
+		this.createTime = user.getCreateTime();
+		this.id = user.getId();
+		this.info = user.getInfo();
+		this.modifyTime = user.getModifyTime();
+		this.name = user.getName();
+		this.userDN = user.getUserDN();
+		this.userType = user.getUserType();
+		this.zone = user.getZone();
+		
 	}
 	
 	@Override
@@ -60,6 +90,7 @@ public class UserData {
 	/**
 	 * @return the name
 	 */
+	@XmlAttribute
 	public String getName() {
 		return name;
 	}
@@ -74,6 +105,7 @@ public class UserData {
 	/**
 	 * @return the id
 	 */
+	@XmlAttribute
 	public String getId() {
 		return id;
 	}
@@ -88,6 +120,7 @@ public class UserData {
 	/**
 	 * @return the zone
 	 */
+	@XmlElement
 	public String getZone() {
 		return zone;
 	}
@@ -102,6 +135,7 @@ public class UserData {
 	/**
 	 * @return the info
 	 */
+	@XmlElement
 	public String getInfo() {
 		return info;
 	}
@@ -116,6 +150,7 @@ public class UserData {
 	/**
 	 * @return the comment
 	 */
+	@XmlElement
 	public String getComment() {
 		return comment;
 	}
@@ -130,6 +165,7 @@ public class UserData {
 	/**
 	 * @return the createTime
 	 */
+	@XmlElement
 	public Date getCreateTime() {
 		return createTime;
 	}
@@ -144,6 +180,7 @@ public class UserData {
 	/**
 	 * @return the modifyTime
 	 */
+	@XmlElement
 	public Date getModifyTime() {
 		return modifyTime;
 	}
@@ -158,6 +195,7 @@ public class UserData {
 	/**
 	 * @return the userType
 	 */
+	@XmlElement
 	public UserTypeEnum getUserType() {
 		return userType;
 	}
@@ -172,6 +210,7 @@ public class UserData {
 	/**
 	 * @return the userDN
 	 */
+	@XmlElement
 	public String getUserDN() {
 		return userDN;
 	}

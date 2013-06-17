@@ -3,22 +3,23 @@
  */
 package org.irods.jargon.rest.commands;
 
-import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.core.pub.UserAO;
-import org.irods.jargon.core.pub.domain.User;
+import org.irods.jargon.rest.domain.UserData;
+import org.jboss.resteasy.annotations.providers.jaxb.json.Mapped;
+import org.jboss.resteasy.annotations.providers.jaxb.json.XmlNsMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Restful services for iRODS users
@@ -32,7 +33,7 @@ public class UserService {
 
 	private Logger log = LoggerFactory.getLogger(this.getClass());
 
-    @Inject
+	@Inject
 	IRODSAccessObjectFactory irodsAccessObjectFactory;
 
 	/**
@@ -50,24 +51,30 @@ public class UserService {
 			final IRODSAccessObjectFactory irodsAccessObjectFactory) {
 		this.irodsAccessObjectFactory = irodsAccessObjectFactory;
 	}
-	
+
 	@GET
 	@Path("/{userName}")
-	public User getUser(@PathParam("userName") final String userName) throws JargonException {
+	@Produces({ "application/xml", "application/json" })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	public UserData getUser(@PathParam("userName") final String userName)
+			throws JargonException {
 		log.info("getUser()");
-		
+
 		if (userName == null || userName.isEmpty()) {
 			throw new IllegalArgumentException("null or empty userName");
 		}
-		
-		IRODSAccount irodsAccount = IRODSAccount.instance("localhost", 1247, "test1", "test",
-				"", "test1", "test1-resc");
-		
-		UserAO userAO = irodsAccessObjectFactory.getUserAO(irodsAccount);
-		log.info("looking up user with name:{}", userName);
-		
-		
-		return userAO.findByName(userName);
+
+		try {
+			IRODSAccount irodsAccount = IRODSAccount.instance("fedZone1", 1247,
+					"test1", "test", "", "fedZone1", "test1-resc");
+
+			UserAO userAO = irodsAccessObjectFactory.getUserAO(irodsAccount);
+			log.info("looking up user with name:{}", userName);
+
+			return new UserData(userAO.findByName(userName));
+		} finally {
+			irodsAccessObjectFactory.closeSessionAndEatExceptions();
+		}
 	}
 
 	@PUT
