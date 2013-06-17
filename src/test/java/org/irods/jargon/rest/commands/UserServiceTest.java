@@ -87,10 +87,7 @@ public class UserServiceTest implements ApplicationContextAware {
 		Assert.assertNotNull(entity);
 	}
 
-	@Test
-	public void testAddUser() {
-		// fail("Not yet implemented");
-	}
+	
 
 	@Override
 	public void setApplicationContext(final ApplicationContext context)
