@@ -5,6 +5,7 @@ package org.irods.jargon.rest.commands;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -88,7 +89,7 @@ public class UserService {
 	}
 
 	@PUT
-	@Path("/{userName}")
+	@Consumes("application/json")
 	public void addUser() throws JargonException {
 		log.info("addUser()");
 	}

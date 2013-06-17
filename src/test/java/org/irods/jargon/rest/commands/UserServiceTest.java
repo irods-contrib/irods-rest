@@ -184,7 +184,6 @@ public class UserServiceTest implements ApplicationContextAware {
 
 	}
 
-
 	@Override
 	public void setApplicationContext(final ApplicationContext context)
 			throws BeansException {
