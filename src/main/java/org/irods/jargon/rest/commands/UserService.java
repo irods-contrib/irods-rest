@@ -63,12 +63,17 @@ public class UserService {
 		if (userName == null || userName.isEmpty()) {
 			throw new IllegalArgumentException("null or empty userName");
 		}
+		
+		if (irodsAccessObjectFactory == null) {
+			throw new IllegalArgumentException("null irodsAccessObjectFactory");
+		}
 
 		try {
-			IRODSAccount irodsAccount = IRODSAccount.instance("fedZone1", 1247,
-					"test1", "test", "", "fedZone1", "test1-resc");
+			IRODSAccount irodsAccount = IRODSAccount.instance("diamond.ils.unc.edu", 2247,
+					"mconway", "gr4up98w", "", "lifelibZone", "lifelibResc1");
 
 			UserAO userAO = irodsAccessObjectFactory.getUserAO(irodsAccount);
+			
 			log.info("looking up user with name:{}", userName);
 
 			return new UserData(userAO.findByName(userName));
@@ -82,5 +87,6 @@ public class UserService {
 	public void addUser() throws JargonException {
 		log.info("addUser()");
 	}
+
 
 }

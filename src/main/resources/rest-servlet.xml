@@ -13,3 +13,4 @@
 	<context:component-scan base-package="org.irods.jargon.rest" />
 	
 </beans:beans>
+ 
