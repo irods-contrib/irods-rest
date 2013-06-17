@@ -19,7 +19,7 @@ public class UserAddByAdminRequest {
 		sb.append("\n\t userName:");
 		sb.append(userName);
 		sb.append("\n\t tempPassword:");
-		sb.append(tempPassword);
+		sb.append("xxx");
 		sb.append("\n\t distinguishedName:");
 		sb.append(distinguishedName);
 		return sb.toString();

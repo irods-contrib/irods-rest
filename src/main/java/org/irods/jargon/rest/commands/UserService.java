@@ -14,8 +14,10 @@ import javax.ws.rs.Produces;
 
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.JargonException;
+import org.irods.jargon.core.protovalues.UserTypeEnum;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.core.pub.UserAO;
+import org.irods.jargon.core.pub.domain.User;
 import org.irods.jargon.rest.configuration.RestConfiguration;
 import org.irods.jargon.rest.domain.UserData;
 import org.jboss.resteasy.annotations.providers.jaxb.json.Mapped;
@@ -90,8 +92,35 @@ public class UserService {
 
 	@PUT
 	@Consumes("application/json")
-	public void addUser() throws JargonException {
+	public void addUser(UserAddByAdminRequest userAddByAdminRequest) throws JargonException {
 		log.info("addUser()");
+		if (userAddByAdminRequest == null) {
+			throw new IllegalArgumentException("null userAddByAdminRequest");
+		}
+		log.info("userAddByAdminRequest:{}", userAddByAdminRequest);
+		
+		try {
+			IRODSAccount irodsAccount = IRODSAccount.instance(restConfiguration.getIrodsHost(), restConfiguration.getIrodsPort(),
+					"test1", "test", "", restConfiguration.getIrodsZone(), restConfiguration.getDefaultStorageResource());
+
+			UserAO userAO = irodsAccessObjectFactory.getUserAO(irodsAccount);
+
+			log.info("adding user based on:{}", userAddByAdminRequest);
+			User user = new User();
+			user.setName(userAddByAdminRequest.getUserName());
+			user.setUserDN(userAddByAdminRequest.getDistinguishedName());
+			user.setUserType(UserTypeEnum.RODS_USER);
+			
+			userAO.addUser(user);
+			log.info("user added... set the password");
+			
+			userAO.changeAUserPasswordByAnAdmin(user.getName(), userAddByAdminRequest.getTempPassword());
+			log.info("password was set to requested value");
+	
+		} finally {
+			irodsAccessObjectFactory.closeSessionAndEatExceptions();
+		}
+		
 	}
 
 	/**

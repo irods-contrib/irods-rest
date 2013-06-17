@@ -6,7 +6,11 @@ import javax.ws.rs.core.MediaType;
 
 import junit.framework.Assert;
 
+import org.irods.jargon.core.connection.IRODSAccount;
+import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.core.pub.IRODSFileSystem;
+import org.irods.jargon.core.pub.UserAO;
+import org.irods.jargon.core.pub.domain.User;
 import org.irods.jargon.rest.utils.RestTestingProperties;
 import org.irods.jargon.testutils.TestingPropertiesHelper;
 import org.jboss.resteasy.client.ClientRequest;
@@ -111,7 +115,8 @@ public class UserServiceTest implements ApplicationContextAware {
 		Assert.assertEquals(200, clientCreateResponse.getStatus());
 		String entity = clientCreateResponse.getEntity();
 		Assert.assertNotNull(entity);
-		Assert.assertFalse("did not get json with user name", entity.indexOf("\"@name\":\"" + testingProperties.get(TestingPropertiesHelper.IRODS_USER_KEY) + "\"") == -1);
+		System.out.println(">>>>>" + entity);
+		Assert.assertFalse("did not get json with user name", entity.indexOf("\"name\":\"" + testingProperties.get(TestingPropertiesHelper.IRODS_USER_KEY) + "\"") == -1);
 	}
 	
 	@Test
@@ -155,7 +160,7 @@ public class UserServiceTest implements ApplicationContextAware {
 
 		final ClientResponse<String> clientCreateResponse = clientCreateRequest
 				.get(String.class);
-		Assert.assertEquals(404, clientCreateResponse.getStatus());
+		Assert.assertEquals(405, clientCreateResponse.getStatus());
 		
 	}
 	
@@ -182,6 +187,42 @@ public class UserServiceTest implements ApplicationContextAware {
 		Assert.assertNotNull(entity);
 		Assert.assertFalse("did not get data not found exception", entity.indexOf("DataNotFoundExeption") != -1);
 
+	}
+	
+	@Test
+	public void testAddUserByAdmin() throws Exception {
+		String testUser = "testAddUserByAdmin";
+		String testPassword = "test123";
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
+				.getIRODSAccessObjectFactory();
+
+		UserAO userAO = accessObjectFactory.getUserAO(irodsAccount);
+		userAO.deleteUser(testUser);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/user/");
+		final ClientRequest clientCreateRequest = new ClientRequest(
+				sb.toString());
+		clientCreateRequest.accept(MediaType.APPLICATION_JSON);
+		UserAddByAdminRequest addRequest = new UserAddByAdminRequest();
+		addRequest.setDistinguishedName("dn here");
+		addRequest.setTempPassword(testPassword);
+		addRequest.setUserName(testUser);
+		clientCreateRequest.body(MediaType.APPLICATION_JSON, addRequest);
+
+		final ClientResponse<String> clientCreateResponse = clientCreateRequest
+				.put(String.class);
+		
+		User user = userAO.findByName(testUser);
+		Assert.assertNotNull("user not added", user);
+		
+		
 	}
 
 	@Override
