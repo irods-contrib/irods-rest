@@ -5,16 +5,25 @@
 	version="3.0">
 	<display-name>irods-rest</display-name>
 
-
-<context-param>
+	<context-param>
 		<param-name>contextConfigLocation</param-name>
 		<param-value>/WEB-INF/rest-servlet.xml</param-value>
 	</context-param>
-	<!--  <context-param>
-		<param-name>resteasy.scan</param-name>
-		<param-value>true</param-value>
-	</context-param> -->
+
+	  <context-param>
+        <param-name>resteasy.media.type.param.mapping</param-name>
+        <param-value>contentType</param-value>
+    </context-param>
+    
+    <!--  security measure to combat XXE attacks - see http://docs.jboss.org/resteasy/docs/2.3.6.Final/userguide/html/Content_Marshalling_Providers.html -->
+    <context-param>
+            <param-name>resteasy.document.expand.entity.references</param-name>
+            <param-value>false</param-value>
+         </context-param>
 	
+	<!-- <context-param> <param-name>resteasy.scan</param-name> <param-value>true</param-value> 
+		</context-param> -->
+
 	<!-- RESTEasy configuration -->
 	<listener>
 		<listener-class>org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap</listener-class>
@@ -40,5 +49,5 @@
 		<servlet-name>rest</servlet-name>
 		<url-pattern>/rest/*</url-pattern>
 	</servlet-mapping>
-		
+
 </web-app> 

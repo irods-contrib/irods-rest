@@ -11,7 +11,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jargon.version>3.3.2-SNAPSHOT</jargon.version>
-		<resteasy.version>2.3.5.Final</resteasy.version>
+		<resteasy.version>2.3.6.Final</resteasy.version>
 		<spring.core.version>3.2.3.RELEASE</spring.core.version>
 	</properties>
 	<issueManagement>
@@ -152,6 +152,11 @@
 			<dependency>
 				<groupId>org.jboss.resteasy</groupId>
 				<artifactId>resteasy-jaxb-provider</artifactId>
+				<version>${resteasy.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jboss.resteasy</groupId>
+				<artifactId>resteasy-jettison-provider</artifactId>
 				<version>${resteasy.version}</version>
 			</dependency>
 			<!-- multipart/form-data and multipart/mixed support 
