@@ -68,6 +68,7 @@ public class UserServiceTest implements ApplicationContextAware {
 
 	@Before
 	public void setUp() throws Exception {
+		
 		if (server != null) {
 			return;
 		}

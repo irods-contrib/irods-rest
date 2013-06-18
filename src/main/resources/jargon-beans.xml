@@ -23,11 +23,29 @@
 
 	<beans:bean id="restConfiguration"
 		class="org.irods.jargon.rest.configuration.RestConfiguration">
-		<beans:property name="irodsHost" value="fedZone1" />
+		<beans:property name="irodsHost" value="localhost" />
 		<beans:property name="irodsPort" value="1247" />
-		<beans:property name="irodsZone" value="fedZone1" />
+		<beans:property name="irodsZone" value="test1" />
 		<beans:property name="defaultStorageResource" value="test1-resc" />
 	</beans:bean>
 
+	<beans:bean id="authenticationManager"
+		class="org.irods.jargon.rest.auth.RestBasicAuthenticationManager">
+		<beans:property name="irodsAccessObjectFactory" ref="irodsAccessObjectFactory" />
+		<beans:property name="restConfiguration" ref="restConfiguration" />
+	</beans:bean>
+
+	<beans:bean id="basicAuthenticationFilter"
+		class="org.springframework.security.web.authentication.www.BasicAuthenticationFilter">
+		<beans:constructor-arg index="0"
+			type="org.springframework.security.authentication.AuthenticationManager" ref="authenticationManager" />
+			<beans:constructor-arg index="1"
+			type="org.springframework.security.web.AuthenticationEntryPoint" ref="authenticationEntryPoint" />
+	</beans:bean> 
+
+	<beans:bean id="authenticationEntryPoint"
+		class="org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint">
+		<beans:property name="realmName" value="irods-rest" />
+	</beans:bean>
 
 </beans:beans>
