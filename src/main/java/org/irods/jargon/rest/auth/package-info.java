@@ -1,4 +1,3 @@
-
 /**
  * Support for authentication and authorization functions for the REST API
  * 

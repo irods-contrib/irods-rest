@@ -91,7 +91,7 @@ public class UserService {
 			log.info("looking up user with name:{}", userName);
 			User user = userAO.findByName(userName);
 			log.info("user found:{}", user);
-			
+
 			return new UserData(user);
 		} finally {
 			irodsAccessObjectFactory.closeSessionAndEatExceptions();

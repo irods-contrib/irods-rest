@@ -14,14 +14,14 @@ import org.irods.jargon.core.pub.domain.User;
 import org.jboss.resteasy.annotations.providers.jaxb.json.BadgerFish;
 
 /**
- * Value object wrapping a jargon <code>User</code> object for representation as XML or JSON
+ * Value object wrapping a jargon <code>User</code> object for representation as
+ * XML or JSON
  * 
  * @author Mike Conway - DICE (www.irods.org)
  */
 @XmlRootElement(name = "user")
 @BadgerFish
 public class UserData {
-	
 
 	private String name = "";
 	private String id = "";
@@ -38,17 +38,19 @@ public class UserData {
 	 */
 	public UserData() {
 	}
-	
+
 	/**
-	 * Constructor takes the iRODS domain object <code>User</code> and marshalls it into
-	 * a <code>UserData</code> object
-	 * @param user {@link User}
+	 * Constructor takes the iRODS domain object <code>User</code> and marshalls
+	 * it into a <code>UserData</code> object
+	 * 
+	 * @param user
+	 *            {@link User}
 	 */
 	public UserData(final User user) {
 		if (user == null) {
 			throw new IllegalArgumentException("null user");
 		}
-		
+
 		this.comment = user.getComment();
 		this.createTime = user.getCreateTime();
 		this.id = user.getId();
@@ -58,9 +60,9 @@ public class UserData {
 		this.userDN = user.getUserDN();
 		this.userType = user.getUserType();
 		this.zone = user.getZone();
-		
+
 	}
-	
+
 	@Override
 	public String toString() {
 		StringBuilder stringBuilder = new StringBuilder();
@@ -96,9 +98,10 @@ public class UserData {
 	}
 
 	/**
-	 * @param name the name to set
+	 * @param name
+	 *            the name to set
 	 */
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
@@ -111,9 +114,10 @@ public class UserData {
 	}
 
 	/**
-	 * @param id the id to set
+	 * @param id
+	 *            the id to set
 	 */
-	public void setId(String id) {
+	public void setId(final String id) {
 		this.id = id;
 	}
 
@@ -126,9 +130,10 @@ public class UserData {
 	}
 
 	/**
-	 * @param zone the zone to set
+	 * @param zone
+	 *            the zone to set
 	 */
-	public void setZone(String zone) {
+	public void setZone(final String zone) {
 		this.zone = zone;
 	}
 
@@ -141,9 +146,10 @@ public class UserData {
 	}
 
 	/**
-	 * @param info the info to set
+	 * @param info
+	 *            the info to set
 	 */
-	public void setInfo(String info) {
+	public void setInfo(final String info) {
 		this.info = info;
 	}
 
@@ -156,9 +162,10 @@ public class UserData {
 	}
 
 	/**
-	 * @param comment the comment to set
+	 * @param comment
+	 *            the comment to set
 	 */
-	public void setComment(String comment) {
+	public void setComment(final String comment) {
 		this.comment = comment;
 	}
 
@@ -171,9 +178,10 @@ public class UserData {
 	}
 
 	/**
-	 * @param createTime the createTime to set
+	 * @param createTime
+	 *            the createTime to set
 	 */
-	public void setCreateTime(Date createTime) {
+	public void setCreateTime(final Date createTime) {
 		this.createTime = createTime;
 	}
 
@@ -186,9 +194,10 @@ public class UserData {
 	}
 
 	/**
-	 * @param modifyTime the modifyTime to set
+	 * @param modifyTime
+	 *            the modifyTime to set
 	 */
-	public void setModifyTime(Date modifyTime) {
+	public void setModifyTime(final Date modifyTime) {
 		this.modifyTime = modifyTime;
 	}
 
@@ -201,9 +210,10 @@ public class UserData {
 	}
 
 	/**
-	 * @param userType the userType to set
+	 * @param userType
+	 *            the userType to set
 	 */
-	public void setUserType(UserTypeEnum userType) {
+	public void setUserType(final UserTypeEnum userType) {
 		this.userType = userType;
 	}
 
@@ -216,9 +226,10 @@ public class UserData {
 	}
 
 	/**
-	 * @param userDN the userDN to set
+	 * @param userDN
+	 *            the userDN to set
 	 */
-	public void setUserDN(String userDN) {
+	public void setUserDN(final String userDN) {
 		this.userDN = userDN;
 	}
 

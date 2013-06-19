@@ -4,12 +4,6 @@
 package org.irods.jargon.rest.auth;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -20,7 +14,6 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
 import org.irods.jargon.core.connection.IRODSAccount;
@@ -28,7 +21,6 @@ import org.irods.jargon.core.connection.auth.AuthResponse;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.rest.configuration.RestConfiguration;
-import org.irods.jargon.rest.utils.RestConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,13 +72,13 @@ public class BasicAuthFilter implements Filter {
 		final HttpServletResponse httpResponse = (HttpServletResponse) response;
 
 		String auth = httpRequest.getHeader("Authorization");
-		
+
 		if (auth == null || auth.isEmpty()) {
 			log.error("auth null or empty");
 			sendAuthError(httpResponse);
 			return;
 		}
-		
+
 		log.info("auth was:{}", auth);
 
 		AuthResponse authResponse = null;
@@ -102,35 +94,27 @@ public class BasicAuthFilter implements Filter {
 			log.info("authResponse:{}", authResponse);
 			log.info("success!");
 			/*
-			HttpServletRequestWrapper wrapper = new HttpServletRequestWrapper(httpRequest) {
-		        @Override
-		        public String getHeader(String name) {
-		        	log.info("getting header from:{}", name);
-		            final String value = (String) super.getAttribute(name);
-		            log.info("value form attrib is:{}", value);
-		            if (value != null) {
-		                return value;
-		            }
-		            return super.getHeader(name);
-		        }
-
-			
-				@SuppressWarnings("rawtypes")
-				@Override
-				public Enumeration getHeaders(String name) {
-					log.info("getting headers from:{}", name);
-		            final String value = (String) request.getAttribute(name);
-		            if (value != null) {
-			            log.info("value from attrib is:{}", value);
-		                Set<String> mySet = new HashSet<String>();
-		                mySet.add(value);
-		                return Collections.enumeration(mySet);
-		            }
-		            return super.getHeaders(name);
-				}
-		    };
-			wrapper.setAttribute(RestConstants.AUTH_RESULT_KEY, irodsAccount.toURI(true).toString());
-			*/
+			 * HttpServletRequestWrapper wrapper = new
+			 * HttpServletRequestWrapper(httpRequest) {
+			 * 
+			 * @Override public String getHeader(String name) {
+			 * log.info("getting header from:{}", name); final String value =
+			 * (String) super.getAttribute(name);
+			 * log.info("value form attrib is:{}", value); if (value != null) {
+			 * return value; } return super.getHeader(name); }
+			 * 
+			 * 
+			 * @SuppressWarnings("rawtypes")
+			 * 
+			 * @Override public Enumeration getHeaders(String name) {
+			 * log.info("getting headers from:{}", name); final String value =
+			 * (String) request.getAttribute(name); if (value != null) {
+			 * log.info("value from attrib is:{}", value); Set<String> mySet =
+			 * new HashSet<String>(); mySet.add(value); return
+			 * Collections.enumeration(mySet); } return super.getHeaders(name);
+			 * } }; wrapper.setAttribute(RestConstants.AUTH_RESULT_KEY,
+			 * irodsAccount.toURI(true).toString());
+			 */
 			chain.doFilter(httpRequest, httpResponse);
 			return;
 

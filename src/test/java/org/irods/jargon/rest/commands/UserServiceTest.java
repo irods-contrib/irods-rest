@@ -1,42 +1,25 @@
 package org.irods.jargon.rest.commands;
 
-import java.net.URI;
 import java.util.Properties;
-
-import javax.ws.rs.core.MediaType;
 
 import junit.framework.Assert;
 
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.Credentials;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.AuthCache;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.protocol.ClientContext;
-import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.BasicAuthCache;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.core.pub.UserAO;
 import org.irods.jargon.core.pub.domain.User;
-import org.irods.jargon.rest.utils.RestConstants;
+import org.irods.jargon.rest.auth.DefaultHttpClientAndContext;
+import org.irods.jargon.rest.auth.RestAuthUtils;
 import org.irods.jargon.rest.utils.RestTestingProperties;
 import org.irods.jargon.testutils.TestingPropertiesHelper;
-import org.jboss.resteasy.client.ClientExecutor;
-import org.jboss.resteasy.client.ClientRequest;
-import org.jboss.resteasy.client.ClientRequestFactory;
-import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
 import org.jboss.resteasy.core.Dispatcher;
 import org.jboss.resteasy.plugins.server.tjws.TJWSEmbeddedJaxrsServer;
 import org.jboss.resteasy.plugins.spring.SpringBeanProcessor;
@@ -100,7 +83,7 @@ public class UserServiceTest implements ApplicationContextAware {
 		server = new TJWSEmbeddedJaxrsServer();
 		server.setPort(port);
 		ResteasyDeployment deployment = server.getDeployment();
-	
+
 		server.start();
 		Dispatcher dispatcher = deployment.getDispatcher();
 		SpringBeanProcessor processor = new SpringBeanProcessor(dispatcher,
@@ -132,118 +115,41 @@ public class UserServiceTest implements ApplicationContextAware {
 		// contentType doesn't really work in test container, set in the header
 		sb.append("?contentType=application/json");
 
-		Credentials credentials = new UsernamePasswordCredentials(
-				irodsAccount.getUserName(), irodsAccount.getPassword());
-		DefaultHttpClient httpClient = new DefaultHttpClient();
-		CredentialsProvider provider = new BasicCredentialsProvider();
-		provider.setCredentials(AuthScope.ANY, credentials);
-		httpClient.setCredentialsProvider(provider);
-		// Create AuthCache instance
-		AuthCache authCache = new BasicAuthCache();
-		// Generate BASIC scheme object and add it to the local
-		// auth cache
-		BasicScheme basicAuth = new BasicScheme();
-		authCache.put(new HttpHost("localhost"), basicAuth);
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
 
-		// Add AuthCache to the execution context
-		BasicHttpContext localcontext = new BasicHttpContext();
-		localcontext.setAttribute(ClientContext.AUTH_CACHE, authCache);
-		ClientExecutor clientExecutor = new ApacheHttpClient4Executor(
-				httpClient);
+			HttpGet httpget = new HttpGet(sb.toString());
+			httpget.addHeader("accept", "application/json");
 
-		URI uri = new URI(sb.toString());
-		ClientRequestFactory fac = new ClientRequestFactory(clientExecutor, uri);
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpget, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+			Assert.assertNotNull(entity);
+			String entityData = EntityUtils.toString(entity);
+			Assert.assertFalse(
+					"did not get json with user name",
+					entityData.indexOf("\"name\":\""
+							+ testingProperties
+									.get(TestingPropertiesHelper.IRODS_USER_KEY)
+							+ "\"") == -1);
 
-		ClientRequest clientCreateRequest = fac.createRequest(sb.toString());
+			EntityUtils.consume(entity);
 
-		clientCreateRequest.accept(MediaType.APPLICATION_JSON);
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
 
-		final ClientResponse<String> clientCreateResponse = clientCreateRequest
-				.get(String.class);
-		Assert.assertEquals(200, clientCreateResponse.getStatus());
-		String entity = clientCreateResponse.getEntity();
-		Assert.assertNotNull(entity);
-		System.out.println(">>>>>" + entity);
-		Assert.assertFalse("did not get json with user name", entity
-				.indexOf("\"name\":\""
-						+ testingProperties
-								.get(TestingPropertiesHelper.IRODS_USER_KEY)
-						+ "\"") == -1);
-	}
-	
-	@Test
-	public void testGetUserJSONBlah() throws Exception {
-
-		IRODSAccount irodsAccount = testingPropertiesHelper
-				.buildIRODSAccountFromTestProperties(testingProperties);
-		StringBuilder sb = new StringBuilder();
-		sb.append("http://localhost:");
-		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
-		sb.append("/user/");
-		sb.append(testingProperties.get(TestingPropertiesHelper.IRODS_USER_KEY));
-		// contentType doesn't really work in test container, set in the header
-		sb.append("?contentType=application/json");
-
-		HttpHost targetHost = new HttpHost("localhost", testingPropertiesHelper.getPropertyValueAsInt(testingProperties, RestTestingProperties.REST_PORT_PROPERTY), "http");
-
-        DefaultHttpClient httpclient = new DefaultHttpClient();
-        try {
-            httpclient.getCredentialsProvider().setCredentials(
-                    new AuthScope(targetHost.getHostName(), targetHost.getPort()),
-                    new UsernamePasswordCredentials(irodsAccount.getUserName(), irodsAccount.getPassword()));
-            // Create AuthCache instance
-            AuthCache authCache = new BasicAuthCache();
-            // Generate BASIC scheme object and add it to the local
-            // auth cache
-            BasicScheme basicAuth = new BasicScheme();
-            authCache.put(targetHost, basicAuth);
-
-            // Add AuthCache to the execution context
-            BasicHttpContext localcontext = new BasicHttpContext();
-            localcontext.setAttribute(ClientContext.AUTH_CACHE, authCache);
-
-            HttpGet httpget = new HttpGet(sb.toString());
-            httpget.addHeader("accept", "application/json");
-
-            System.out.println("executing request: " + httpget.getRequestLine());
-            System.out.println("to target: " + targetHost);
-
-            for (int i = 0; i < 3; i++) {
-                HttpResponse response = httpclient.execute(targetHost, httpget, localcontext);
-                HttpEntity entity = response.getEntity();
-        		Assert.assertEquals(200, response.getStatusLine().getStatusCode());
-        		Assert.assertNotNull(entity);
-        		System.out.println(">>>>>" + entity);
-        		String entityData = EntityUtils.toString(entity);
-        		Assert.assertFalse("did not get json with user name", entityData
-        				.indexOf("\"name\":\""
-        						+ testingProperties
-        								.get(TestingPropertiesHelper.IRODS_USER_KEY)
-        						+ "\"") == -1);
-
-                System.out.println("----------------------------------------");
-                System.out.println(response.getStatusLine());
-                if (entity != null) {
-                    System.out.println("Response content length: " + entity.getContentLength());
-                }
-                EntityUtils.consume(entity);
-            }
-
-        } finally {
-            // When HttpClient instance is no longer needed,
-            // shut down the connection manager to ensure
-            // immediate deallocation of all system resources
-            httpclient.getConnectionManager().shutdown();
-        }
-		
 	}
 
-	@Test
 	public void testGetUserXML() throws Exception {
+
 		IRODSAccount irodsAccount = testingPropertiesHelper
 				.buildIRODSAccountFromTestProperties(testingProperties);
-
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
 		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
@@ -253,23 +159,35 @@ public class UserServiceTest implements ApplicationContextAware {
 		// contentType doesn't really work in test container, set in the header
 		sb.append("?contentType=application/xml");
 
-		final ClientRequest clientCreateRequest = new ClientRequest(
-				sb.toString());
-		clientCreateRequest.header(RestConstants.AUTH_RESULT_KEY, irodsAccount
-				.toURI(true).toString());
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
 
-		clientCreateRequest.accept(MediaType.APPLICATION_XML);
+			HttpGet httpget = new HttpGet(sb.toString());
+			httpget.addHeader("accept", "application/xml");
 
-		final ClientResponse<String> clientCreateResponse = clientCreateRequest
-				.get(String.class);
-		Assert.assertEquals(200, clientCreateResponse.getStatus());
-		String entity = clientCreateResponse.getEntity();
-		Assert.assertNotNull(entity);
-		Assert.assertFalse("did not get json with user name", entity
-				.indexOf("name=\""
-						+ testingProperties
-								.get(TestingPropertiesHelper.IRODS_USER_KEY)
-						+ "\"") == -1);
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpget, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+			Assert.assertNotNull(entity);
+			String entityData = EntityUtils.toString(entity);
+			Assert.assertFalse(
+					"did not get json with user name",
+					entityData.indexOf("name=\""
+							+ testingProperties
+									.get(TestingPropertiesHelper.IRODS_USER_KEY)
+							+ "\"") == -1);
+
+			EntityUtils.consume(entity);
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+
 	}
 
 	@Test
@@ -281,21 +199,30 @@ public class UserServiceTest implements ApplicationContextAware {
 		sb.append("http://localhost:");
 		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
 				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
-		sb.append("/user");
+		sb.append("/user/");
+
 		// contentType doesn't really work in test container, set in the header
 		sb.append("?contentType=application/xml");
 
-		final ClientRequest clientCreateRequest = new ClientRequest(
-				sb.toString());
-		clientCreateRequest.header(RestConstants.AUTH_RESULT_KEY, irodsAccount
-				.toURI(true).toString());
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
 
-		clientCreateRequest.accept(MediaType.APPLICATION_XML);
+			HttpGet httpget = new HttpGet(sb.toString());
+			httpget.addHeader("accept", "application/xml");
 
-		final ClientResponse<String> clientCreateResponse = clientCreateRequest
-				.get(String.class);
-		Assert.assertEquals(405, clientCreateResponse.getStatus());
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpget, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			Assert.assertEquals(405, response.getStatusLine().getStatusCode());
+			EntityUtils.consume(entity);
 
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
 	}
 
 	@Test
@@ -307,24 +234,27 @@ public class UserServiceTest implements ApplicationContextAware {
 		sb.append("http://localhost:");
 		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
 				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
-		sb.append("/user/");
-		sb.append("iamaninvaliduser");
-		// contentType doesn't really work in test container, set in the header
-		sb.append("?contentType=application/xml");
+		sb.append("/user/iamaninvaliduser");
 
-		final ClientRequest clientCreateRequest = new ClientRequest(
-				sb.toString());
-		clientCreateRequest.accept(MediaType.APPLICATION_XML);
-		clientCreateRequest.header(RestConstants.AUTH_RESULT_KEY, irodsAccount
-				.toURI(true).toString());
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
 
-		final ClientResponse<String> clientCreateResponse = clientCreateRequest
-				.get(String.class);
-		Assert.assertEquals(500, clientCreateResponse.getStatus());
-		String entity = clientCreateResponse.getEntity();
-		Assert.assertNotNull(entity);
-		Assert.assertFalse("did not get data not found exception",
-				entity.indexOf("DataNotFoundExeption") != -1);
+			HttpGet httpget = new HttpGet(sb.toString());
+			httpget.addHeader("accept", "application/xml");
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpget, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			Assert.assertEquals(500, response.getStatusLine().getStatusCode());
+			EntityUtils.consume(entity);
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
 
 	}
 
@@ -347,19 +277,39 @@ public class UserServiceTest implements ApplicationContextAware {
 		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
 				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
 		sb.append("/user/");
-		final ClientRequest clientCreateRequest = new ClientRequest(
-				sb.toString());
-		clientCreateRequest.accept(MediaType.APPLICATION_JSON);
-		clientCreateRequest.header(RestConstants.AUTH_RESULT_KEY, irodsAccount
-				.toURI(true).toString());
 
-		UserAddByAdminRequest addRequest = new UserAddByAdminRequest();
-		addRequest.setDistinguishedName("dn here");
-		addRequest.setTempPassword(testPassword);
-		addRequest.setUserName(testUser);
-		clientCreateRequest.body(MediaType.APPLICATION_JSON, addRequest);
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
 
-		clientCreateRequest.put(String.class);
+			HttpPut httpPut = new HttpPut(sb.toString());
+			httpPut.addHeader("accept", "application/json");
+			httpPut.addHeader("Content-Type", "application/json");
+
+			ObjectMapper mapper = new ObjectMapper();
+			UserAddByAdminRequest addRequest = new UserAddByAdminRequest();
+			addRequest.setDistinguishedName("dn here");
+			addRequest.setTempPassword(testPassword);
+			addRequest.setUserName(testUser);
+			String body = mapper.writeValueAsString(addRequest);
+			httpPut.setEntity(new StringEntity(body));
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpPut, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			Assert.assertEquals(204, response.getStatusLine().getStatusCode()); // FIXME:
+																				// 204
+																				// till
+																				// content
+
+			EntityUtils.consume(entity);
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
 
 		User user = userAO.findByName(testUser);
 		Assert.assertNotNull("user not added", user);
