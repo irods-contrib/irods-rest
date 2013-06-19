@@ -14,6 +14,7 @@ public class RestConfiguration {
 	private int irodsPort = 1247;
 	private String irodsZone = "";
 	private String defaultStorageResource = "";
+	private String realm = "irods-rest";
 	
 	/**
 	 * @return the irodsHost
@@ -62,6 +63,18 @@ public class RestConfiguration {
 	 */
 	public void setDefaultStorageResource(String defaultStorageResource) {
 		this.defaultStorageResource = defaultStorageResource;
+	}
+	/**
+	 * @return the realm
+	 */
+	public String getRealm() {
+		return realm;
+	}
+	/**
+	 * @param realm the realm to set
+	 */
+	public void setRealm(String realm) {
+		this.realm = realm;
 	}
 	
 }

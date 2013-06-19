@@ -3,10 +3,14 @@
  */
 package org.irods.jargon.rest.commands;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -18,8 +22,10 @@ import org.irods.jargon.core.protovalues.UserTypeEnum;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.core.pub.UserAO;
 import org.irods.jargon.core.pub.domain.User;
+import org.irods.jargon.core.utils.IRODSUriUtils;
 import org.irods.jargon.rest.configuration.RestConfiguration;
 import org.irods.jargon.rest.domain.UserData;
+import org.irods.jargon.rest.utils.RestConstants;
 import org.jboss.resteasy.annotations.providers.jaxb.json.Mapped;
 import org.jboss.resteasy.annotations.providers.jaxb.json.XmlNsMap;
 import org.slf4j.Logger;
@@ -64,7 +70,7 @@ public class UserService {
 	@Path("/{userName}")
 	@Produces({ "application/xml", "application/json" })
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
-	public UserData getUser(@PathParam("userName") final String userName)
+	public UserData getUser(@PathParam("userName") final String userName, @HeaderParam(RestConstants.AUTH_RESULT_KEY) final String irodsAccountString)
 			throws JargonException {
 		log.info("getUser()");
 
@@ -72,19 +78,23 @@ public class UserService {
 			throw new IllegalArgumentException("null or empty userName");
 		}
 		
+		if (irodsAccountString == null || irodsAccountString.isEmpty()) {
+			throw new IllegalArgumentException("null or empty irodsAccountString");
+		}
+		
 		if (irodsAccessObjectFactory == null) {
 			throw new IllegalArgumentException("null irodsAccessObjectFactory");
 		}
 
 		try {
-			IRODSAccount irodsAccount = IRODSAccount.instance(restConfiguration.getIrodsHost(), restConfiguration.getIrodsPort(),
-					"test1", "test", "", restConfiguration.getIrodsZone(), restConfiguration.getDefaultStorageResource());
-
+			IRODSAccount irodsAccount = IRODSUriUtils.getIRODSAccountFromURI(new URI(irodsAccountString));
 			UserAO userAO = irodsAccessObjectFactory.getUserAO(irodsAccount);
 			
 			log.info("looking up user with name:{}", userName);
 
 			return new UserData(userAO.findByName(userName));
+		} catch (URISyntaxException e) {
+			throw new JargonException("invalid iRODS account");
 		} finally {
 			irodsAccessObjectFactory.closeSessionAndEatExceptions();
 		}

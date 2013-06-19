@@ -11,6 +11,7 @@ import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.core.pub.UserAO;
 import org.irods.jargon.core.pub.domain.User;
+import org.irods.jargon.rest.utils.RestConstants;
 import org.irods.jargon.rest.utils.RestTestingProperties;
 import org.irods.jargon.testutils.TestingPropertiesHelper;
 import org.jboss.resteasy.client.ClientRequest;
@@ -68,7 +69,7 @@ public class UserServiceTest implements ApplicationContextAware {
 
 	@Before
 	public void setUp() throws Exception {
-		
+
 		if (server != null) {
 			return;
 		}
@@ -98,6 +99,8 @@ public class UserServiceTest implements ApplicationContextAware {
 	@Test
 	public void testGetUserJSON() throws Exception {
 
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
 		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
@@ -110,18 +113,25 @@ public class UserServiceTest implements ApplicationContextAware {
 		final ClientRequest clientCreateRequest = new ClientRequest(
 				sb.toString());
 		clientCreateRequest.accept(MediaType.APPLICATION_JSON);
-
+		clientCreateRequest.header(RestConstants.AUTH_RESULT_KEY, irodsAccount
+				.toURI(true).toString());
 		final ClientResponse<String> clientCreateResponse = clientCreateRequest
 				.get(String.class);
 		Assert.assertEquals(200, clientCreateResponse.getStatus());
 		String entity = clientCreateResponse.getEntity();
 		Assert.assertNotNull(entity);
 		System.out.println(">>>>>" + entity);
-		Assert.assertFalse("did not get json with user name", entity.indexOf("\"name\":\"" + testingProperties.get(TestingPropertiesHelper.IRODS_USER_KEY) + "\"") == -1);
+		Assert.assertFalse("did not get json with user name", entity
+				.indexOf("\"name\":\""
+						+ testingProperties
+								.get(TestingPropertiesHelper.IRODS_USER_KEY)
+						+ "\"") == -1);
 	}
-	
+
 	@Test
 	public void testGetUserXML() throws Exception {
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
@@ -134,6 +144,9 @@ public class UserServiceTest implements ApplicationContextAware {
 
 		final ClientRequest clientCreateRequest = new ClientRequest(
 				sb.toString());
+		clientCreateRequest.header(RestConstants.AUTH_RESULT_KEY, irodsAccount
+				.toURI(true).toString());
+
 		clientCreateRequest.accept(MediaType.APPLICATION_XML);
 
 		final ClientResponse<String> clientCreateResponse = clientCreateRequest
@@ -141,11 +154,17 @@ public class UserServiceTest implements ApplicationContextAware {
 		Assert.assertEquals(200, clientCreateResponse.getStatus());
 		String entity = clientCreateResponse.getEntity();
 		Assert.assertNotNull(entity);
-		Assert.assertFalse("did not get json with user name", entity.indexOf("name=\""+ testingProperties.get(TestingPropertiesHelper.IRODS_USER_KEY) + "\"") == -1);
+		Assert.assertFalse("did not get json with user name", entity
+				.indexOf("name=\""
+						+ testingProperties
+								.get(TestingPropertiesHelper.IRODS_USER_KEY)
+						+ "\"") == -1);
 	}
-	
+
 	@Test
 	public void testGetUserNull() throws Exception {
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
@@ -157,16 +176,21 @@ public class UserServiceTest implements ApplicationContextAware {
 
 		final ClientRequest clientCreateRequest = new ClientRequest(
 				sb.toString());
+		clientCreateRequest.header(RestConstants.AUTH_RESULT_KEY, irodsAccount
+				.toURI(true).toString());
+
 		clientCreateRequest.accept(MediaType.APPLICATION_XML);
 
 		final ClientResponse<String> clientCreateResponse = clientCreateRequest
 				.get(String.class);
 		Assert.assertEquals(405, clientCreateResponse.getStatus());
-		
+
 	}
-	
+
 	@Test
 	public void testGetUserInvalid() throws Exception {
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
@@ -180,18 +204,22 @@ public class UserServiceTest implements ApplicationContextAware {
 		final ClientRequest clientCreateRequest = new ClientRequest(
 				sb.toString());
 		clientCreateRequest.accept(MediaType.APPLICATION_XML);
+		clientCreateRequest.header(RestConstants.AUTH_RESULT_KEY, irodsAccount
+				.toURI(true).toString());
 
 		final ClientResponse<String> clientCreateResponse = clientCreateRequest
 				.get(String.class);
 		Assert.assertEquals(500, clientCreateResponse.getStatus());
 		String entity = clientCreateResponse.getEntity();
 		Assert.assertNotNull(entity);
-		Assert.assertFalse("did not get data not found exception", entity.indexOf("DataNotFoundExeption") != -1);
+		Assert.assertFalse("did not get data not found exception",
+				entity.indexOf("DataNotFoundExeption") != -1);
 
 	}
-	
+
 	@Test
 	public void testAddUserByAdmin() throws Exception {
+
 		String testUser = "testAddUserByAdmin";
 		String testPassword = "test123";
 		IRODSAccount irodsAccount = testingPropertiesHelper
@@ -211,19 +239,20 @@ public class UserServiceTest implements ApplicationContextAware {
 		final ClientRequest clientCreateRequest = new ClientRequest(
 				sb.toString());
 		clientCreateRequest.accept(MediaType.APPLICATION_JSON);
+		clientCreateRequest.header(RestConstants.AUTH_RESULT_KEY, irodsAccount
+				.toURI(true).toString());
+
 		UserAddByAdminRequest addRequest = new UserAddByAdminRequest();
 		addRequest.setDistinguishedName("dn here");
 		addRequest.setTempPassword(testPassword);
 		addRequest.setUserName(testUser);
 		clientCreateRequest.body(MediaType.APPLICATION_JSON, addRequest);
 
-		final ClientResponse<String> clientCreateResponse = clientCreateRequest
-				.put(String.class);
-		
+		clientCreateRequest.put(String.class);
+
 		User user = userAO.findByName(testUser);
 		Assert.assertNotNull("user not added", user);
-		
-		
+
 	}
 
 	@Override
