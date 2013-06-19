@@ -17,6 +17,24 @@ import org.slf4j.LoggerFactory;
 public class RestAuthUtils {
 
 	private static Logger log = LoggerFactory.getLogger(RestAuthUtils.class);
+	
+	public static String basicAuthTokenFromIRODSAccount(final IRODSAccount irodsAccount) {
+		if (irodsAccount == null) {
+			throw new IllegalArgumentException("null irodsAccount");
+		}
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append("Basic ");
+
+		
+		StringBuilder toEncode = new StringBuilder();
+		toEncode.append(irodsAccount.getUserName());
+		toEncode.append(":");
+		toEncode.append(irodsAccount.getPassword());
+		
+		sb.append(Base64.encodeBase64String(toEncode.toString().getBytes()));
+		return sb.toString();
+	}
 
 	/**
 	 * Given the raw 'basic' auth header (with the Basic prefix), build an iRODS
@@ -53,8 +71,7 @@ public class RestAuthUtils {
 			throw new JargonException("user and password not in credentials");
 
 		}
-		final String[] credentials = decoded.split(decoded.substring(index),
-				':');
+		final String[] credentials = decoded.split(":");
 
 		log.info("credentials:{}", credentials);
 

@@ -11,5 +11,6 @@ package org.irods.jargon.rest.utils;
 public class RestConstants {
 
 	public static final String AUTH_RESULT_KEY = "authResult";
+	public static final String BASIC_AUTH_HEADER = "Authorization";
 
 }

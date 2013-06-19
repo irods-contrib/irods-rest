@@ -4,6 +4,12 @@
 package org.irods.jargon.rest.auth;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -74,6 +80,14 @@ public class BasicAuthFilter implements Filter {
 		final HttpServletResponse httpResponse = (HttpServletResponse) response;
 
 		String auth = httpRequest.getHeader("Authorization");
+		
+		if (auth == null || auth.isEmpty()) {
+			log.error("auth null or empty");
+			sendAuthError(httpResponse);
+			return;
+		}
+		
+		log.info("auth was:{}", auth);
 
 		AuthResponse authResponse = null;
 		try {
@@ -84,26 +98,47 @@ public class BasicAuthFilter implements Filter {
 
 			authResponse = irodsAccessObjectFactory
 					.authenticateIRODSAccount(irodsAccount);
-			httpRequest.setAttribute(RestConstants.AUTH_RESULT_KEY, irodsAccount.toURI(true).toString());
 
 			log.info("authResponse:{}", authResponse);
 			log.info("success!");
+			/*
 			HttpServletRequestWrapper wrapper = new HttpServletRequestWrapper(httpRequest) {
 		        @Override
 		        public String getHeader(String name) {
-		            final String value = (String) request.getAttribute(name);
+		        	log.info("getting header from:{}", name);
+		            final String value = (String) super.getAttribute(name);
+		            log.info("value form attrib is:{}", value);
 		            if (value != null) {
 		                return value;
 		            }
 		            return super.getHeader(name);
 		        }
+
+			
+				@SuppressWarnings("rawtypes")
+				@Override
+				public Enumeration getHeaders(String name) {
+					log.info("getting headers from:{}", name);
+		            final String value = (String) request.getAttribute(name);
+		            if (value != null) {
+			            log.info("value from attrib is:{}", value);
+		                Set<String> mySet = new HashSet<String>();
+		                mySet.add(value);
+		                return Collections.enumeration(mySet);
+		            }
+		            return super.getHeaders(name);
+				}
 		    };
-			chain.doFilter(wrapper, httpResponse);
+			wrapper.setAttribute(RestConstants.AUTH_RESULT_KEY, irodsAccount.toURI(true).toString());
+			*/
+			chain.doFilter(httpRequest, httpResponse);
 			return;
 
 		} catch (JargonException e) {
 			log.warn("auth exception", e);
 			sendAuthError(httpResponse);
+		} finally {
+			irodsAccessObjectFactory.closeSessionAndEatExceptions();
 		}
 
 		sendAuthError(httpResponse);
