@@ -119,11 +119,10 @@ public class BasicAuthFilter implements Filter {
 		} catch (JargonException e) { 
 			log.warn("auth exception", e);
 			sendAuthError(httpResponse);
+			return;
 		} finally {
 			irodsAccessObjectFactory.closeSessionAndEatExceptions();
 		}
-
-		sendAuthError(httpResponse);
 
 	}
 
