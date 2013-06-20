@@ -79,8 +79,6 @@ public class BasicAuthFilter implements Filter {
 			return;
 		}
 
-		log.info("auth was:{}", auth);
-
 		AuthResponse authResponse = null;
 		try {
 			IRODSAccount irodsAccount = RestAuthUtils

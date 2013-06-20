@@ -295,6 +295,9 @@ public class UserServiceTest implements ApplicationContextAware {
 			addRequest.setTempPassword(testPassword);
 			addRequest.setUserName(testUser);
 			String body = mapper.writeValueAsString(addRequest);
+			
+			System.out.println(body);
+			
 			httpPut.setEntity(new StringEntity(body));
 
 			HttpResponse response = clientAndContext.getHttpClient().execute(
@@ -302,6 +305,10 @@ public class UserServiceTest implements ApplicationContextAware {
 			HttpEntity entity = response.getEntity();
 			Assert.assertEquals(200, response.getStatusLine().getStatusCode()); 
 			String entityData = EntityUtils.toString(entity);
+			
+			System.out.println(entityData);
+			
+			
 			UserAddActionResponse actual = mapper.readValue(entityData, UserAddActionResponse.class);
 			Assert.assertEquals(testUser, actual.getUserName());
 			Assert.assertEquals(UserAddActionResponse.UserAddActionResponseCode.SUCCESS, actual.getUserAddActionResponse());
@@ -357,6 +364,9 @@ public class UserServiceTest implements ApplicationContextAware {
 			addRequest.setTempPassword(testPassword);
 			addRequest.setUserName(testUser);
 			String body = mapper.writeValueAsString(addRequest);
+			
+			System.out.println(body);
+			
 			httpPut.setEntity(new StringEntity(body));
 
 			HttpResponse response = clientAndContext.getHttpClient().execute(
@@ -364,6 +374,10 @@ public class UserServiceTest implements ApplicationContextAware {
 			HttpEntity entity = response.getEntity();
 			Assert.assertEquals(200, response.getStatusLine().getStatusCode()); 
 			String entityData = EntityUtils.toString(entity);
+			
+			System.out.println(entityData);
+
+			
 			UserAddActionResponse actual = mapper.readValue(entityData, UserAddActionResponse.class);
 			Assert.assertEquals(testUser, actual.getUserName());
 			Assert.assertEquals(UserAddActionResponse.UserAddActionResponseCode.USER_NAME_IS_TAKEN, actual.getUserAddActionResponse());
