@@ -118,7 +118,7 @@ public class BasicAuthFilter implements Filter {
 			chain.doFilter(httpRequest, httpResponse);
 			return;
 
-		} catch (JargonException e) {
+		} catch (JargonException e) { 
 			log.warn("auth exception", e);
 			sendAuthError(httpResponse);
 		} finally {

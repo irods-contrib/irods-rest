@@ -1,4 +1,4 @@
-package org.irods.jargon.rest.commands;
+package org.irods.jargon.rest.commands.user;
 
 import java.util.Properties;
 
@@ -12,12 +12,15 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.irods.jargon.core.connection.IRODSAccount;
+import org.irods.jargon.core.protovalues.UserTypeEnum;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.core.pub.UserAO;
 import org.irods.jargon.core.pub.domain.User;
 import org.irods.jargon.rest.auth.DefaultHttpClientAndContext;
 import org.irods.jargon.rest.auth.RestAuthUtils;
+import org.irods.jargon.rest.commands.user.UserAddByAdminRequest;
+import org.irods.jargon.rest.commands.user.UserService;
 import org.irods.jargon.rest.utils.RestTestingProperties;
 import org.irods.jargon.testutils.TestingPropertiesHelper;
 import org.jboss.resteasy.core.Dispatcher;
@@ -69,7 +72,7 @@ public class UserServiceTest implements ApplicationContextAware {
 			server.stop();
 		}
 		irodsFileSystem.closeAndEatExceptions();
-	}
+	} 
 
 	@Before
 	public void setUp() throws Exception {
@@ -297,12 +300,12 @@ public class UserServiceTest implements ApplicationContextAware {
 			HttpResponse response = clientAndContext.getHttpClient().execute(
 					httpPut, clientAndContext.getHttpContext());
 			HttpEntity entity = response.getEntity();
-			Assert.assertEquals(204, response.getStatusLine().getStatusCode()); // FIXME:
-																				// 204
-																				// till
-																				// content
-
-			EntityUtils.consume(entity);
+			Assert.assertEquals(200, response.getStatusLine().getStatusCode()); 
+			String entityData = EntityUtils.toString(entity);
+			UserAddActionResponse actual = mapper.readValue(entityData, UserAddActionResponse.class);
+			Assert.assertEquals(testUser, actual.getUserName());
+			Assert.assertEquals(UserAddActionResponse.UserAddActionResponseCode.SUCCESS, actual.getUserAddActionResponse());
+			Assert.assertEquals(UserAddActionResponse.UserAddActionResponseCode.SUCCESS.ordinal(), actual.getUserAddActionResponseNumericCode());
 
 		} finally {
 			// When HttpClient instance is no longer needed,
@@ -313,6 +316,191 @@ public class UserServiceTest implements ApplicationContextAware {
 
 		User user = userAO.findByName(testUser);
 		Assert.assertNotNull("user not added", user);
+
+	}
+	
+	@Test
+	public void testAddUserDuplicateByAdmin() throws Exception {
+
+		String testUser = "testAddUserDuplicateByAdmin";
+		String testPassword = "test123";
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
+				.getIRODSAccessObjectFactory();
+
+		UserAO userAO = accessObjectFactory.getUserAO(irodsAccount);
+		userAO.deleteUser(testUser);
+		User user = new User();
+		user.setName(testUser);
+		user.setUserType(UserTypeEnum.RODS_USER);
+		userAO.addUser(user);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/user/");
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
+
+			HttpPut httpPut = new HttpPut(sb.toString());
+			httpPut.addHeader("accept", "application/json");
+			httpPut.addHeader("Content-Type", "application/json");
+
+			ObjectMapper mapper = new ObjectMapper();
+			UserAddByAdminRequest addRequest = new UserAddByAdminRequest();
+			addRequest.setDistinguishedName("dn here");
+			addRequest.setTempPassword(testPassword);
+			addRequest.setUserName(testUser);
+			String body = mapper.writeValueAsString(addRequest);
+			httpPut.setEntity(new StringEntity(body));
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpPut, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			Assert.assertEquals(200, response.getStatusLine().getStatusCode()); 
+			String entityData = EntityUtils.toString(entity);
+			UserAddActionResponse actual = mapper.readValue(entityData, UserAddActionResponse.class);
+			Assert.assertEquals(testUser, actual.getUserName());
+			Assert.assertEquals(UserAddActionResponse.UserAddActionResponseCode.USER_NAME_IS_TAKEN, actual.getUserAddActionResponse());
+			Assert.assertEquals(UserAddActionResponse.UserAddActionResponseCode.USER_NAME_IS_TAKEN.ordinal(), actual.getUserAddActionResponseNumericCode());
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+	}
+	
+	@Test
+	public void testAddUserByAdminInvalidMessage() throws Exception {
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/user/");
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
+
+			HttpPut httpPut = new HttpPut(sb.toString());
+			httpPut.addHeader("accept", "application/json");
+			httpPut.addHeader("Content-Type", "application/json");
+			String body = "I am not valid json";
+			httpPut.setEntity(new StringEntity(body));
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpPut, clientAndContext.getHttpContext());
+			Assert.assertEquals(400, response.getStatusLine().getStatusCode()); 
+			
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+	}
+	
+	@Test
+	public void testAddUserByAdminBlankUserName() throws Exception {
+
+		String testPassword = "test123";
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/user/");
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
+
+			HttpPut httpPut = new HttpPut(sb.toString());
+			httpPut.addHeader("accept", "application/json");
+			httpPut.addHeader("Content-Type", "application/json");
+
+			ObjectMapper mapper = new ObjectMapper();
+			UserAddByAdminRequest addRequest = new UserAddByAdminRequest();
+			addRequest.setDistinguishedName("dn here");
+			addRequest.setTempPassword(testPassword);
+			addRequest.setUserName("");
+			String body = mapper.writeValueAsString(addRequest);
+			httpPut.setEntity(new StringEntity(body));
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpPut, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			Assert.assertEquals(200, response.getStatusLine().getStatusCode()); 
+			String entityData = EntityUtils.toString(entity);
+			UserAddActionResponse actual = mapper.readValue(entityData, UserAddActionResponse.class);
+			Assert.assertEquals(UserAddActionResponse.UserAddActionResponseCode.ATTRIBUTES_MISSING, actual.getUserAddActionResponse());
+			Assert.assertEquals(UserAddActionResponse.UserAddActionResponseCode.ATTRIBUTES_MISSING.ordinal(), actual.getUserAddActionResponseNumericCode());
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+	}
+	
+	@Test
+	public void testAddUserByAdminBlankPassword() throws Exception {
+
+		String testUserName = "test123";
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/user/");
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
+
+			HttpPut httpPut = new HttpPut(sb.toString());
+			httpPut.addHeader("accept", "application/json");
+			httpPut.addHeader("Content-Type", "application/json");
+
+			ObjectMapper mapper = new ObjectMapper();
+			UserAddByAdminRequest addRequest = new UserAddByAdminRequest();
+			addRequest.setDistinguishedName("dn here");
+			addRequest.setTempPassword("");
+			addRequest.setUserName(testUserName);
+			String body = mapper.writeValueAsString(addRequest);
+			httpPut.setEntity(new StringEntity(body));
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpPut, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			Assert.assertEquals(200, response.getStatusLine().getStatusCode()); 
+			String entityData = EntityUtils.toString(entity);
+			UserAddActionResponse actual = mapper.readValue(entityData, UserAddActionResponse.class);
+			Assert.assertEquals(UserAddActionResponse.UserAddActionResponseCode.ATTRIBUTES_MISSING, actual.getUserAddActionResponse());
+			Assert.assertEquals(UserAddActionResponse.UserAddActionResponseCode.ATTRIBUTES_MISSING.ordinal(), actual.getUserAddActionResponseNumericCode());
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
 
 	}
 

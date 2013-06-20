@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.irods.jargon.rest.commands;
+package org.irods.jargon.rest.commands.user;
 
 /**
  * @author Mike Conway - DICE (www.irods.org)
