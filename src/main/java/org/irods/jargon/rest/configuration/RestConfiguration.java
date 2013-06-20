@@ -16,6 +16,9 @@ public class RestConfiguration {
 	private String irodsZone = "";
 	private String defaultStorageResource = "";
 	private String realm = "irods-rest";
+	private boolean smimeEncryptAdminFunctions = false;
+	private String privateCertAbsPath = "";
+	private String publicKeyAbsPath = "";
 
 	/**
 	 * @return the irodsHost
@@ -90,6 +93,48 @@ public class RestConfiguration {
 	 */
 	public void setRealm(final String realm) {
 		this.realm = realm;
+	}
+
+	/**
+	 * @return the smimeEncryptAdminFunctions
+	 */
+	public boolean isSmimeEncryptAdminFunctions() {
+		return smimeEncryptAdminFunctions;
+	}
+
+	/**
+	 * @param smimeEncryptAdminFunctions the smimeEncryptAdminFunctions to set
+	 */
+	public void setSmimeEncryptAdminFunctions(boolean smimeEncryptAdminFunctions) {
+		this.smimeEncryptAdminFunctions = smimeEncryptAdminFunctions;
+	}
+
+	/**
+	 * @return the privateCertAbsPath
+	 */
+	public String getPrivateCertAbsPath() {
+		return privateCertAbsPath;
+	}
+
+	/**
+	 * @param privateCertAbsPath the privateCertAbsPath to set
+	 */
+	public void setPrivateCertAbsPath(String privateCertAbsPath) {
+		this.privateCertAbsPath = privateCertAbsPath;
+	}
+
+	/**
+	 * @return the publicKeyAbsPath
+	 */
+	public String getPublicKeyAbsPath() {
+		return publicKeyAbsPath;
+	}
+
+	/**
+	 * @param publicKeyAbsPath the publicKeyAbsPath to set
+	 */
+	public void setPublicKeyAbsPath(String publicKeyAbsPath) {
+		this.publicKeyAbsPath = publicKeyAbsPath;
 	}
 
 }

@@ -175,6 +175,12 @@
 				<artifactId>resteasy-jackson-provider</artifactId>
 				<version>${resteasy.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>org.jboss.resteasy</groupId>
+				<artifactId>resteasy-crypto</artifactId>
+				<version>${resteasy.version}</version>
+			</dependency>
+
 
 			<!-- Ruby YAML support <dependency> <groupId>org.jboss.resteasy</groupId> 
 				<artifactId>resteasy-yaml-provider</artifactId> <version>${resteasy.version}</version> 
@@ -270,21 +276,12 @@
 				<artifactId>spring-beans</artifactId>
 				<version>${spring.core.version}</version>
 			</dependency>
-			<!--  <dependency>
-				<groupId>org.springframework.security</groupId>
-				<artifactId>spring-security-core</artifactId>
-				<version>${spring.security.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework.security</groupId>
-				<artifactId>spring-security-web</artifactId>
-				<version>${spring.security.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework.security</groupId>
-				<artifactId>spring-security-config</artifactId>
-				<version>${spring.security.version}</version>
-			</dependency>-->
+			<!-- <dependency> <groupId>org.springframework.security</groupId> <artifactId>spring-security-core</artifactId> 
+				<version>${spring.security.version}</version> </dependency> <dependency> 
+				<groupId>org.springframework.security</groupId> <artifactId>spring-security-web</artifactId> 
+				<version>${spring.security.version}</version> </dependency> <dependency> 
+				<groupId>org.springframework.security</groupId> <artifactId>spring-security-config</artifactId> 
+				<version>${spring.security.version}</version> </dependency> -->
 			<dependency>
 				<groupId>org.jboss.resteasy</groupId>
 				<artifactId>tjws</artifactId>
@@ -321,6 +318,10 @@
 		<dependency>
 			<groupId>org.jboss.resteasy</groupId>
 			<artifactId>resteasy-jackson-provider</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-crypto</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.jboss.resteasy</groupId>
@@ -382,7 +383,7 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-expression</artifactId>
 		</dependency>
-			<dependency>
+		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-aop</artifactId>
 		</dependency>
