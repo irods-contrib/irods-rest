@@ -22,27 +22,34 @@
 		class="org.irods.jargon.core.pub.IRODSAccessObjectFactoryImpl">
 		<beans:constructor-arg ref="irodsSession" />
 	</beans:bean>
-	
+
 	<beans:bean id="restConfiguration"
 		class="org.irods.jargon.rest.configuration.RestConfiguration">
-		<beans:property name="irodsHost" value="fedZone1" />
+		<beans:property name="irodsHost" value="152.54.14.9" />
 		<beans:property name="irodsPort" value="1247" />
-		<beans:property name="irodsZone" value="fedZone1" />
-		<beans:property name="defaultStorageResource" value="test1-resc" />
-		<beans:property name="privateCertAbsPath" value="c:/temp/test-certs/private.pem"/>
-		<beans:property name="publicKeyAbsPath" value="c:/temp/test-certs/public.pem"/>
+		<beans:property name="irodsZone" value="tempZone" />
+		<beans:property name="defaultStorageResource" value="demoResc" />
+		<beans:property name="privateCertAbsPath" value="c:/temp/test-certs/private.pem" />
+		<beans:property name="publicKeyAbsPath" value="c:/temp/test-certs/public.pem" />
 	</beans:bean>
 
-	<!--  
-	<beans:bean id="restConfiguration"
-		class="org.irods.jargon.rest.configuration.RestConfiguration">
-		<beans:property name="irodsHost" value="geni-gimi.renci.org" />
-		<beans:property name="irodsPort" value="1247" />
-		<beans:property name="irodsZone" value="geniRenci" />
-		<beans:property name="defaultStorageResource" value="demoResc" />
-	</beans:bean>
--->
-	<beans:bean id="springFilter" class="org.irods.jargon.rest.auth.BasicAuthFilter">  
+	<!-- <beans:bean id="restConfiguration" class="org.irods.jargon.rest.configuration.RestConfiguration"> 
+		<beans:property name="irodsHost" value="geni-gimi.renci.org" /> <beans:property 
+		name="irodsPort" value="1247" /> <beans:property name="irodsZone" value="geniRenci" 
+		/> <beans:property name="defaultStorageResource" value="demoResc" /> </beans:bean> 
+		<beans:bean id="restConfiguration" class="org.irods.jargon.rest.configuration.RestConfiguration"> 
+		<beans:property name="irodsHost" value="fedZone1" /> <beans:property name="irodsPort" 
+		value="1247" /> <beans:property name="irodsZone" value="fedZone1" /> <beans:property 
+		name="defaultStorageResource" value="test1-resc" /> <beans:property name="privateCertAbsPath" 
+		value="c:/temp/test-certs/private.pem"/> <beans:property name="publicKeyAbsPath" 
+		value="c:/temp/test-certs/public.pem"/> </beans:bean> <beans:bean id="restConfiguration" 
+		class="org.irods.jargon.rest.configuration.RestConfiguration"> <beans:property 
+		name="irodsHost" value="152.54.14.9" /> <beans:property name="irodsPort" 
+		value="1247" /> <beans:property name="irodsZone" value="tempZone" /> <beans:property 
+		name="defaultStorageResource" value="demoResc" /> <beans:property name="privateCertAbsPath" 
+		value="c:/temp/test-certs/private.pem"/> <beans:property name="publicKeyAbsPath" 
+		value="c:/temp/test-certs/public.pem"/> </beans:bean> -->
+	<beans:bean id="springFilter" class="org.irods.jargon.rest.auth.BasicAuthFilter">
 	</beans:bean>
 
 </beans:beans>

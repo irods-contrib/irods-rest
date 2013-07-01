@@ -19,8 +19,6 @@ import org.irods.jargon.core.pub.UserAO;
 import org.irods.jargon.core.pub.domain.User;
 import org.irods.jargon.rest.auth.DefaultHttpClientAndContext;
 import org.irods.jargon.rest.auth.RestAuthUtils;
-import org.irods.jargon.rest.commands.user.UserAddByAdminRequest;
-import org.irods.jargon.rest.commands.user.UserService;
 import org.irods.jargon.rest.utils.RestTestingProperties;
 import org.irods.jargon.testutils.TestingPropertiesHelper;
 import org.jboss.resteasy.core.Dispatcher;
@@ -72,7 +70,7 @@ public class UserServiceTest implements ApplicationContextAware {
 			server.stop();
 		}
 		irodsFileSystem.closeAndEatExceptions();
-	} 
+	}
 
 	@Before
 	public void setUp() throws Exception {
@@ -266,6 +264,7 @@ public class UserServiceTest implements ApplicationContextAware {
 
 		String testUser = "testAddUserByAdmin";
 		String testPassword = "test123";
+		String testDn = "testDNForaddubyAdmin";
 		IRODSAccount irodsAccount = testingPropertiesHelper
 				.buildIRODSAccountFromTestProperties(testingProperties);
 
@@ -291,28 +290,33 @@ public class UserServiceTest implements ApplicationContextAware {
 
 			ObjectMapper mapper = new ObjectMapper();
 			UserAddByAdminRequest addRequest = new UserAddByAdminRequest();
-			addRequest.setDistinguishedName("dn here");
+			addRequest.setDistinguishedName(testDn);
 			addRequest.setTempPassword(testPassword);
 			addRequest.setUserName(testUser);
 			String body = mapper.writeValueAsString(addRequest);
-			
+
 			System.out.println(body);
-			
+
 			httpPut.setEntity(new StringEntity(body));
 
 			HttpResponse response = clientAndContext.getHttpClient().execute(
 					httpPut, clientAndContext.getHttpContext());
 			HttpEntity entity = response.getEntity();
-			Assert.assertEquals(200, response.getStatusLine().getStatusCode()); 
+			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
 			String entityData = EntityUtils.toString(entity);
-			
+
 			System.out.println(entityData);
-			
-			
-			UserAddActionResponse actual = mapper.readValue(entityData, UserAddActionResponse.class);
+
+			UserAddActionResponse actual = mapper.readValue(entityData,
+					UserAddActionResponse.class);
 			Assert.assertEquals(testUser, actual.getUserName());
-			Assert.assertEquals(UserAddActionResponse.UserAddActionResponseCode.SUCCESS, actual.getUserAddActionResponse());
-			Assert.assertEquals(UserAddActionResponse.UserAddActionResponseCode.SUCCESS.ordinal(), actual.getUserAddActionResponseNumericCode());
+			Assert.assertEquals(
+					UserAddActionResponse.UserAddActionResponseCode.SUCCESS,
+					actual.getUserAddActionResponse());
+			Assert.assertEquals(
+					UserAddActionResponse.UserAddActionResponseCode.SUCCESS
+							.ordinal(), actual
+							.getUserAddActionResponseNumericCode());
 
 		} finally {
 			// When HttpClient instance is no longer needed,
@@ -323,9 +327,10 @@ public class UserServiceTest implements ApplicationContextAware {
 
 		User user = userAO.findByName(testUser);
 		Assert.assertNotNull("user not added", user);
+		Assert.assertEquals("dn not set", testDn, user.getUserDN());
 
 	}
-	
+
 	@Test
 	public void testAddUserDuplicateByAdmin() throws Exception {
 
@@ -364,24 +369,29 @@ public class UserServiceTest implements ApplicationContextAware {
 			addRequest.setTempPassword(testPassword);
 			addRequest.setUserName(testUser);
 			String body = mapper.writeValueAsString(addRequest);
-			
+
 			System.out.println(body);
-			
+
 			httpPut.setEntity(new StringEntity(body));
 
 			HttpResponse response = clientAndContext.getHttpClient().execute(
 					httpPut, clientAndContext.getHttpContext());
 			HttpEntity entity = response.getEntity();
-			Assert.assertEquals(200, response.getStatusLine().getStatusCode()); 
+			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
 			String entityData = EntityUtils.toString(entity);
-			
+
 			System.out.println(entityData);
 
-			
-			UserAddActionResponse actual = mapper.readValue(entityData, UserAddActionResponse.class);
+			UserAddActionResponse actual = mapper.readValue(entityData,
+					UserAddActionResponse.class);
 			Assert.assertEquals(testUser, actual.getUserName());
-			Assert.assertEquals(UserAddActionResponse.UserAddActionResponseCode.USER_NAME_IS_TAKEN, actual.getUserAddActionResponse());
-			Assert.assertEquals(UserAddActionResponse.UserAddActionResponseCode.USER_NAME_IS_TAKEN.ordinal(), actual.getUserAddActionResponseNumericCode());
+			Assert.assertEquals(
+					UserAddActionResponse.UserAddActionResponseCode.USER_NAME_IS_TAKEN,
+					actual.getUserAddActionResponse());
+			Assert.assertEquals(
+					UserAddActionResponse.UserAddActionResponseCode.USER_NAME_IS_TAKEN
+							.ordinal(), actual
+							.getUserAddActionResponseNumericCode());
 
 		} finally {
 			// When HttpClient instance is no longer needed,
@@ -390,13 +400,13 @@ public class UserServiceTest implements ApplicationContextAware {
 			clientAndContext.getHttpClient().getConnectionManager().shutdown();
 		}
 	}
-	
+
 	@Test
 	public void testAddUserByAdminInvalidMessage() throws Exception {
 
 		IRODSAccount irodsAccount = testingPropertiesHelper
 				.buildIRODSAccountFromTestProperties(testingProperties);
-		
+
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
 		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
@@ -415,8 +425,8 @@ public class UserServiceTest implements ApplicationContextAware {
 
 			HttpResponse response = clientAndContext.getHttpClient().execute(
 					httpPut, clientAndContext.getHttpContext());
-			Assert.assertEquals(400, response.getStatusLine().getStatusCode()); 
-			
+			Assert.assertEquals(400, response.getStatusLine().getStatusCode());
+
 		} finally {
 			// When HttpClient instance is no longer needed,
 			// shut down the connection manager to ensure
@@ -424,7 +434,7 @@ public class UserServiceTest implements ApplicationContextAware {
 			clientAndContext.getHttpClient().getConnectionManager().shutdown();
 		}
 	}
-	
+
 	@Test
 	public void testAddUserByAdminBlankUserName() throws Exception {
 
@@ -457,11 +467,17 @@ public class UserServiceTest implements ApplicationContextAware {
 			HttpResponse response = clientAndContext.getHttpClient().execute(
 					httpPut, clientAndContext.getHttpContext());
 			HttpEntity entity = response.getEntity();
-			Assert.assertEquals(200, response.getStatusLine().getStatusCode()); 
+			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
 			String entityData = EntityUtils.toString(entity);
-			UserAddActionResponse actual = mapper.readValue(entityData, UserAddActionResponse.class);
-			Assert.assertEquals(UserAddActionResponse.UserAddActionResponseCode.ATTRIBUTES_MISSING, actual.getUserAddActionResponse());
-			Assert.assertEquals(UserAddActionResponse.UserAddActionResponseCode.ATTRIBUTES_MISSING.ordinal(), actual.getUserAddActionResponseNumericCode());
+			UserAddActionResponse actual = mapper.readValue(entityData,
+					UserAddActionResponse.class);
+			Assert.assertEquals(
+					UserAddActionResponse.UserAddActionResponseCode.ATTRIBUTES_MISSING,
+					actual.getUserAddActionResponse());
+			Assert.assertEquals(
+					UserAddActionResponse.UserAddActionResponseCode.ATTRIBUTES_MISSING
+							.ordinal(), actual
+							.getUserAddActionResponseNumericCode());
 
 		} finally {
 			// When HttpClient instance is no longer needed,
@@ -470,7 +486,7 @@ public class UserServiceTest implements ApplicationContextAware {
 			clientAndContext.getHttpClient().getConnectionManager().shutdown();
 		}
 	}
-	
+
 	@Test
 	public void testAddUserByAdminBlankPassword() throws Exception {
 
@@ -503,11 +519,17 @@ public class UserServiceTest implements ApplicationContextAware {
 			HttpResponse response = clientAndContext.getHttpClient().execute(
 					httpPut, clientAndContext.getHttpContext());
 			HttpEntity entity = response.getEntity();
-			Assert.assertEquals(200, response.getStatusLine().getStatusCode()); 
+			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
 			String entityData = EntityUtils.toString(entity);
-			UserAddActionResponse actual = mapper.readValue(entityData, UserAddActionResponse.class);
-			Assert.assertEquals(UserAddActionResponse.UserAddActionResponseCode.ATTRIBUTES_MISSING, actual.getUserAddActionResponse());
-			Assert.assertEquals(UserAddActionResponse.UserAddActionResponseCode.ATTRIBUTES_MISSING.ordinal(), actual.getUserAddActionResponseNumericCode());
+			UserAddActionResponse actual = mapper.readValue(entityData,
+					UserAddActionResponse.class);
+			Assert.assertEquals(
+					UserAddActionResponse.UserAddActionResponseCode.ATTRIBUTES_MISSING,
+					actual.getUserAddActionResponse());
+			Assert.assertEquals(
+					UserAddActionResponse.UserAddActionResponseCode.ATTRIBUTES_MISSING
+							.ordinal(), actual
+							.getUserAddActionResponseNumericCode());
 
 		} finally {
 			// When HttpClient instance is no longer needed,
