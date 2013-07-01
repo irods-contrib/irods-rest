@@ -11,6 +11,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.irods.jargon.core.protovalues.UserTypeEnum;
 import org.irods.jargon.core.pub.domain.User;
+import org.irods.jargon.rest.configuration.RestConfiguration;
+import org.irods.jargon.rest.utils.ConfigurationUtils;
 import org.jboss.resteasy.annotations.providers.jaxb.json.BadgerFish;
 
 /**
@@ -34,6 +36,16 @@ public class UserData {
 	private String userDN = "";
 
 	/**
+	 * Optional URL for web access
+	 */
+	private String webAccessURL = "";
+
+	/**
+	 * iRODS env settings for this user/grid
+	 */
+	private String irodsEnv = "";
+
+	/**
 	 * 
 	 */
 	public UserData() {
@@ -46,9 +58,13 @@ public class UserData {
 	 * @param user
 	 *            {@link User}
 	 */
-	public UserData(final User user) {
+	public UserData(final User user, final RestConfiguration restConfiguration) {
 		if (user == null) {
 			throw new IllegalArgumentException("null user");
+		}
+
+		if (restConfiguration == null) {
+			throw new IllegalArgumentException("null restConfiguration");
 		}
 
 		this.comment = user.getComment();
@@ -60,6 +76,9 @@ public class UserData {
 		this.userDN = user.getUserDN();
 		this.userType = user.getUserType();
 		this.zone = user.getZone();
+		this.irodsEnv = ConfigurationUtils.buildIrodsEnvForConfigAndUser(
+				restConfiguration, user.getNameWithZone());
+		this.webAccessURL = restConfiguration.getWebInterfaceURL();
 
 	}
 
@@ -231,6 +250,24 @@ public class UserData {
 	 */
 	public void setUserDN(final String userDN) {
 		this.userDN = userDN;
+	}
+
+	@XmlAttribute
+	public String getIrodsEnv() {
+		return irodsEnv;
+	}
+
+	public void setIrodsEnv(String irodsEnv) {
+		this.irodsEnv = irodsEnv;
+	}
+
+	@XmlAttribute
+	public String getWebAccessURL() {
+		return webAccessURL;
+	}
+
+	public void setWebAccessURL(String webAccessURL) {
+		this.webAccessURL = webAccessURL;
 	}
 
 }

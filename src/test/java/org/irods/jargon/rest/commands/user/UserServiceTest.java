@@ -332,6 +332,78 @@ public class UserServiceTest implements ApplicationContextAware {
 	}
 
 	@Test
+	public void testAddUserByAdminLongDn() throws Exception {
+
+		String testUser = "testAddUserByAdminLongDn";
+		String testPassword = "test123";
+		String testDN = "/CN=xxxxxyyxx-64f0-4d49-a0a9-508a8a5328cd/emailAddress=xxxxxxxxxxthismaynotshowup";
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
+				.getIRODSAccessObjectFactory();
+
+		UserAO userAO = accessObjectFactory.getUserAO(irodsAccount);
+		userAO.deleteUser(testUser);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/user/");
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
+
+			HttpPut httpPut = new HttpPut(sb.toString());
+			httpPut.addHeader("accept", "application/json");
+			httpPut.addHeader("Content-Type", "application/json");
+
+			ObjectMapper mapper = new ObjectMapper();
+			UserAddByAdminRequest addRequest = new UserAddByAdminRequest();
+			addRequest.setDistinguishedName(testDN);
+			addRequest.setTempPassword(testPassword);
+			addRequest.setUserName(testUser);
+			String body = mapper.writeValueAsString(addRequest);
+
+			System.out.println(body);
+
+			httpPut.setEntity(new StringEntity(body));
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpPut, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+			String entityData = EntityUtils.toString(entity);
+
+			System.out.println(entityData);
+
+			UserAddActionResponse actual = mapper.readValue(entityData,
+					UserAddActionResponse.class);
+			Assert.assertEquals(testUser, actual.getUserName());
+			Assert.assertEquals(
+					UserAddActionResponse.UserAddActionResponseCode.SUCCESS,
+					actual.getUserAddActionResponse());
+			Assert.assertEquals(
+					UserAddActionResponse.UserAddActionResponseCode.SUCCESS
+							.ordinal(), actual
+							.getUserAddActionResponseNumericCode());
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+
+		User user = userAO.findByName(testUser);
+		Assert.assertNotNull("user not added", user);
+		Assert.assertEquals("dn not set", testDN, user.getUserDN());
+
+	}
+
+	@Test
 	public void testAddUserDuplicateByAdmin() throws Exception {
 
 		String testUser = "testAddUserDuplicateByAdmin";

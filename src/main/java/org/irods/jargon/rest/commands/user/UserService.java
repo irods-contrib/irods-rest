@@ -24,6 +24,7 @@ import org.irods.jargon.rest.auth.RestAuthUtils;
 import org.irods.jargon.rest.commands.user.UserAddActionResponse.UserAddActionResponseCode;
 import org.irods.jargon.rest.configuration.RestConfiguration;
 import org.irods.jargon.rest.domain.UserData;
+import org.irods.jargon.rest.utils.ConfigurationUtils;
 import org.jboss.resteasy.annotations.providers.jaxb.json.Mapped;
 import org.jboss.resteasy.annotations.providers.jaxb.json.XmlNsMap;
 import org.slf4j.Logger;
@@ -94,32 +95,37 @@ public class UserService {
 			User user = userAO.findByName(userName);
 			log.info("user found:{}", user);
 
-			return new UserData(user);
+			return new UserData(user, restConfiguration);
 		} finally {
 			irodsAccessObjectFactory.closeSessionAndEatExceptions();
 		}
 	}
 
 	/**
-	 * Add a user and set the password based on a {@link UserAddByAdminRequest}, which is expected as a JSON structure in the PUT message body.
-	 * This method will return a JSON structure reflecting {@link UserAddActionResponse} with error or success details.
+	 * Add a user and set the password based on a {@link UserAddByAdminRequest},
+	 * which is expected as a JSON structure in the PUT message body. This
+	 * method will return a JSON structure reflecting
+	 * {@link UserAddActionResponse} with error or success details.
 	 * <p/>
-	 * In iRODS, this method will add the user and set a temporary password as described in the JSON request.
+	 * In iRODS, this method will add the user and set a temporary password as
+	 * described in the JSON request.
 	 * <p/>
-	 * Note that any Jargon or other exceptions are trapped and returned to the caller in the response.
+	 * Note that any Jargon or other exceptions are trapped and returned to the
+	 * caller in the response.
 	 * 
-	 * @param authorization BasicAuth info
-	 * @param userAddByAdminRequest   {@link UserAddByAdminRequest}
-	 * @return  {@link UserAddActionResponse}
-	 *
+	 * @param authorization
+	 *            BasicAuth info
+	 * @param userAddByAdminRequest
+	 *            {@link UserAddByAdminRequest}
+	 * @return {@link UserAddActionResponse}
+	 * 
 	 */
 	@PUT
 	@Consumes("application/json")
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
 	public UserAddActionResponse addUser(
 			@HeaderParam("Authorization") final String authorization,
-			final UserAddByAdminRequest userAddByAdminRequest)
-			 {
+			final UserAddByAdminRequest userAddByAdminRequest) {
 		log.info("addUser()");
 		UserAddActionResponse response = new UserAddActionResponse();
 
@@ -129,24 +135,26 @@ public class UserService {
 			response.setMessage("null userAddByAdminRequest");
 			return response;
 		}
-		
+
 		log.info("userAddByAdminRequest:{}", userAddByAdminRequest);
-		
-		if (userAddByAdminRequest.getUserName() == null || userAddByAdminRequest.getUserName().isEmpty()) {
+
+		if (userAddByAdminRequest.getUserName() == null
+				|| userAddByAdminRequest.getUserName().isEmpty()) {
 			log.error("user name missing");
 			response.setMessage("User name is missing in the request");
 			response.setUserAddActionResponse(UserAddActionResponseCode.ATTRIBUTES_MISSING);
 			return response;
 		}
-		
-		if (userAddByAdminRequest.getTempPassword() == null || userAddByAdminRequest.getTempPassword().isEmpty()) {
+
+		if (userAddByAdminRequest.getTempPassword() == null
+				|| userAddByAdminRequest.getTempPassword().isEmpty()) {
 			log.error("temp password is missing");
 			response.setMessage("temp password is missing in the request");
 			response.setUserName(userAddByAdminRequest.getUserName());
 			response.setUserAddActionResponse(UserAddActionResponseCode.ATTRIBUTES_MISSING);
 			return response;
 		}
-		
+
 		try {
 			IRODSAccount irodsAccount = RestAuthUtils
 					.getIRODSAccountFromBasicAuthValues(authorization,
@@ -168,6 +176,10 @@ public class UserService {
 			response.setMessage("success");
 			response.setUserName(userAddByAdminRequest.getUserName());
 			response.setUserAddActionResponse(UserAddActionResponseCode.SUCCESS);
+			response.setIrodsEnv(ConfigurationUtils
+					.buildIrodsEnvForConfigAndUser(restConfiguration,
+							user.getNameWithZone()));
+			response.setWebAccessURL(restConfiguration.getWebInterfaceURL());
 			return response;
 		} catch (DuplicateDataException dde) {
 			log.error("duplicate data for user add", dde);

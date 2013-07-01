@@ -21,6 +21,12 @@ public class RestConfiguration {
 	private String publicKeyAbsPath = "";
 
 	/**
+	 * Optional URL for a web interface to access grid data (typically an
+	 * idrop-web installation pointing to the same grid)
+	 */
+	private String webInterfaceURL = "";
+
+	/**
 	 * @return the irodsHost
 	 */
 	public String getIrodsHost() {
@@ -103,7 +109,8 @@ public class RestConfiguration {
 	}
 
 	/**
-	 * @param smimeEncryptAdminFunctions the smimeEncryptAdminFunctions to set
+	 * @param smimeEncryptAdminFunctions
+	 *            the smimeEncryptAdminFunctions to set
 	 */
 	public void setSmimeEncryptAdminFunctions(boolean smimeEncryptAdminFunctions) {
 		this.smimeEncryptAdminFunctions = smimeEncryptAdminFunctions;
@@ -117,7 +124,8 @@ public class RestConfiguration {
 	}
 
 	/**
-	 * @param privateCertAbsPath the privateCertAbsPath to set
+	 * @param privateCertAbsPath
+	 *            the privateCertAbsPath to set
 	 */
 	public void setPrivateCertAbsPath(String privateCertAbsPath) {
 		this.privateCertAbsPath = privateCertAbsPath;
@@ -131,10 +139,19 @@ public class RestConfiguration {
 	}
 
 	/**
-	 * @param publicKeyAbsPath the publicKeyAbsPath to set
+	 * @param publicKeyAbsPath
+	 *            the publicKeyAbsPath to set
 	 */
 	public void setPublicKeyAbsPath(String publicKeyAbsPath) {
 		this.publicKeyAbsPath = publicKeyAbsPath;
+	}
+
+	public String getWebInterfaceURL() {
+		return webInterfaceURL;
+	}
+
+	public void setWebInterfaceURL(String webInterfaceURL) {
+		this.webInterfaceURL = webInterfaceURL;
 	}
 
 }
