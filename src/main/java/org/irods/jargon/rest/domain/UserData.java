@@ -77,7 +77,7 @@ public class UserData {
 		this.userType = user.getUserType();
 		this.zone = user.getZone();
 		this.irodsEnv = ConfigurationUtils.buildIrodsEnvForConfigAndUser(
-				restConfiguration, user.getNameWithZone());
+				restConfiguration, user.getName());
 		this.webAccessURL = restConfiguration.getWebInterfaceURL();
 
 	}
