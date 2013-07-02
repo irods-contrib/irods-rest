@@ -23,15 +23,6 @@
 		<beans:constructor-arg ref="irodsSession" />
 	</beans:bean>
 
-	<beans:bean id="restConfiguration"
-		class="org.irods.jargon.rest.configuration.RestConfiguration">
-		<beans:property name="irodsHost" value="geni-gimi.renci.org" />
-		<beans:property name="irodsPort" value="1247" />
-		<beans:property name="irodsZone" value="geniRenci" />
-		<beans:property name="defaultStorageResource" value="demoResc" />
-		<beans:property name="webInterfaceURL"
-			value="https://geni-gimi.renci.org:8443/idrop-web2" />
-	</beans:bean>
 
 	<beans:bean id="restConfiguration"
 		class="org.irods.jargon.rest.configuration.RestConfiguration">
