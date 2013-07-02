@@ -11,7 +11,6 @@
 		class="org.irods.jargon.core.connection.IRODSSimpleProtocolManager"
 		factory-method="instance" init-method="initialize" destroy-method="destroy" />
 
-
 	<beans:bean id="irodsSession"
 		class="org.irods.jargon.core.connection.IRODSSession" factory-method="instance">
 		<beans:constructor-arg
@@ -22,7 +21,6 @@
 		class="org.irods.jargon.core.pub.IRODSAccessObjectFactoryImpl">
 		<beans:constructor-arg ref="irodsSession" />
 	</beans:bean>
-
 
 	<beans:bean id="restConfiguration"
 		class="org.irods.jargon.rest.configuration.RestConfiguration">
