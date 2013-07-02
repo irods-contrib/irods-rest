@@ -50,7 +50,7 @@ public class ConfigurationUtils {
 		sb.append(userName);
 		sb.append("\n");
 		sb.append("irodsCwd=");
-		sb.append("irodsHome=/");
+		sb.append("/");
 		sb.append(restConfiguration.getIrodsZone());
 		sb.append("/home/");
 		sb.append(userName);

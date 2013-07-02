@@ -25,6 +25,16 @@
 
 	<beans:bean id="restConfiguration"
 		class="org.irods.jargon.rest.configuration.RestConfiguration">
+		<beans:property name="irodsHost" value="geni-gimi.renci.org" />
+		<beans:property name="irodsPort" value="1247" />
+		<beans:property name="irodsZone" value="geniRenci" />
+		<beans:property name="defaultStorageResource" value="demoResc" />
+		<beans:property name="webInterfaceURL"
+			value="https://geni-gimi.renci.org:8443/idrop-web2" />
+	</beans:bean>
+
+	<beans:bean id="restConfiguration"
+		class="org.irods.jargon.rest.configuration.RestConfiguration">
 		<beans:property name="irodsHost" value="152.54.14.9" />
 		<beans:property name="irodsPort" value="1247" />
 		<beans:property name="irodsZone" value="tempZone" />
@@ -39,7 +49,7 @@
 		<beans:property name="irodsHost" value="geni-gimi.renci.org" /> <beans:property 
 		name="irodsPort" value="1247" /> <beans:property name="irodsZone" value="geniRenci" 
 		/> <beans:property name="defaultStorageResource" value="demoResc" /> <beans:property 
-		name="webInterfaceURL" value = "https://iren-web.renci.org:8443/idrop-web2" 
+		name="webInterfaceURL" value="https://geni-gimi.renci.org:8443/idrop-web2" 
 		/> </beans:bean> -->
 	<!-- <beans:bean id="restConfiguration" class="org.irods.jargon.rest.configuration.RestConfiguration"> 
 		<beans:property name="irodsHost" value="fedZone1" /> <beans:property name="irodsPort" 
