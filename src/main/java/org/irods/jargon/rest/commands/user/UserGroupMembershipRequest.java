@@ -4,11 +4,11 @@
 package org.irods.jargon.rest.commands.user;
 
 /**
- * Request to add a user to the given user group
+ * Request to add or remove a user from/to the given user group
  * @author Mike Conway - DICE (www.irods.org)
  *
  */
-public class UserAddToGroupRequest {
+public class UserGroupMembershipRequest {
 
 	
 	private String userName = "";
@@ -18,12 +18,12 @@ public class UserAddToGroupRequest {
 	/**
 	 * 
 	 */
-	public UserAddToGroupRequest() {
+	public UserGroupMembershipRequest() {
 	}
 	
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("userAddToGroupRequest");
+		sb.append("UserGroupMembershipRequest");
 		sb.append("\n\tuserName:");
 		sb.append(userName);
 		sb.append("\n\tuserGroup:");

@@ -136,7 +136,7 @@ public class UserGroupServiceTest implements ApplicationContextAware  {
 			httpPut.addHeader("Content-Type", "application/json");
 
 			ObjectMapper mapper = new ObjectMapper();
-			UserAddToGroupRequest userAddToGroupRequest = new UserAddToGroupRequest();
+			UserGroupMembershipRequest userAddToGroupRequest = new UserGroupMembershipRequest();
 			userAddToGroupRequest.setUserGroup(testingProperties
 					.getProperty(TestingPropertiesHelper.IRODS_USER_GROUP_KEY));
 			userAddToGroupRequest.setZone(irodsAccount.getZone());
