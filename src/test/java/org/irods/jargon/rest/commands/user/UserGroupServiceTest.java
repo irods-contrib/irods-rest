@@ -15,6 +15,7 @@ import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.core.pub.UserGroupAO;
+import org.irods.jargon.core.pub.domain.UserGroup;
 import org.irods.jargon.rest.auth.DefaultHttpClientAndContext;
 import org.irods.jargon.rest.auth.RestAuthUtils;
 import org.irods.jargon.rest.commands.GenericCommandResponse;
@@ -228,6 +229,133 @@ public class UserGroupServiceTest implements ApplicationContextAware {
 					GenericCommandResponse.class);
 			Assert.assertEquals(GenericCommandResponse.Status.OK,
 					actual.getStatus());
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+
+	}
+
+	@Test
+	public void testAddUserGroup() throws Exception {
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
+				.getIRODSAccessObjectFactory();
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/user_group");
+
+		String testUserGroup = "testAddUserGroup";
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+
+		UserGroupAO userGroupAO = accessObjectFactory
+				.getUserGroupAO(irodsAccount);
+
+		userGroupAO.removeUserGroup(testUserGroup);
+
+		try {
+
+			HttpPut httpPut = new HttpPut(sb.toString());
+			httpPut.addHeader("accept", "application/json");
+			httpPut.addHeader("Content-Type", "application/json");
+
+			ObjectMapper mapper = new ObjectMapper();
+			UserGroupRequest userGroupRequest = new UserGroupRequest();
+			userGroupRequest.setUserGroupName(testUserGroup);
+			userGroupRequest.setZone(irodsAccount.getZone());
+
+			String body = mapper.writeValueAsString(userGroupRequest);
+			System.out.println(body);
+			httpPut.setEntity(new StringEntity(body));
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpPut, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+			String entityData = EntityUtils.toString(entity);
+
+			System.out.println(entityData);
+
+			GenericCommandResponse actual = mapper.readValue(entityData,
+					GenericCommandResponse.class);
+			Assert.assertEquals(GenericCommandResponse.Status.OK,
+					actual.getStatus());
+
+			userGroupAO.removeUserGroup(testUserGroup);
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+
+	}
+
+	@Test
+	public void testRemoveUserGroup() throws Exception {
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
+				.getIRODSAccessObjectFactory();
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+
+		UserGroupAO userGroupAO = accessObjectFactory
+				.getUserGroupAO(irodsAccount);
+		String userGroupName = "testRemoveUserGroup";
+
+		UserGroup userGroup = new UserGroup();
+		userGroup.setUserGroupName(userGroupName);
+		userGroup.setZone(irodsAccount.getZone());
+
+		userGroupAO.removeUserGroup(userGroupName);
+		userGroupAO.addUserGroup(userGroup);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/user_group/");
+		sb.append(userGroupName);
+
+		try {
+
+			HttpDelete httpDelete = new HttpDelete(sb.toString());
+			httpDelete.addHeader("accept", "application/json");
+			httpDelete.addHeader("Content-Type", "application/json");
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpDelete, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+			String entityData = EntityUtils.toString(entity);
+
+			System.out.println(entityData);
+
+			ObjectMapper mapper = new ObjectMapper();
+
+			GenericCommandResponse actual = mapper.readValue(entityData,
+					GenericCommandResponse.class);
+			Assert.assertEquals(GenericCommandResponse.Status.OK,
+					actual.getStatus());
+
+			UserGroup actualUserGroup = userGroupAO.findByName(userGroupName);
+			Assert.assertNull("did not remove user group", actualUserGroup);
 
 		} finally {
 			// When HttpClient instance is no longer needed,

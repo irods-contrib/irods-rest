@@ -16,6 +16,7 @@ import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.core.pub.UserGroupAO;
+import org.irods.jargon.core.pub.domain.UserGroup;
 import org.irods.jargon.rest.auth.RestAuthUtils;
 import org.irods.jargon.rest.commands.GenericCommandResponse;
 import org.irods.jargon.rest.configuration.RestConfiguration;
@@ -137,6 +138,50 @@ public class UserGroupService {
 	 * 
 	 */
 	@DELETE
+	@Path("/{userGroup}")
+	@Consumes("application/json")
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	public GenericCommandResponse deleteUserGroup(
+			@HeaderParam("Authorization") final String authorization,
+			@PathParam("userGroup") final String userGroup)
+			throws InvalidRequestDataException, IrodsRestException {
+		log.info("deleteUserGroup()");
+		GenericCommandResponse response = new GenericCommandResponse();
+
+		if (userGroup == null || userGroup.isEmpty()) {
+			throw new InvalidRequestDataException("missing userGroup");
+		}
+
+		try {
+			IRODSAccount irodsAccount = RestAuthUtils
+					.getIRODSAccountFromBasicAuthValues(authorization,
+							restConfiguration);
+
+			UserGroupAO userGroupAO = irodsAccessObjectFactory
+					.getUserGroupAO(irodsAccount);
+
+			userGroupAO.removeUserGroup(userGroup);
+			return response;
+
+		} catch (JargonException je) {
+			log.error("Jargon exception", je);
+			throw new IrodsRestException(je);
+		} finally {
+			irodsAccessObjectFactory.closeSessionAndEatExceptions();
+		}
+	}
+
+	/**
+	 * Delete a user from a given user group.
+	 * 
+	 * @param authorization
+	 *            BasicAuth info
+	 * @param UserGroupMembershipRequest
+	 *            {@link UserGroupMembershipRequest}
+	 * @return {@link GenericCommandResponse}
+	 * 
+	 */
+	@DELETE
 	@Path("/{userGroup}/user/{userName}")
 	@Consumes("application/json")
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
@@ -171,6 +216,67 @@ public class UserGroupService {
 
 		} catch (JargonException je) {
 			log.error("Jargon exception", je);
+			throw new IrodsRestException(je);
+		} finally {
+			irodsAccessObjectFactory.closeSessionAndEatExceptions();
+		}
+	}
+
+	/**
+	 * Add a new user group
+	 * 
+	 * @param authorization
+	 * @param userGroupAddRequest
+	 * @return
+	 * @throws InvalidRequestDataException
+	 * @throws IrodsRestException
+	 */
+	@PUT
+	@Consumes("application/json")
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	public GenericCommandResponse addUserGroup(
+			@HeaderParam("Authorization") final String authorization,
+			final UserGroupRequest userGroupAddRequest)
+			throws InvalidRequestDataException, IrodsRestException {
+		log.info("addUserGroup()");
+		GenericCommandResponse response = new GenericCommandResponse();
+
+		if (userGroupAddRequest == null) {
+			log.error("request not found");
+			throw new InvalidRequestDataException("missing userGroupAddRequest");
+		}
+
+		log.info("userGroupAddRequest:{}", userGroupAddRequest);
+
+		if (userGroupAddRequest.getUserGroupName() == null
+				|| userGroupAddRequest.getUserGroupName().isEmpty()) {
+			log.error("user groupName missing");
+			throw new InvalidRequestDataException("missing userName");
+		}
+
+		if (userGroupAddRequest.getZone() == null
+				|| userGroupAddRequest.getZone().isEmpty()) {
+			throw new InvalidRequestDataException("missing zone");
+		}
+
+		try {
+			IRODSAccount irodsAccount = RestAuthUtils
+					.getIRODSAccountFromBasicAuthValues(authorization,
+							restConfiguration);
+
+			UserGroupAO userGroupAO = irodsAccessObjectFactory
+					.getUserGroupAO(irodsAccount);
+
+			UserGroup userGroup = new UserGroup();
+			userGroup.setUserGroupName(userGroupAddRequest.getUserGroupName());
+			userGroup.setZone(userGroupAddRequest.getZone());
+
+			userGroupAO.addUserGroup(userGroup);
+
+			return response;
+
+		} catch (JargonException je) {
+			log.error("Jargon exception in user add", je);
 			throw new IrodsRestException(je);
 		} finally {
 			irodsAccessObjectFactory.closeSessionAndEatExceptions();
