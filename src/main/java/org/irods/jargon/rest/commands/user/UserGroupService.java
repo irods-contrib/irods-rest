@@ -10,6 +10,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.JargonException;
@@ -33,7 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 @Named
 @Path("/user_group")
-public class UserGroupService  {
+public class UserGroupService {
 
 	private Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -124,9 +125,9 @@ public class UserGroupService  {
 			irodsAccessObjectFactory.closeSessionAndEatExceptions();
 		}
 	}
-	
+
 	/**
-	 * Add a user to a given user group.
+	 * Delete a user from a given user group.
 	 * 
 	 * @param authorization
 	 *            BasicAuth info
@@ -136,38 +137,23 @@ public class UserGroupService  {
 	 * 
 	 */
 	@DELETE
-	@Path("/user")
+	@Path("/{userGroup}/user/{userName}")
 	@Consumes("application/json")
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
 	public GenericCommandResponse deleteUserFromGroup(
 			@HeaderParam("Authorization") final String authorization,
-			final UserGroupMembershipRequest deleteUserFromGroupRequest)
+			@PathParam("userGroup") final String userGroup,
+			@PathParam("userName") final String userName)
 			throws InvalidRequestDataException, IrodsRestException {
-		log.info("addUserToGroup()");
+		log.info("deleteUserFromGroup()");
 		GenericCommandResponse response = new GenericCommandResponse();
 
-		if (deleteUserFromGroupRequest == null) {
-			log.error("request not found");
-			throw new InvalidRequestDataException(
-					"missing userAddToGroupRequest");
-		}
-
-		log.info("deleteUserFromGroupRequest:{}", deleteUserFromGroupRequest);
-
-		if (deleteUserFromGroupRequest.getUserName() == null
-				|| deleteUserFromGroupRequest.getUserName().isEmpty()) {
-			log.error("user name missing");
-			throw new InvalidRequestDataException("missing userName");
-		}
-
-		if (deleteUserFromGroupRequest.getUserGroup() == null
-				|| deleteUserFromGroupRequest.getUserGroup().isEmpty()) {
+		if (userGroup == null || userGroup.isEmpty()) {
 			throw new InvalidRequestDataException("missing userGroup");
 		}
 
-		if (deleteUserFromGroupRequest.getZone() == null
-				|| deleteUserFromGroupRequest.getZone().isEmpty()) {
-			throw new InvalidRequestDataException("missing zone");
+		if (userName == null || userName.isEmpty()) {
+			throw new InvalidRequestDataException("missing userName");
 		}
 
 		try {
@@ -177,24 +163,19 @@ public class UserGroupService  {
 
 			UserGroupAO userGroupAO = irodsAccessObjectFactory
 					.getUserGroupAO(irodsAccount);
-			
-			userGroupAO.removeUserFromGroup(arg0, arg1, arg2);
-			
-			
-			userGroupAO.addUserToGroup(deleteUserFromGroupRequest.getUserGroup(),
-					deleteUserFromGroupRequest.getUserName(),
-					deleteUserFromGroupRequest.getZone());
+
+			userGroupAO.removeUserFromGroup(userGroup, userName,
+					irodsAccount.getZone());
 
 			return response;
 
 		} catch (JargonException je) {
-			log.error("Jargon exception in user add", je);
+			log.error("Jargon exception", je);
 			throw new IrodsRestException(je);
 		} finally {
 			irodsAccessObjectFactory.closeSessionAndEatExceptions();
 		}
 	}
-
 
 	/**
 	 * @return the restConfiguration

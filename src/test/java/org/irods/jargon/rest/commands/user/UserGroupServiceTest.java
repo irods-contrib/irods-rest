@@ -6,6 +6,7 @@ import junit.framework.Assert;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
@@ -45,7 +46,7 @@ import org.springframework.test.context.support.DirtiesContextTestExecutionListe
 		"classpath:rest-servlet.xml" })
 @TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
 		DirtiesContextTestExecutionListener.class })
-public class UserGroupServiceTest implements ApplicationContextAware  {
+public class UserGroupServiceTest implements ApplicationContextAware {
 
 	private static TJWSEmbeddedJaxrsServer server;
 
@@ -120,14 +121,11 @@ public class UserGroupServiceTest implements ApplicationContextAware  {
 
 		UserGroupAO userGroupAO = accessObjectFactory
 				.getUserGroupAO(irodsAccount);
-		String userGroupName = 	testingProperties
+		String userGroupName = testingProperties
 				.getProperty(TestingPropertiesHelper.IRODS_USER_GROUP_KEY);
-		userGroupAO
-				.removeUserFromGroup(userGroupName
-					,
-						testingProperties
-								.getProperty(TestingPropertiesHelper.IRODS_SECONDARY_USER_KEY),
-						irodsAccount.getZone());
+		userGroupAO.removeUserFromGroup(userGroupName, testingProperties
+				.getProperty(TestingPropertiesHelper.IRODS_SECONDARY_USER_KEY),
+				irodsAccount.getZone());
 
 		try {
 
@@ -162,6 +160,75 @@ public class UserGroupServiceTest implements ApplicationContextAware  {
 					GenericCommandResponse.class);
 			Assert.assertEquals(GenericCommandResponse.Status.OK,
 					actual.getStatus());
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+
+	}
+
+	@Test
+	public void testRemoveUserFromGroup() throws Exception {
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
+				.getIRODSAccessObjectFactory();
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+
+		UserGroupAO userGroupAO = accessObjectFactory
+				.getUserGroupAO(irodsAccount);
+		String userGroupName = testingProperties
+				.getProperty(TestingPropertiesHelper.IRODS_USER_GROUP_KEY);
+		userGroupAO.removeUserFromGroup(userGroupName, testingProperties
+				.getProperty(TestingPropertiesHelper.IRODS_SECONDARY_USER_KEY),
+				irodsAccount.getZone());
+
+		userGroupAO.addUserToGroup(userGroupName, testingProperties
+				.getProperty(TestingPropertiesHelper.IRODS_SECONDARY_USER_KEY),
+				irodsAccount.getZone());
+
+		String userGroup = testingProperties
+				.getProperty(TestingPropertiesHelper.IRODS_USER_GROUP_KEY);
+		irodsAccount.getZone();
+		String userName = testingProperties
+				.getProperty(TestingPropertiesHelper.IRODS_SECONDARY_USER_KEY);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/user_group/");
+		sb.append(userGroup);
+		sb.append("/user/");
+		sb.append(userName);
+
+		try {
+
+			HttpDelete httpDelete = new HttpDelete(sb.toString());
+			httpDelete.addHeader("accept", "application/json");
+			httpDelete.addHeader("Content-Type", "application/json");
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpDelete, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+			String entityData = EntityUtils.toString(entity);
+
+			System.out.println(entityData);
+
+			ObjectMapper mapper = new ObjectMapper();
+
+			GenericCommandResponse actual = mapper.readValue(entityData,
+					GenericCommandResponse.class);
+			Assert.assertEquals(GenericCommandResponse.Status.OK,
+					actual.getStatus());
+
 		} finally {
 			// When HttpClient instance is no longer needed,
 			// shut down the connection manager to ensure
