@@ -1,5 +1,6 @@
 package org.irods.jargon.rest.commands.user;
 
+import java.net.URLEncoder;
 import java.util.Properties;
 
 import junit.framework.Assert;
@@ -12,9 +13,12 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.irods.jargon.core.connection.IRODSAccount;
+import org.irods.jargon.core.protovalues.UserTypeEnum;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.core.pub.IRODSFileSystem;
+import org.irods.jargon.core.pub.UserAO;
 import org.irods.jargon.core.pub.UserGroupAO;
+import org.irods.jargon.core.pub.domain.User;
 import org.irods.jargon.core.pub.domain.UserGroup;
 import org.irods.jargon.rest.auth.DefaultHttpClientAndContext;
 import org.irods.jargon.rest.auth.RestAuthUtils;
@@ -431,6 +435,87 @@ public class UserGroupServiceTest implements ApplicationContextAware {
 			HttpDelete httpDelete = new HttpDelete(sb.toString());
 			httpDelete.addHeader("accept", "application/json");
 			httpDelete.addHeader("Content-Type", "application/json");
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpDelete, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+			String entityData = EntityUtils.toString(entity);
+
+			System.out.println(entityData);
+
+			ObjectMapper mapper = new ObjectMapper();
+
+			UserGroupCommandResponse actual = mapper.readValue(entityData,
+					UserGroupCommandResponse.class);
+			Assert.assertEquals(GenericCommandResponse.Status.OK,
+					actual.getStatus());
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+
+	}
+
+	@Test
+	public void testRemoveUserFromGroupHyphenated() throws Exception {
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
+				.getIRODSAccessObjectFactory();
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+
+		UserGroupAO userGroupAO = accessObjectFactory
+				.getUserGroupAO(irodsAccount);
+
+		String testUserGroupName = "geni-ahtest2";
+		String testUserName = "geni-ahelsing";
+
+		UserGroup userGroup = new UserGroup();
+		userGroup.setUserGroupName(testUserGroupName);
+		userGroup.setZone(irodsAccount.getZone());
+
+		userGroupAO.removeUserGroup(testUserGroupName);
+		userGroupAO.addUserGroup(userGroup);
+
+		User testUser = new User();
+		testUser.setName(testUserName);
+		testUser.setUserType(UserTypeEnum.RODS_USER);
+
+		UserAO userAO = irodsFileSystem.getIRODSAccessObjectFactory()
+				.getUserAO(irodsAccount);
+		userAO.deleteUser(testUserName);
+		userAO.addUser(testUser);
+
+		userGroupAO.removeUserFromGroup(testUserGroupName, testUserName,
+				irodsAccount.getZone());
+
+		userGroupAO.addUserToGroup(testUserGroupName, testUserName,
+				irodsAccount.getZone());
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/user_group/");
+		sb.append(URLEncoder.encode(testUserGroupName));
+		sb.append("/user/");
+		sb.append(URLEncoder.encode(testUserName));
+
+		System.out.println("request url:" + sb.toString());
+
+		try {
+
+			HttpDelete httpDelete = new HttpDelete(sb.toString());
+			httpDelete.addHeader("accept", "application/json");
+			// httpDelete.addHeader("Content-Type", "application/json");
 
 			HttpResponse response = clientAndContext.getHttpClient().execute(
 					httpDelete, clientAndContext.getHttpContext());

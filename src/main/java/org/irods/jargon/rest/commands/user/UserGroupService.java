@@ -207,7 +207,7 @@ public class UserGroupService {
 	 */
 	@DELETE
 	@Path("/{userGroup}/user/{userName}")
-	@Consumes("application/json")
+	// @Consumes("application/json")
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
 	public UserGroupCommandResponse deleteUserFromGroup(
 			@HeaderParam("Authorization") final String authorization,
