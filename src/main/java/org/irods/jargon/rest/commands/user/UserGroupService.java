@@ -13,12 +13,17 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
 import org.irods.jargon.core.connection.IRODSAccount;
+import org.irods.jargon.core.exception.DuplicateDataException;
+import org.irods.jargon.core.exception.InvalidGroupException;
+import org.irods.jargon.core.exception.InvalidUserException;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.core.pub.UserGroupAO;
 import org.irods.jargon.core.pub.domain.UserGroup;
 import org.irods.jargon.rest.auth.RestAuthUtils;
 import org.irods.jargon.rest.commands.GenericCommandResponse;
+import org.irods.jargon.rest.commands.GenericCommandResponse.Status;
+import org.irods.jargon.rest.commands.user.UserGroupCommandResponse.UserGroupCommandStatus;
 import org.irods.jargon.rest.configuration.RestConfiguration;
 import org.irods.jargon.rest.exception.InvalidRequestDataException;
 import org.irods.jargon.rest.exception.IrodsRestException;
@@ -75,12 +80,12 @@ public class UserGroupService {
 	@Path("/user")
 	@Consumes("application/json")
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
-	public GenericCommandResponse addUserToGroup(
+	public UserGroupCommandResponse addUserToGroup(
 			@HeaderParam("Authorization") final String authorization,
 			final UserGroupMembershipRequest userAddToGroupRequest)
 			throws InvalidRequestDataException, IrodsRestException {
 		log.info("addUserToGroup()");
-		GenericCommandResponse response = new GenericCommandResponse();
+		UserGroupCommandResponse response = new UserGroupCommandResponse();
 
 		if (userAddToGroupRequest == null) {
 			log.error("request not found");
@@ -113,9 +118,28 @@ public class UserGroupService {
 
 			UserGroupAO userGroupAO = irodsAccessObjectFactory
 					.getUserGroupAO(irodsAccount);
-			userGroupAO.addUserToGroup(userAddToGroupRequest.getUserGroup(),
-					userAddToGroupRequest.getUserName(),
-					userAddToGroupRequest.getZone());
+
+			try {
+				userGroupAO.addUserToGroup(
+						userAddToGroupRequest.getUserGroup(),
+						userAddToGroupRequest.getUserName(),
+						userAddToGroupRequest.getZone());
+			} catch (InvalidUserException iue) {
+				log.info("invalid user will be reflected in response");
+				response.setStatus(Status.ERROR);
+				response.setMessage(iue.getMessage());
+				response.setUserGroupCommandStatus(UserGroupCommandStatus.INVALID_USER);
+			} catch (DuplicateDataException dde) {
+				log.info("duplicate user will be reflected in response");
+				response.setStatus(Status.ERROR);
+				response.setMessage(dde.getMessage());
+				response.setUserGroupCommandStatus(UserGroupCommandStatus.DUPLICATE_USER);
+			} catch (InvalidGroupException ige) {
+				log.info("invalid group will be reflected in response");
+				response.setStatus(Status.ERROR);
+				response.setMessage(ige.getMessage());
+				response.setUserGroupCommandStatus(UserGroupCommandStatus.INVALID_GROUP);
+			}
 
 			return response;
 
@@ -141,12 +165,12 @@ public class UserGroupService {
 	@Path("/{userGroup}")
 	@Consumes("application/json")
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
-	public GenericCommandResponse deleteUserGroup(
+	public UserGroupCommandResponse deleteUserGroup(
 			@HeaderParam("Authorization") final String authorization,
 			@PathParam("userGroup") final String userGroup)
 			throws InvalidRequestDataException, IrodsRestException {
 		log.info("deleteUserGroup()");
-		GenericCommandResponse response = new GenericCommandResponse();
+		UserGroupCommandResponse response = new UserGroupCommandResponse();
 
 		if (userGroup == null || userGroup.isEmpty()) {
 			throw new InvalidRequestDataException("missing userGroup");
@@ -185,13 +209,13 @@ public class UserGroupService {
 	@Path("/{userGroup}/user/{userName}")
 	@Consumes("application/json")
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
-	public GenericCommandResponse deleteUserFromGroup(
+	public UserGroupCommandResponse deleteUserFromGroup(
 			@HeaderParam("Authorization") final String authorization,
 			@PathParam("userGroup") final String userGroup,
 			@PathParam("userName") final String userName)
 			throws InvalidRequestDataException, IrodsRestException {
 		log.info("deleteUserFromGroup()");
-		GenericCommandResponse response = new GenericCommandResponse();
+		UserGroupCommandResponse response = new UserGroupCommandResponse();
 
 		if (userGroup == null || userGroup.isEmpty()) {
 			throw new InvalidRequestDataException("missing userGroup");
@@ -234,12 +258,12 @@ public class UserGroupService {
 	@PUT
 	@Consumes("application/json")
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
-	public GenericCommandResponse addUserGroup(
+	public UserGroupCommandResponse addUserGroup(
 			@HeaderParam("Authorization") final String authorization,
 			final UserGroupRequest userGroupAddRequest)
 			throws InvalidRequestDataException, IrodsRestException {
 		log.info("addUserGroup()");
-		GenericCommandResponse response = new GenericCommandResponse();
+		UserGroupCommandResponse response = new UserGroupCommandResponse();
 
 		if (userGroupAddRequest == null) {
 			log.error("request not found");
@@ -271,7 +295,14 @@ public class UserGroupService {
 			userGroup.setUserGroupName(userGroupAddRequest.getUserGroupName());
 			userGroup.setZone(userGroupAddRequest.getZone());
 
-			userGroupAO.addUserGroup(userGroup);
+			try {
+				userGroupAO.addUserGroup(userGroup);
+			} catch (DuplicateDataException dde) {
+				log.info("duplicate data exception will be reflected in response");
+				response.setStatus(Status.ERROR);
+				response.setMessage(dde.getMessage());
+				response.setUserGroupCommandStatus(UserGroupCommandStatus.DUPLICATE_GROUP);
+			}
 
 			return response;
 
