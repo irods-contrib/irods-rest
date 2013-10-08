@@ -22,18 +22,19 @@
 		<beans:constructor-arg ref="irodsSession" />
 	</beans:bean>
 
- <beans:bean id="restConfiguration" class="org.irods.jargon.rest.configuration.RestConfiguration"> 
-		<beans:property name="irodsHost" value="192.1.242.24 " /> <beans:property name="irodsPort" 
+  <beans:bean id="restConfiguration" class="org.irods.jargon.rest.configuration.RestConfiguration"> 
+		<beans:property name="irodsHost" value="155.99.144.100" /> <beans:property name="irodsPort" 
 		value="1247" /> <beans:property name="irodsZone" value="tempZone" /> <beans:property 
 		name="defaultStorageResource" value="demoResc" /> <beans:property name="privateCertAbsPath" 
 		value="c:/temp/test-certs/private.pem"/> <beans:property name="publicKeyAbsPath" 
 		value="c:/temp/test-certs/public.pem"/> <beans:property name="webInterfaceURL" 
 		value = "https://iren-web.renci.org:8443/idrop-web2" /> </beans:bean> 
+	
 	
 	<!--  test
 	
 	 <beans:bean id="restConfiguration" class="org.irods.jargon.rest.configuration.RestConfiguration"> 
-		<beans:property name="irodsHost" value="192.1.242.24 " /> <beans:property name="irodsPort" 
+		<beans:property name="irodsHost" value="155.99.144.100" /> <beans:property name="irodsPort" 
 		value="1247" /> <beans:property name="irodsZone" value="tempZone" /> <beans:property 
 		name="defaultStorageResource" value="demoResc" /> <beans:property name="privateCertAbsPath" 
 		value="c:/temp/test-certs/private.pem"/> <beans:property name="publicKeyAbsPath" 
@@ -41,6 +42,14 @@
 		value = "https://iren-web.renci.org:8443/idrop-web2" /> </beans:bean> 
 	
 	
+	
+	<beans:bean id="restConfiguration" class="org.irods.jargon.rest.configuration.RestConfiguration"> 
+		<beans:property name="irodsHost" value="localhost" /> <beans:property name="irodsPort" 
+		value="1247" /> <beans:property name="irodsZone" value="test1" /> <beans:property 
+		name="defaultStorageResource" value="test1-resc" /> <beans:property name="privateCertAbsPath" 
+		value="c:/temp/test-certs/private.pem"/> <beans:property name="publicKeyAbsPath" 
+		value="c:/temp/test-certs/public.pem"/> <beans:property name="webInterfaceURL" 
+		value = "https://iren-web.renci.org:8443/idrop-web2" /> </beans:bean> 
 	
 	
 	 -->

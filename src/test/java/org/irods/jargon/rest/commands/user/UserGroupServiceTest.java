@@ -459,6 +459,127 @@ public class UserGroupServiceTest implements ApplicationContextAware {
 		}
 
 	}
+	
+	
+	@Test
+	public void testRemoveUserFromGroupNotInGroup() throws Exception {
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
+				.getIRODSAccessObjectFactory();
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+
+		UserGroupAO userGroupAO = accessObjectFactory
+				.getUserGroupAO(irodsAccount);
+		String userGroupName = testingProperties
+				.getProperty(TestingPropertiesHelper.IRODS_USER_GROUP_KEY);
+		userGroupAO.removeUserFromGroup(userGroupName, testingProperties
+				.getProperty(TestingPropertiesHelper.IRODS_SECONDARY_USER_KEY),
+				irodsAccount.getZone());
+
+		String userGroup = testingProperties
+				.getProperty(TestingPropertiesHelper.IRODS_USER_GROUP_KEY);
+		irodsAccount.getZone();
+		String userName = testingProperties
+				.getProperty(TestingPropertiesHelper.IRODS_SECONDARY_USER_KEY);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/user_group/");
+		sb.append(userGroup);
+		sb.append("/user/");
+		sb.append(userName);
+
+		try {
+
+			HttpDelete httpDelete = new HttpDelete(sb.toString());
+			httpDelete.addHeader("accept", "application/json");
+			httpDelete.addHeader("Content-Type", "application/json");
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpDelete, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+			String entityData = EntityUtils.toString(entity);
+
+			System.out.println(entityData);
+
+			ObjectMapper mapper = new ObjectMapper();
+
+			UserGroupCommandResponse actual = mapper.readValue(entityData,
+					UserGroupCommandResponse.class);
+			Assert.assertEquals(GenericCommandResponse.Status.OK,
+					actual.getStatus());
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+
+	}
+	
+	@Test
+	public void testRemoveUserFromGroupNotInGroupAndNotExists() throws Exception {
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+
+		
+		String userGroup = testingProperties
+				.getProperty(TestingPropertiesHelper.IRODS_USER_GROUP_KEY);
+		irodsAccount.getZone();
+		String userName = "iambogus";
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/user_group/");
+		sb.append(userGroup);
+		sb.append("/user/");
+		sb.append(userName);
+
+		try {
+
+			HttpDelete httpDelete = new HttpDelete(sb.toString());
+			httpDelete.addHeader("accept", "application/json");
+			httpDelete.addHeader("Content-Type", "application/json");
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpDelete, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+			String entityData = EntityUtils.toString(entity);
+
+			System.out.println(entityData);
+
+			ObjectMapper mapper = new ObjectMapper();
+
+			UserGroupCommandResponse actual = mapper.readValue(entityData,
+					UserGroupCommandResponse.class);
+			Assert.assertEquals(GenericCommandResponse.Status.ERROR,
+					actual.getStatus());
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+
+	}
+
 
 	@Test
 	public void testRemoveUserFromGroupHyphenated() throws Exception {

@@ -238,6 +238,12 @@ public class UserGroupService {
 
 			return response;
 
+			
+		} catch (InvalidUserException iue) {
+			log.error("Invalid user exception", iue);
+			response.setStatus(Status.ERROR);
+			response.setMessage(iue.getMessage());
+			return response;
 		} catch (JargonException je) {
 			log.error("Jargon exception", je);
 			throw new IrodsRestException(je);

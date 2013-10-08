@@ -17,9 +17,12 @@ import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.DuplicateDataException;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.protovalues.UserTypeEnum;
+import org.irods.jargon.core.pub.CollectionAO;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.core.pub.UserAO;
 import org.irods.jargon.core.pub.domain.User;
+import org.irods.jargon.core.pub.io.IRODSFile;
+import org.irods.jargon.core.utils.MiscIRODSUtils;
 import org.irods.jargon.rest.auth.RestAuthUtils;
 import org.irods.jargon.rest.commands.user.UserAddActionResponse.UserAddActionResponseCode;
 import org.irods.jargon.rest.configuration.RestConfiguration;
@@ -94,7 +97,19 @@ public class UserService {
 			log.info("looking up user with name:{}", userName);
 			User user = userAO.findByName(userName);
 			log.info("user found:{}", user);
-
+			
+			//FIXME: group and experiment collection add for GENI, temporary
+			String homeDir = MiscIRODSUtils.computeHomeDirectoryForIRODSAccount(irodsAccount);
+			IRODSFile experimentDir = irodsAccessObjectFactory.getIRODSFileFactory(irodsAccount).instanceIRODSFile(homeDir, "experimentDir");
+			log.info("adding experiment dir:{}", experimentDir);
+			experimentDir.mkdirs();
+			
+			log.info("experiment dir set, now give write permission to labwiki");
+			CollectionAO collectionAO = irodsAccessObjectFactory.getCollectionAO(irodsAccount);
+			
+			collectionAO.setAccessPermissionWrite(irodsAccount.getZone(), experimentDir.getAbsolutePath(), "labwiki", true);
+			log.info("labwiki access permission set");
+			
 			return new UserData(user, restConfiguration);
 		} finally {
 			irodsAccessObjectFactory.closeSessionAndEatExceptions();
