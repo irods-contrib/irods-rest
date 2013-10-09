@@ -97,9 +97,7 @@ public class UserService {
 			log.info("looking up user with name:{}", userName);
 			User user = userAO.findByName(userName);
 			log.info("user found:{}", user);
-			
-			
-			
+
 			return new UserData(user, restConfiguration);
 		} finally {
 			irodsAccessObjectFactory.closeSessionAndEatExceptions();
@@ -178,20 +176,35 @@ public class UserService {
 			userAO.changeAUserPasswordByAnAdmin(user.getName(),
 					userAddByAdminRequest.getTempPassword());
 			log.info("password was set to requested value");
-			
-			
-			//FIXME: group and experiment collection add for GENI, temporary
-			String homeDir = MiscIRODSUtils.computeHomeDirectoryForIRODSAccount(irodsAccount);
-			IRODSFile experimentDir = irodsAccessObjectFactory.getIRODSFileFactory(irodsAccount).instanceIRODSFile(homeDir, "experimentDir");
+
+			// FIXME: group and experiment collection add for GENI, temporary
+			String homeDir = MiscIRODSUtils
+					.computeHomeDirectoryForGivenUserInSameZoneAsIRODSAccount(
+							irodsAccount, user.getName());
+			// create an IRODS account for this new user
+			IRODSAccount userAccount = IRODSAccount.instance(
+					irodsAccount.getHost(), irodsAccount.getPort(),
+					user.getName(), userAddByAdminRequest.getTempPassword(),
+					"", irodsAccount.getZone(),
+					irodsAccount.getDefaultStorageResource());
+
+			IRODSFile experimentDir = irodsAccessObjectFactory
+					.getIRODSFileFactory(userAccount).instanceIRODSFile(
+							homeDir, "experimentScripts");
 			log.info("adding experiment dir:{}", experimentDir);
 			experimentDir.mkdirs();
-			
+
+			CollectionAO collectionAO = irodsAccessObjectFactory
+					.getCollectionAO(userAccount);
+
 			log.info("experiment dir set, now give write permission to labwiki");
-			CollectionAO collectionAO = irodsAccessObjectFactory.getCollectionAO(irodsAccount);
-			
-			collectionAO.setAccessPermissionWrite(irodsAccount.getZone(), experimentDir.getAbsolutePath(), "labwiki", true);
+			collectionAO.setAccessPermissionInherit(irodsAccount.getZone(),
+					experimentDir.getAbsolutePath(), true);
+			collectionAO.setAccessPermissionWrite(irodsAccount.getZone(),
+					experimentDir.getAbsolutePath(), "labwiki", true);
+
 			log.info("labwiki access permission set");
-			
+
 			response.setMessage("success");
 			response.setUserName(userAddByAdminRequest.getUserName());
 			response.setUserAddActionResponse(UserAddActionResponseCode.SUCCESS);

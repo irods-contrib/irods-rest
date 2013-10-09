@@ -1,5 +1,6 @@
 package org.irods.jargon.rest.commands.user;
 
+import java.io.File;
 import java.util.Properties;
 
 import junit.framework.Assert;
@@ -12,11 +13,14 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.irods.jargon.core.connection.IRODSAccount;
+import org.irods.jargon.core.exception.DataNotFoundException;
 import org.irods.jargon.core.protovalues.UserTypeEnum;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.core.pub.UserAO;
 import org.irods.jargon.core.pub.domain.User;
+import org.irods.jargon.core.pub.io.IRODSFile;
+import org.irods.jargon.core.utils.MiscIRODSUtils;
 import org.irods.jargon.rest.auth.DefaultHttpClientAndContext;
 import org.irods.jargon.rest.auth.RestAuthUtils;
 import org.irods.jargon.rest.utils.RestTestingProperties;
@@ -262,9 +266,9 @@ public class UserServiceTest implements ApplicationContextAware {
 	@Test
 	public void testAddUserByAdmin() throws Exception {
 
-		String testUser = "testAddUserByAdmin";
+		String testUser = "testAddUserByAdmin2";
 		String testPassword = "test123";
-		String testDn = "testDNForaddubyAdmin";
+		String testDn = "testDNForaddubyAdmin2";
 		IRODSAccount irodsAccount = testingPropertiesHelper
 				.buildIRODSAccountFromTestProperties(testingProperties);
 
@@ -340,11 +344,30 @@ public class UserServiceTest implements ApplicationContextAware {
 		IRODSAccount irodsAccount = testingPropertiesHelper
 				.buildIRODSAccountFromTestProperties(testingProperties);
 
+		IRODSAccount userAccount = testingPropertiesHelper
+				.buildIRODSAccountForIRODSUserFromTestPropertiesForGivenUser(
+						testingProperties, testUser, testPassword);
+
 		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
 				.getIRODSAccessObjectFactory();
 
 		UserAO userAO = accessObjectFactory.getUserAO(irodsAccount);
-		userAO.deleteUser(testUser);
+
+		try {
+			User testingUser = userAO.findByName(testUser);
+			String homeDir = MiscIRODSUtils
+					.computeHomeDirectoryForIRODSAccount(userAccount);
+			IRODSFile userHomeDir = irodsFileSystem.getIRODSFileFactory(
+					userAccount).instanceIRODSFile(homeDir);
+
+			for (File homeDirFile : userHomeDir.listFiles()) {
+				homeDirFile.delete();
+			}
+			userAO.deleteUser(testUser);
+
+		} catch (DataNotFoundException dnf) {
+			// OK
+		}
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
