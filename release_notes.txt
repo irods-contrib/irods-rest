@@ -1,79 +1,27 @@
-http://blog.comsysto.com/category/lean-java/resteasy/
+*'''Project''': iRODS Rest API
+*'''Date''': 
+*'''Release Version''':
+*'''git tag''': 
 
+==News==
 
+iRODS Restful API
+=======
+Please go to [[https://code.renci.org/gf/project/irods-rest/]] for the latest news and info.
 
-<beans:bean id="authenticationManager"
-		class="org.irods.jargon.rest.auth.RestBasicAuthenticationManager">
-		<beans:property name="irodsAccessObjectFactory" ref="irodsAccessObjectFactory" />
-		<beans:property name="restConfiguration" ref="restConfiguration" />
-	</beans:bean>
+==Requirements==
 
-	<beans:bean id="basicAuthenticationFilter"
-		class="org.springframework.security.web.authentication.www.BasicAuthenticationFilter">
-		<beans:constructor-arg index="0"
-			type="org.springframework.security.authentication.AuthenticationManager"
-			ref="authenticationManager" />
-		<beans:constructor-arg index="1"
-			type="org.springframework.security.web.AuthenticationEntryPoint" ref="authenticationEntryPoint" />
-	</beans:bean>
+*Depends on Java 1.6+
+*Built using Apache Maven2, see POM for dependencies
 
-	<beans:bean id="authenticationEntryPoint"
-		class="org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint">
-		<beans:property name="realmName" value="irods-rest" />
-	</beans:bean>
+==Libraries==
 
-	<beans:bean id="filterChainProxy"
-		class="org.springframework.security.web.FilterChainProxy">
-		<sec:filter-chain-map path-type="ant">
-			<sec:filter-chain pattern="/**"
-				filters="
-           basicAuthenticationFilter, exceptionTranslationFilter,filterSecurityInterceptor" />
-		</sec:filter-chain-map>
-	</beans:bean>
+irods-rest uses Maven for dependency management.  See the pom.xml file for references to various dependencies.
 
-	<beans:bean id="exceptionTranslationFilter"
-		class="org.springframework.security.web.access.ExceptionTranslationFilter">
-		<beans:property name="authenticationEntryPoint" ref="authenticationEntryPoint" />
-		<beans:property name="accessDeniedHandler" ref="accessDeniedHandler" />
-	</beans:bean>
+Note that the following bug and feature requests are logged in GForge with related commit information [[https://code.renci.org/gf/project/irods-rest/tracker/]]
 
-	<beans:bean id="accessDeniedHandler"
-		class="org.springframework.security.web.access.AccessDeniedHandlerImpl">
-		<beans:property name="errorPage" value="/accessDenied.htm" />
-	</beans:bean>
+==Bug Fixes==
 
-	<beans:bean id="filterSecurityInterceptor"
-		class="org.springframework.security.web.access.intercept.FilterSecurityInterceptor">
-		<beans:property name="authenticationManager" ref="authenticationManager" />
-		<beans:property name="accessDecisionManager" ref="accessDecisionManager" />
-		<beans:property name="securityMetadataSource">
-			<sec:filter-security-metadata-source  use-expressions="true">
-				<intercept-url pattern="/index.htm" access="permitAll" />
-				<intercept-url pattern="/accessDenied.htm" access="permitAll" />
-				<intercept-url pattern="/rest/**" access="isAuthenticated()" />
-			</sec:filter-security-metadata-source>
-		</beans:property>
-	</beans:bean>
-	
-	<beans:bean id="accessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
-      <beans:property name="decisionVoters">
-          <beans:list>
-              <beans:bean class="org.springframework.security.web.access.expression.WebExpressionVoter">
-          </beans:bean>
-      </beans:list>
-  </beans:property>
-  </beans:bean>
-  
-  
-  
-  webxml
-  
-  	<filter>
-		<filter-name>securityFilter</filter-name>
-		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
-	</filter>
+==Features==
 
-	<filter-mapping>
-		<filter-name>securityFilter</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
+*[#1787] DFC development of a REST API

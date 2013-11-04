@@ -3,7 +3,6 @@
  */
 package org.irods.jargon.rest.commands.user;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -17,14 +16,13 @@ import org.irods.jargon.core.exception.DuplicateDataException;
 import org.irods.jargon.core.exception.InvalidGroupException;
 import org.irods.jargon.core.exception.InvalidUserException;
 import org.irods.jargon.core.exception.JargonException;
-import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.core.pub.UserGroupAO;
 import org.irods.jargon.core.pub.domain.UserGroup;
 import org.irods.jargon.rest.auth.RestAuthUtils;
+import org.irods.jargon.rest.commands.AbstractIrodsService;
 import org.irods.jargon.rest.commands.GenericCommandResponse;
 import org.irods.jargon.rest.commands.GenericCommandResponse.Status;
 import org.irods.jargon.rest.commands.user.UserGroupCommandResponse.UserGroupCommandStatus;
-import org.irods.jargon.rest.configuration.RestConfiguration;
 import org.irods.jargon.rest.exception.InvalidRequestDataException;
 import org.irods.jargon.rest.exception.IrodsRestException;
 import org.jboss.resteasy.annotations.providers.jaxb.json.Mapped;
@@ -40,31 +38,9 @@ import org.slf4j.LoggerFactory;
  */
 @Named
 @Path("/user_group")
-public class UserGroupService {
+public class UserGroupService extends AbstractIrodsService {
 
 	private Logger log = LoggerFactory.getLogger(this.getClass());
-
-	@Inject
-	IRODSAccessObjectFactory irodsAccessObjectFactory;
-
-	@Inject
-	RestConfiguration restConfiguration;
-
-	/**
-	 * @return the irodsAccessObjectFactory
-	 */
-	public IRODSAccessObjectFactory getIrodsAccessObjectFactory() {
-		return irodsAccessObjectFactory;
-	}
-
-	/**
-	 * @param irodsAccessObjectFactory
-	 *            the irodsAccessObjectFactory to set
-	 */
-	public void setIrodsAccessObjectFactory(
-			final IRODSAccessObjectFactory irodsAccessObjectFactory) {
-		this.irodsAccessObjectFactory = irodsAccessObjectFactory;
-	}
 
 	/**
 	 * Add a user to a given user group.
@@ -114,9 +90,9 @@ public class UserGroupService {
 		try {
 			IRODSAccount irodsAccount = RestAuthUtils
 					.getIRODSAccountFromBasicAuthValues(authorization,
-							restConfiguration);
+							getRestConfiguration());
 
-			UserGroupAO userGroupAO = irodsAccessObjectFactory
+			UserGroupAO userGroupAO = getIrodsAccessObjectFactory()
 					.getUserGroupAO(irodsAccount);
 
 			try {
@@ -147,7 +123,7 @@ public class UserGroupService {
 			log.error("Jargon exception in user add", je);
 			throw new IrodsRestException(je);
 		} finally {
-			irodsAccessObjectFactory.closeSessionAndEatExceptions();
+			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
 		}
 	}
 
@@ -179,9 +155,9 @@ public class UserGroupService {
 		try {
 			IRODSAccount irodsAccount = RestAuthUtils
 					.getIRODSAccountFromBasicAuthValues(authorization,
-							restConfiguration);
+							getRestConfiguration());
 
-			UserGroupAO userGroupAO = irodsAccessObjectFactory
+			UserGroupAO userGroupAO = getIrodsAccessObjectFactory()
 					.getUserGroupAO(irodsAccount);
 
 			userGroupAO.removeUserGroup(userGroup);
@@ -191,7 +167,7 @@ public class UserGroupService {
 			log.error("Jargon exception", je);
 			throw new IrodsRestException(je);
 		} finally {
-			irodsAccessObjectFactory.closeSessionAndEatExceptions();
+			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
 		}
 	}
 
@@ -228,9 +204,9 @@ public class UserGroupService {
 		try {
 			IRODSAccount irodsAccount = RestAuthUtils
 					.getIRODSAccountFromBasicAuthValues(authorization,
-							restConfiguration);
+							getRestConfiguration());
 
-			UserGroupAO userGroupAO = irodsAccessObjectFactory
+			UserGroupAO userGroupAO = getIrodsAccessObjectFactory()
 					.getUserGroupAO(irodsAccount);
 
 			userGroupAO.removeUserFromGroup(userGroup, userName,
@@ -238,7 +214,6 @@ public class UserGroupService {
 
 			return response;
 
-			
 		} catch (InvalidUserException iue) {
 			log.error("Invalid user exception", iue);
 			response.setStatus(Status.ERROR);
@@ -248,7 +223,7 @@ public class UserGroupService {
 			log.error("Jargon exception", je);
 			throw new IrodsRestException(je);
 		} finally {
-			irodsAccessObjectFactory.closeSessionAndEatExceptions();
+			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
 		}
 	}
 
@@ -292,9 +267,9 @@ public class UserGroupService {
 		try {
 			IRODSAccount irodsAccount = RestAuthUtils
 					.getIRODSAccountFromBasicAuthValues(authorization,
-							restConfiguration);
+							getRestConfiguration());
 
-			UserGroupAO userGroupAO = irodsAccessObjectFactory
+			UserGroupAO userGroupAO = getIrodsAccessObjectFactory()
 					.getUserGroupAO(irodsAccount);
 
 			UserGroup userGroup = new UserGroup();
@@ -316,23 +291,8 @@ public class UserGroupService {
 			log.error("Jargon exception in user add", je);
 			throw new IrodsRestException(je);
 		} finally {
-			irodsAccessObjectFactory.closeSessionAndEatExceptions();
+			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
 		}
-	}
-
-	/**
-	 * @return the restConfiguration
-	 */
-	public RestConfiguration getRestConfiguration() {
-		return restConfiguration;
-	}
-
-	/**
-	 * @param restConfiguration
-	 *            the restConfiguration to set
-	 */
-	public void setRestConfiguration(final RestConfiguration restConfiguration) {
-		this.restConfiguration = restConfiguration;
 	}
 
 }

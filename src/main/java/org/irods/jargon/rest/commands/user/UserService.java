@@ -3,7 +3,6 @@
  */
 package org.irods.jargon.rest.commands.user;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -17,15 +16,11 @@ import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.DuplicateDataException;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.protovalues.UserTypeEnum;
-import org.irods.jargon.core.pub.CollectionAO;
-import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.core.pub.UserAO;
 import org.irods.jargon.core.pub.domain.User;
-import org.irods.jargon.core.pub.io.IRODSFile;
-import org.irods.jargon.core.utils.MiscIRODSUtils;
 import org.irods.jargon.rest.auth.RestAuthUtils;
+import org.irods.jargon.rest.commands.AbstractIrodsService;
 import org.irods.jargon.rest.commands.user.UserAddActionResponse.UserAddActionResponseCode;
-import org.irods.jargon.rest.configuration.RestConfiguration;
 import org.irods.jargon.rest.domain.UserData;
 import org.irods.jargon.rest.utils.ConfigurationUtils;
 import org.jboss.resteasy.annotations.providers.jaxb.json.Mapped;
@@ -41,31 +36,9 @@ import org.slf4j.LoggerFactory;
  */
 @Named
 @Path("/user")
-public class UserService {
+public class UserService extends AbstractIrodsService {
 
 	private Logger log = LoggerFactory.getLogger(this.getClass());
-
-	@Inject
-	IRODSAccessObjectFactory irodsAccessObjectFactory;
-
-	@Inject
-	RestConfiguration restConfiguration;
-
-	/**
-	 * @return the irodsAccessObjectFactory
-	 */
-	public IRODSAccessObjectFactory getIrodsAccessObjectFactory() {
-		return irodsAccessObjectFactory;
-	}
-
-	/**
-	 * @param irodsAccessObjectFactory
-	 *            the irodsAccessObjectFactory to set
-	 */
-	public void setIrodsAccessObjectFactory(
-			final IRODSAccessObjectFactory irodsAccessObjectFactory) {
-		this.irodsAccessObjectFactory = irodsAccessObjectFactory;
-	}
 
 	@GET
 	@Path("/{userName}")
@@ -85,22 +58,23 @@ public class UserService {
 			throw new IllegalArgumentException("null or empty userName");
 		}
 
-		if (irodsAccessObjectFactory == null) {
+		if (getIrodsAccessObjectFactory() == null) {
 			throw new IllegalArgumentException("null irodsAccessObjectFactory");
 		}
 
 		try {
 			IRODSAccount irodsAccount = RestAuthUtils
 					.getIRODSAccountFromBasicAuthValues(authorization,
-							restConfiguration);
-			UserAO userAO = irodsAccessObjectFactory.getUserAO(irodsAccount);
+							getRestConfiguration());
+			UserAO userAO = getIrodsAccessObjectFactory().getUserAO(
+					irodsAccount);
 			log.info("looking up user with name:{}", userName);
 			User user = userAO.findByName(userName);
 			log.info("user found:{}", user);
 
-			return new UserData(user, restConfiguration);
+			return new UserData(user, getRestConfiguration());
 		} finally {
-			irodsAccessObjectFactory.closeSessionAndEatExceptions();
+			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
 		}
 	}
 
@@ -161,9 +135,10 @@ public class UserService {
 		try {
 			IRODSAccount irodsAccount = RestAuthUtils
 					.getIRODSAccountFromBasicAuthValues(authorization,
-							restConfiguration);
+							getRestConfiguration());
 
-			UserAO userAO = irodsAccessObjectFactory.getUserAO(irodsAccount);
+			UserAO userAO = getIrodsAccessObjectFactory().getUserAO(
+					irodsAccount);
 
 			log.info("adding user based on:{}", userAddByAdminRequest);
 			User user = new User();
@@ -177,41 +152,14 @@ public class UserService {
 					userAddByAdminRequest.getTempPassword());
 			log.info("password was set to requested value");
 
-			// FIXME: group and experiment collection add for GENI, temporary
-			String homeDir = MiscIRODSUtils
-					.computeHomeDirectoryForGivenUserInSameZoneAsIRODSAccount(
-							irodsAccount, user.getName());
-			// create an IRODS account for this new user
-			IRODSAccount userAccount = IRODSAccount.instance(
-					irodsAccount.getHost(), irodsAccount.getPort(),
-					user.getName(), userAddByAdminRequest.getTempPassword(),
-					"", irodsAccount.getZone(),
-					irodsAccount.getDefaultStorageResource());
-
-			IRODSFile experimentDir = irodsAccessObjectFactory
-					.getIRODSFileFactory(userAccount).instanceIRODSFile(
-							homeDir, "experimentScripts");
-			log.info("adding experiment dir:{}", experimentDir);
-			experimentDir.mkdirs();
-
-			CollectionAO collectionAO = irodsAccessObjectFactory
-					.getCollectionAO(userAccount);
-
-			log.info("experiment dir set, now give write permission to labwiki");
-			collectionAO.setAccessPermissionInherit(irodsAccount.getZone(),
-					experimentDir.getAbsolutePath(), true);
-			collectionAO.setAccessPermissionWrite(irodsAccount.getZone(),
-					experimentDir.getAbsolutePath(), "labwiki", true);
-
-			log.info("labwiki access permission set");
-
 			response.setMessage("success");
 			response.setUserName(userAddByAdminRequest.getUserName());
 			response.setUserAddActionResponse(UserAddActionResponseCode.SUCCESS);
 			response.setIrodsEnv(ConfigurationUtils
-					.buildIrodsEnvForConfigAndUser(restConfiguration,
+					.buildIrodsEnvForConfigAndUser(getRestConfiguration(),
 							user.getNameWithZone()));
-			response.setWebAccessURL(restConfiguration.getWebInterfaceURL());
+			response.setWebAccessURL(getRestConfiguration()
+					.getWebInterfaceURL());
 			return response;
 		} catch (DuplicateDataException dde) {
 			log.error("duplicate data for user add", dde);
@@ -226,23 +174,8 @@ public class UserService {
 			response.setUserAddActionResponse(UserAddActionResponseCode.INTERNAL_ERROR);
 			return response;
 		} finally {
-			irodsAccessObjectFactory.closeSessionAndEatExceptions();
+			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
 		}
-	}
-
-	/**
-	 * @return the restConfiguration
-	 */
-	public RestConfiguration getRestConfiguration() {
-		return restConfiguration;
-	}
-
-	/**
-	 * @param restConfiguration
-	 *            the restConfiguration to set
-	 */
-	public void setRestConfiguration(final RestConfiguration restConfiguration) {
-		this.restConfiguration = restConfiguration;
 	}
 
 }
