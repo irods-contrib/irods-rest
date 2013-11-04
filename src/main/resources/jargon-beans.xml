@@ -23,13 +23,11 @@
 	</beans:bean>
 	
 	 <beans:bean id="restConfiguration" class="org.irods.jargon.rest.configuration.RestConfiguration"> 
-		<beans:property name="irodsHost" value="155.99.144.100" /> <beans:property name="irodsPort" 
-		value="1247" /> <beans:property name="irodsZone" value="tempZone" /> <beans:property 
-		name="defaultStorageResource" value="demoResc" /> <beans:property name="privateCertAbsPath" 
-		value="c:/temp/test-certs/private.pem"/> <beans:property name="publicKeyAbsPath" 
-		value="c:/temp/test-certs/public.pem"/> <beans:property name="webInterfaceURL" 
-		value = "https://iren-web.renci.org:8443/idrop-web2" /> </beans:bean> 
-	
+		<beans:property name="irodsHost" value="geni-gimi.renci.org" /> <beans:property 
+		name="irodsPort" value="1247" /> <beans:property name="irodsZone" value="geniRenci" 
+		/> <beans:property name="defaultStorageResource" value="demoResc" /> <beans:property 
+		name="webInterfaceURL" value="https://geni-gimi.renci.org:8443/idrop-web2" 
+		/> </beans:bean>
 	<!-- 
 
 <beans:bean id="restConfiguration" class="org.irods.jargon.rest.configuration.RestConfiguration"> 
