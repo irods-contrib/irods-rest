@@ -2,7 +2,10 @@ package org.irods.jargon.rest.commands;
 
 import javax.inject.Inject;
 
+import org.irods.jargon.core.connection.IRODSAccount;
+import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
+import org.irods.jargon.rest.auth.RestAuthUtils;
 import org.irods.jargon.rest.configuration.RestConfiguration;
 
 /**
@@ -48,6 +51,18 @@ public abstract class AbstractIrodsService {
 	 */
 	public void setRestConfiguration(final RestConfiguration restConfiguration) {
 		this.restConfiguration = restConfiguration;
+	}
+	
+	/**
+	 * Method delegates to utility to turn the authorization header into an iRODS account
+	 * @param authorization <code>String</code> with the basic auth headers
+	 * @return {@link IRODSAccount} that corresponds to the authorization
+	 * @throws JargonException
+	 */
+	protected IRODSAccount retrieveIrodsAccountFromAuthentication(final String authorization) throws JargonException {
+		return RestAuthUtils
+			.getIRODSAccountFromBasicAuthValues(authorization,
+					getRestConfiguration());
 	}
 
 }
