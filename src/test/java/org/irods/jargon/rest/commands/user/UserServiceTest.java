@@ -354,7 +354,7 @@ public class UserServiceTest implements ApplicationContextAware {
 		UserAO userAO = accessObjectFactory.getUserAO(irodsAccount);
 
 		try {
-			User testingUser = userAO.findByName(testUser);
+			userAO.findByName(testUser);
 			String homeDir = MiscIRODSUtils
 					.computeHomeDirectoryForIRODSAccount(userAccount);
 			IRODSFile userHomeDir = irodsFileSystem.getIRODSFileFactory(

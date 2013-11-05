@@ -16,9 +16,12 @@ import javax.ws.rs.QueryParam;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.CollectionAO;
+import org.irods.jargon.core.pub.CollectionAndDataObjectListAndSearchAO;
 import org.irods.jargon.core.pub.domain.Collection;
+import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry;
 import org.irods.jargon.rest.commands.AbstractIrodsService;
 import org.irods.jargon.rest.domain.CollectionData;
+import org.irods.jargon.rest.domain.FileListingEntry;
 import org.jboss.resteasy.annotations.providers.jaxb.json.Mapped;
 import org.jboss.resteasy.annotations.providers.jaxb.json.XmlNsMap;
 import org.slf4j.Logger;
@@ -55,6 +58,7 @@ public class CollectionService extends AbstractIrodsService {
 			@QueryParam("offset") @DefaultValue("0") final int offset,
 			@QueryParam("listing") @DefaultValue("false") final boolean isListing)
 			throws JargonException {
+		
 		log.info("getCollectionData()");
 
 		if (authorization == null || authorization.isEmpty()) {
@@ -94,6 +98,34 @@ public class CollectionService extends AbstractIrodsService {
 			collectionData.setModifiedAt(collection.getModifiedAt());
 			collectionData.setSpecColType(collection.getSpecColType());
 			log.info("collectionData:{}", collectionData);
+			
+			// if listing, then get children based on given offset
+			if (isListing) {
+				log.info("add listing with offset at:{}", offset);
+				CollectionAndDataObjectListAndSearchAO collectionAndDataObjectListAndSearchAO = this.getIrodsAccessObjectFactory().getCollectionAndDataObjectListAndSearchAO(irodsAccount);
+				FileListingEntry fileListingEntry;
+				
+				for (CollectionAndDataObjectListingEntry entry :collectionAndDataObjectListAndSearchAO.listCollectionsUnderPath(collection.getAbsolutePath(), offset)) {
+					fileListingEntry = new FileListingEntry();
+					fileListingEntry.setCount(entry.getCount());
+					fileListingEntry.setCreatedAt(entry.getCreatedAt());
+					fileListingEntry.setDataSize(entry.getDataSize());
+					fileListingEntry.setId(entry.getId());
+					fileListingEntry.setLastResult(entry.isLastResult());
+					fileListingEntry.setModifiedAt(entry.getModifiedAt());
+					fileListingEntry.setObjectType(entry.getObjectType());
+					fileListingEntry.setOwnerName(entry.getOwnerName());
+					fileListingEntry.setOwnerZone(entry.getOwnerZone());
+					fileListingEntry.setParentPath(entry.getParentPath());
+					fileListingEntry.setPathOrName(entry.getPathOrName());
+					fileListingEntry.setSpecColType(entry.getSpecColType());
+					fileListingEntry.setSpecialObjectPath(entry.getSpecialObjectPath());
+					fileListingEntry.setTotalRecords(entry.getTotalRecords());
+					collectionData.getChildren().add(fileListingEntry);
+				
+				}
+				log.info("listing added...");
+			}
 			return collectionData;
 		} finally {
 			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();

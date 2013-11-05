@@ -3,9 +3,12 @@
  */
 package org.irods.jargon.rest.domain;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.irods.jargon.core.pub.domain.ObjStat.SpecColType;
@@ -47,6 +50,7 @@ public class CollectionData {
 	private Date createdAt = new Date();
 	private Date modifiedAt = new Date();
 	private SpecColType specColType = SpecColType.NORMAL;
+	private List<FileListingEntry> children = new ArrayList<FileListingEntry>();
 
 	/**
 	 * 
@@ -73,7 +77,7 @@ public class CollectionData {
 	/**
 	 * @return the collectionName
 	 */
-	@XmlAttribute
+	@XmlElement
 	public String getCollectionName() {
 		return collectionName;
 	}
@@ -90,6 +94,7 @@ public class CollectionData {
 	 * @return the objectPath
 	 */
 
+	@XmlElement
 	public String getObjectPath() {
 		return objectPath;
 	}
@@ -105,7 +110,7 @@ public class CollectionData {
 	/**
 	 * @return the collectionParentName
 	 */
-	@XmlAttribute
+	@XmlElement
 	public String getCollectionParentName() {
 		return collectionParentName;
 	}
@@ -121,7 +126,7 @@ public class CollectionData {
 	/**
 	 * @return the collectionOwnerName
 	 */
-	@XmlAttribute
+	@XmlElement
 	public String getCollectionOwnerName() {
 		return collectionOwnerName;
 	}
@@ -137,7 +142,7 @@ public class CollectionData {
 	/**
 	 * @return the collectionOwnerZone
 	 */
-	@XmlAttribute
+	@XmlElement
 	public String getCollectionOwnerZone() {
 		return collectionOwnerZone;
 	}
@@ -153,7 +158,7 @@ public class CollectionData {
 	/**
 	 * @return the collectionMapId
 	 */
-	@XmlAttribute
+	@XmlElement
 	public String getCollectionMapId() {
 		return collectionMapId;
 	}
@@ -169,7 +174,7 @@ public class CollectionData {
 	/**
 	 * @return the collectionInheritance
 	 */
-	@XmlAttribute
+	@XmlElement
 	public String getCollectionInheritance() {
 		return collectionInheritance;
 	}
@@ -185,7 +190,7 @@ public class CollectionData {
 	/**
 	 * @return the comments
 	 */
-	@XmlAttribute
+	@XmlElement
 	public String getComments() {
 		return comments;
 	}
@@ -201,8 +206,7 @@ public class CollectionData {
 	/**
 	 * @return the info1
 	 */
-	@XmlAttribute
-	public String getInfo1() {
+	@XmlElement	public String getInfo1() {
 		return info1;
 	}
 
@@ -217,7 +221,7 @@ public class CollectionData {
 	/**
 	 * @return the info2
 	 */
-	@XmlAttribute
+	@XmlElement
 	public String getInfo2() {
 		return info2;
 	}
@@ -233,8 +237,7 @@ public class CollectionData {
 	/**
 	 * @return the createdAt
 	 */
-	@XmlAttribute
-	public Date getCreatedAt() {
+	@XmlElement	public Date getCreatedAt() {
 		return createdAt;
 	}
 
@@ -249,8 +252,7 @@ public class CollectionData {
 	/**
 	 * @return the modifiedAt
 	 */
-	@XmlAttribute
-	public Date getModifiedAt() {
+	@XmlElement	public Date getModifiedAt() {
 		return modifiedAt;
 	}
 
@@ -265,7 +267,7 @@ public class CollectionData {
 	/**
 	 * @return the specColType
 	 */
-	@XmlAttribute
+	@XmlElement
 	public SpecColType getSpecColType() {
 		return specColType;
 	}
@@ -276,6 +278,21 @@ public class CollectionData {
 	 */
 	public void setSpecColType(final SpecColType specColType) {
 		this.specColType = specColType;
+	}
+
+	/**
+	 * @return the children
+	 */
+	public List<FileListingEntry> getChildren() {
+		return children;
+	}
+
+	/**
+	 * @param children
+	 *            the children to set
+	 */
+	public void setChildren(final List<FileListingEntry> children) {
+		this.children = children;
 	}
 
 }
