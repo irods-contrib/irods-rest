@@ -3,13 +3,12 @@
  */
 package org.irods.jargon.rest.commands.collection;
 
-import java.net.URI;
-
 import javax.inject.Named;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
@@ -40,42 +39,53 @@ public class CollectionService extends AbstractIrodsService {
 	private Logger log = LoggerFactory.getLogger(this.getClass());
 
 	/**
-	 * Retreive information about a collection, and optionally return a listing of data within the collection as xml or json.
+	 * Retreive information about a collection, and optionally return a listing
+	 * of data within the collection as xml or json.
 	 * 
-	 * @param authorization <code>String</code> with the basic auth header
-	 * @param uri {@link URI} with the irods data
-	 * @param offset <code>int</code> with an optional (default = 0) offset for any listing
-	 * @param isListing <code>boolean</code> with an optional (default=false) parameter that will cause a listing of collection children
+	 * @param authorization
+	 *            <code>String</code> with the basic auth header
+	 * @param offset
+	 *            <code>int</code> with an optional (default = 0) offset for any
+	 *            listing
+	 * @param isListing
+	 *            <code>boolean</code> with an optional (default=false)
+	 *            parameter that will cause a listing of collection children
 	 * @return {@link CollectionData} marshaled in the appropriate format.
 	 * @throws JargonException
 	 */
 	@GET
+	@Path("{path:.*}")
 	@Produces({ "application/xml", "application/json" })
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
 	public CollectionData getCollectionData(
 			@HeaderParam("Authorization") final String authorization,
-			@QueryParam("uri") final URI uri,
+			@PathParam("path") final String path,
 			@QueryParam("offset") @DefaultValue("0") final int offset,
 			@QueryParam("listing") @DefaultValue("false") final boolean isListing)
 			throws JargonException {
-		
+
 		log.info("getCollectionData()");
 
 		if (authorization == null || authorization.isEmpty()) {
 			throw new IllegalArgumentException("null or empty authorization");
 		}
 
-		if (uri == null) {
-			throw new IllegalArgumentException("null uri");
+		if (path == null || path.isEmpty()) {
+			throw new IllegalArgumentException("null or empty path");
 		}
 
 		try {
 			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
 			CollectionAO collectionAO = getIrodsAccessObjectFactory()
 					.getCollectionAO(irodsAccount);
-			log.info("looking up collection with URI:{}", uri);
-			Collection collection = collectionAO.findByAbsolutePath(uri
-					.getPath());
+			// log.info("looking up collection with URI:{}", uri);
+
+			StringBuilder sBuilder = new StringBuilder();
+			sBuilder.append('/');
+			sBuilder.append(path);
+
+			Collection collection = collectionAO.findByAbsolutePath(sBuilder
+					.toString());
 
 			log.info("found collection, marshall the data:{}", collection);
 			CollectionData collectionData = new CollectionData();
@@ -98,14 +108,17 @@ public class CollectionService extends AbstractIrodsService {
 			collectionData.setModifiedAt(collection.getModifiedAt());
 			collectionData.setSpecColType(collection.getSpecColType());
 			log.info("collectionData:{}", collectionData);
-			
+
 			// if listing, then get children based on given offset
 			if (isListing) {
 				log.info("add listing with offset at:{}", offset);
-				CollectionAndDataObjectListAndSearchAO collectionAndDataObjectListAndSearchAO = this.getIrodsAccessObjectFactory().getCollectionAndDataObjectListAndSearchAO(irodsAccount);
+				CollectionAndDataObjectListAndSearchAO collectionAndDataObjectListAndSearchAO = getIrodsAccessObjectFactory()
+						.getCollectionAndDataObjectListAndSearchAO(irodsAccount);
 				FileListingEntry fileListingEntry;
-				
-				for (CollectionAndDataObjectListingEntry entry :collectionAndDataObjectListAndSearchAO.listCollectionsUnderPath(collection.getAbsolutePath(), offset)) {
+
+				for (CollectionAndDataObjectListingEntry entry : collectionAndDataObjectListAndSearchAO
+						.listCollectionsUnderPath(collection.getAbsolutePath(),
+								offset)) {
 					fileListingEntry = new FileListingEntry();
 					fileListingEntry.setCount(entry.getCount());
 					fileListingEntry.setCreatedAt(entry.getCreatedAt());
@@ -119,10 +132,11 @@ public class CollectionService extends AbstractIrodsService {
 					fileListingEntry.setParentPath(entry.getParentPath());
 					fileListingEntry.setPathOrName(entry.getPathOrName());
 					fileListingEntry.setSpecColType(entry.getSpecColType());
-					fileListingEntry.setSpecialObjectPath(entry.getSpecialObjectPath());
+					fileListingEntry.setSpecialObjectPath(entry
+							.getSpecialObjectPath());
 					fileListingEntry.setTotalRecords(entry.getTotalRecords());
 					collectionData.getChildren().add(fileListingEntry);
-				
+
 				}
 				log.info("listing added...");
 			}
