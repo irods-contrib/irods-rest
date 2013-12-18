@@ -543,4 +543,72 @@ public class CollectionServiceTest implements ApplicationContextAware {
 		}
 	}
 
+	@Test
+	public void testGetCollectionMetadataListingXML() throws Exception {
+		String testDirName = "testGetCollectionMetadataListingXML";
+
+		String targetIrodsCollection = testingPropertiesHelper
+				.buildIRODSCollectionAbsolutePathFromTestProperties(
+						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
+								+ testDirName);
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
+				.getIRODSAccessObjectFactory();
+		CollectionAO collectionAO = accessObjectFactory
+				.getCollectionAO(irodsAccount);
+
+		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(
+				irodsAccount).instanceIRODSFile(targetIrodsCollection);
+		collFile.mkdirs();
+
+		// initialize the AVU data
+		String expectedAttribName = "testmdattrib1".toUpperCase();
+		String expectedAttribValue = "testmdvalue1";
+		String expectedAttribUnits = "test1mdunits";
+		AvuData avuData = AvuData.instance(expectedAttribName,
+				expectedAttribValue, expectedAttribUnits);
+		collectionAO.deleteAVUMetadata(targetIrodsCollection, avuData);
+
+		collectionAO.addAVUMetadata(targetIrodsCollection, avuData);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/collection");
+		sb.append(collFile.getAbsolutePath());
+		sb.append("/metadata");
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
+
+			HttpGet httpget = new HttpGet(sb.toString());
+			httpget.addHeader("accept", "application/xml");
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpget, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+			Assert.assertNotNull(entity);
+			String entityData = EntityUtils.toString(entity);
+			EntityUtils.consume(entity);
+			System.out.println("XML>>>");
+			System.out.println(entityData);
+			Assert.assertNotNull("null xml returned", entity);
+			Assert.assertTrue(
+					"did not get expected xml stuff",
+					entityData
+							.indexOf("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><ns2:collection xmlns:ns2=\"http://irods.org/irods-rest\" ") > -1);
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+	}
+
 }

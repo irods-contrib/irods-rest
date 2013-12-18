@@ -28,14 +28,12 @@ public class MetadataListing {
 	 * Type of iRODS domain object (collection, data object, etc) that this
 	 * metadata belongs to
 	 */
-	@XmlAttribute
 	private CollectionAndDataObjectListingEntry.ObjectType objectType = ObjectType.UNKNOWN;
 
 	/**
 	 * Unique name that identifies the given object, for example, for a
 	 * collection, this is the iRODS absolute path
 	 */
-	@XmlElement
 	private String uniqueNameString = "";
 
 	public MetadataListing() {
@@ -59,6 +57,7 @@ public class MetadataListing {
 	/**
 	 * @return the objectType
 	 */
+	@XmlAttribute
 	public CollectionAndDataObjectListingEntry.ObjectType getObjectType() {
 		return objectType;
 	}
@@ -75,6 +74,7 @@ public class MetadataListing {
 	/**
 	 * @return the uniqueNameString
 	 */
+	@XmlElement
 	public String getUniqueNameString() {
 		return uniqueNameString;
 	}
