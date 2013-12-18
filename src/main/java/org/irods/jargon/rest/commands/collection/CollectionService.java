@@ -3,6 +3,9 @@
  */
 package org.irods.jargon.rest.commands.collection;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Named;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -18,9 +21,14 @@ import org.irods.jargon.core.pub.CollectionAO;
 import org.irods.jargon.core.pub.CollectionAndDataObjectListAndSearchAO;
 import org.irods.jargon.core.pub.domain.Collection;
 import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry;
+import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry.ObjectType;
+import org.irods.jargon.core.query.JargonQueryException;
+import org.irods.jargon.core.query.MetaDataAndDomainData;
 import org.irods.jargon.rest.commands.AbstractIrodsService;
 import org.irods.jargon.rest.domain.CollectionData;
 import org.irods.jargon.rest.domain.FileListingEntry;
+import org.irods.jargon.rest.domain.MetadataEntry;
+import org.irods.jargon.rest.domain.MetadataListing;
 import org.jboss.resteasy.annotations.providers.jaxb.json.Mapped;
 import org.jboss.resteasy.annotations.providers.jaxb.json.XmlNsMap;
 import org.slf4j.Logger;
@@ -36,7 +44,7 @@ import org.slf4j.LoggerFactory;
 @Path("/collection")
 public class CollectionService extends AbstractIrodsService {
 
-	private Logger log = LoggerFactory.getLogger(this.getClass());
+	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
 	/**
 	 * Retreive information about a collection, and optionally return a listing
@@ -141,6 +149,68 @@ public class CollectionService extends AbstractIrodsService {
 				log.info("listing added...");
 			}
 			return collectionData;
+		} finally {
+			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
+		}
+	}
+
+	@GET
+	@Path("{path:.*}/metadata")
+	@Produces({ "application/xml", "application/json" })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	public MetadataListing getCollectionMetadata(
+			@HeaderParam("Authorization") final String authorization,
+			@PathParam("path") final String path) throws JargonException {
+
+		log.info("getCollectionMetadata()");
+
+		if (authorization == null || authorization.isEmpty()) {
+			throw new IllegalArgumentException("null or empty authorization");
+		}
+
+		if (path == null || path.isEmpty()) {
+			throw new IllegalArgumentException("null or empty path");
+		}
+
+		StringBuilder sb = new StringBuilder();
+		sb.append('/');
+		sb.append(path);
+
+		try {
+			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
+			CollectionAO collectionAO = getIrodsAccessObjectFactory()
+					.getCollectionAO(irodsAccount);
+
+			log.info("listing metadata");
+			List<MetadataEntry> metadataEntries = new ArrayList<MetadataEntry>();
+			try {
+				List<MetaDataAndDomainData> metadataList = collectionAO
+						.findMetadataValuesForCollection(sb.toString());
+
+				MetadataEntry entry;
+				for (MetaDataAndDomainData metadata : metadataList) {
+					entry = new MetadataEntry();
+					entry.setCount(metadata.getCount());
+					entry.setLastResult(metadata.isLastResult());
+					entry.setTotalRecords(metadata.getTotalRecords());
+					entry.setAttribute(metadata.getAvuAttribute());
+					entry.setValue(metadata.getAvuValue());
+					entry.setUnit(metadata.getAvuUnit());
+					metadataEntries.add(entry);
+				}
+
+				log.info("built response");
+
+				MetadataListing metadataListing = new MetadataListing();
+				metadataListing.setMetadataEntries(metadataEntries);
+				metadataListing.setObjectType(ObjectType.COLLECTION);
+				metadataListing.setUniqueNameString(path);
+				return metadataListing;
+
+			} catch (JargonQueryException e) {
+				throw new JargonException("cannot query metadata", e);
+			}
+
 		} finally {
 			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
 		}

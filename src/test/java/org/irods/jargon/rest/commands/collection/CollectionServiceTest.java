@@ -17,11 +17,13 @@ import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.pub.CollectionAO;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.core.pub.IRODSFileSystem;
+import org.irods.jargon.core.pub.domain.AvuData;
 import org.irods.jargon.core.pub.domain.Collection;
 import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.rest.auth.DefaultHttpClientAndContext;
 import org.irods.jargon.rest.auth.RestAuthUtils;
 import org.irods.jargon.rest.domain.CollectionData;
+import org.irods.jargon.rest.domain.MetadataListing;
 import org.irods.jargon.rest.utils.RestTestingProperties;
 import org.irods.jargon.testutils.TestingPropertiesHelper;
 import org.jboss.resteasy.core.Dispatcher;
@@ -140,10 +142,10 @@ public class CollectionServiceTest implements ApplicationContextAware {
 		sb.append("/collection");
 		sb.append(collFile.getAbsolutePath());
 		sb.append("?contentType=application/json");
-		//sb.append("&uri=");
-		//sb.append(collFile.toURI().toString());
-		//sb.append("&listing=false");
-		//sb.append("&offset=0");
+		// sb.append("&uri=");
+		// sb.append(collFile.toURI().toString());
+		// sb.append("&listing=false");
+		// sb.append("&offset=0");
 
 		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
 				.httpClientSetup(irodsAccount, testingProperties);
@@ -170,19 +172,29 @@ public class CollectionServiceTest implements ApplicationContextAware {
 
 			Assert.assertEquals(collection.getCollectionId(),
 					actual.getCollectionId());
-			Assert.assertEquals(collection.getCollectionInheritance(), actual.getCollectionInheritance());
-			Assert.assertEquals(collection.getCollectionMapId(), actual.getCollectionMapId());
-			Assert.assertEquals(collection.getCollectionName(), actual.getCollectionName());
-			Assert.assertEquals(collection.getCollectionOwnerName(), actual.getCollectionOwnerName());
-			Assert.assertEquals(collection.getCollectionOwnerZone(), actual.getCollectionOwnerZone());
-			Assert.assertEquals(collection.getCollectionParentName(), actual.getCollectionParentName());
+			Assert.assertEquals(collection.getCollectionInheritance(),
+					actual.getCollectionInheritance());
+			Assert.assertEquals(collection.getCollectionMapId(),
+					actual.getCollectionMapId());
+			Assert.assertEquals(collection.getCollectionName(),
+					actual.getCollectionName());
+			Assert.assertEquals(collection.getCollectionOwnerName(),
+					actual.getCollectionOwnerName());
+			Assert.assertEquals(collection.getCollectionOwnerZone(),
+					actual.getCollectionOwnerZone());
+			Assert.assertEquals(collection.getCollectionParentName(),
+					actual.getCollectionParentName());
 			Assert.assertEquals(collection.getComments(), actual.getComments());
 			Assert.assertEquals(collection.getInfo1(), actual.getInfo1());
 			Assert.assertEquals(collection.getInfo2(), actual.getInfo2());
-			Assert.assertEquals(collection.getObjectPath(), actual.getObjectPath());
-			Assert.assertEquals(collection.getCreatedAt(), actual.getCreatedAt());
-			Assert.assertEquals(collection.getModifiedAt(), actual.getModifiedAt());
-			Assert.assertEquals(collection.getSpecColType(), actual.getSpecColType());
+			Assert.assertEquals(collection.getObjectPath(),
+					actual.getObjectPath());
+			Assert.assertEquals(collection.getCreatedAt(),
+					actual.getCreatedAt());
+			Assert.assertEquals(collection.getModifiedAt(),
+					actual.getModifiedAt());
+			Assert.assertEquals(collection.getSpecColType(),
+					actual.getSpecColType());
 
 		} finally {
 			// When HttpClient instance is no longer needed,
@@ -191,16 +203,17 @@ public class CollectionServiceTest implements ApplicationContextAware {
 			clientAndContext.getHttpClient().getConnectionManager().shutdown();
 		}
 	}
-	
+
 	@Test
-	public void testGetCollectionJsonNoListingQMarkInNameAndSpaces() throws Exception {
+	public void testGetCollectionJsonNoListingQMarkInNameAndSpaces()
+			throws Exception {
 		String testDirName = "how about this?/&that/testGetCollectionJsonNoListingQMarkInNameAndSpaces";
 
 		String targetIrodsCollection = testingPropertiesHelper
 				.buildIRODSCollectionAbsolutePathFromTestProperties(
 						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
 								+ testDirName);
-		
+
 		targetIrodsCollection = URLEncoder.encode(targetIrodsCollection);
 
 		IRODSAccount irodsAccount = testingPropertiesHelper
@@ -221,10 +234,10 @@ public class CollectionServiceTest implements ApplicationContextAware {
 		sb.append("/collection");
 		sb.append(collFile.getAbsolutePath());
 		sb.append("?contentType=application/json");
-		//sb.append("&uri=");
-		//sb.append(collFile.toURI().toString());
-		//sb.append("&listing=false");
-		//sb.append("&offset=0");
+		// sb.append("&uri=");
+		// sb.append(collFile.toURI().toString());
+		// sb.append("&listing=false");
+		// sb.append("&offset=0");
 
 		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
 				.httpClientSetup(irodsAccount, testingProperties);
@@ -251,19 +264,29 @@ public class CollectionServiceTest implements ApplicationContextAware {
 
 			Assert.assertEquals(collection.getCollectionId(),
 					actual.getCollectionId());
-			Assert.assertEquals(collection.getCollectionInheritance(), actual.getCollectionInheritance());
-			Assert.assertEquals(collection.getCollectionMapId(), actual.getCollectionMapId());
-			Assert.assertEquals(collection.getCollectionName(), actual.getCollectionName());
-			Assert.assertEquals(collection.getCollectionOwnerName(), actual.getCollectionOwnerName());
-			Assert.assertEquals(collection.getCollectionOwnerZone(), actual.getCollectionOwnerZone());
-			Assert.assertEquals(collection.getCollectionParentName(), actual.getCollectionParentName());
+			Assert.assertEquals(collection.getCollectionInheritance(),
+					actual.getCollectionInheritance());
+			Assert.assertEquals(collection.getCollectionMapId(),
+					actual.getCollectionMapId());
+			Assert.assertEquals(collection.getCollectionName(),
+					actual.getCollectionName());
+			Assert.assertEquals(collection.getCollectionOwnerName(),
+					actual.getCollectionOwnerName());
+			Assert.assertEquals(collection.getCollectionOwnerZone(),
+					actual.getCollectionOwnerZone());
+			Assert.assertEquals(collection.getCollectionParentName(),
+					actual.getCollectionParentName());
 			Assert.assertEquals(collection.getComments(), actual.getComments());
 			Assert.assertEquals(collection.getInfo1(), actual.getInfo1());
 			Assert.assertEquals(collection.getInfo2(), actual.getInfo2());
-			Assert.assertEquals(collection.getObjectPath(), actual.getObjectPath());
-			Assert.assertEquals(collection.getCreatedAt(), actual.getCreatedAt());
-			Assert.assertEquals(collection.getModifiedAt(), actual.getModifiedAt());
-			Assert.assertEquals(collection.getSpecColType(), actual.getSpecColType());
+			Assert.assertEquals(collection.getObjectPath(),
+					actual.getObjectPath());
+			Assert.assertEquals(collection.getCreatedAt(),
+					actual.getCreatedAt());
+			Assert.assertEquals(collection.getModifiedAt(),
+					actual.getModifiedAt());
+			Assert.assertEquals(collection.getSpecColType(),
+					actual.getSpecColType());
 
 		} finally {
 			// When HttpClient instance is no longer needed,
@@ -272,7 +295,7 @@ public class CollectionServiceTest implements ApplicationContextAware {
 			clientAndContext.getHttpClient().getConnectionManager().shutdown();
 		}
 	}
-	
+
 	@Test
 	public void testGetCollectionJsonWithListing() throws Exception {
 		String testDirName = "testGetCollectionJsonWithListing";
@@ -294,7 +317,7 @@ public class CollectionServiceTest implements ApplicationContextAware {
 		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(
 				irodsAccount).instanceIRODSFile(targetIrodsCollection);
 		collFile.mkdirs();
-		
+
 		String myTarget = "";
 		IRODSFile irodsFile;
 
@@ -342,21 +365,32 @@ public class CollectionServiceTest implements ApplicationContextAware {
 
 			Assert.assertEquals(collection.getCollectionId(),
 					actual.getCollectionId());
-			Assert.assertEquals(collection.getCollectionInheritance(), actual.getCollectionInheritance());
-			Assert.assertEquals(collection.getCollectionMapId(), actual.getCollectionMapId());
-			Assert.assertEquals(collection.getCollectionName(), actual.getCollectionName());
-			Assert.assertEquals(collection.getCollectionOwnerName(), actual.getCollectionOwnerName());
-			Assert.assertEquals(collection.getCollectionOwnerZone(), actual.getCollectionOwnerZone());
-			Assert.assertEquals(collection.getCollectionParentName(), actual.getCollectionParentName());
+			Assert.assertEquals(collection.getCollectionInheritance(),
+					actual.getCollectionInheritance());
+			Assert.assertEquals(collection.getCollectionMapId(),
+					actual.getCollectionMapId());
+			Assert.assertEquals(collection.getCollectionName(),
+					actual.getCollectionName());
+			Assert.assertEquals(collection.getCollectionOwnerName(),
+					actual.getCollectionOwnerName());
+			Assert.assertEquals(collection.getCollectionOwnerZone(),
+					actual.getCollectionOwnerZone());
+			Assert.assertEquals(collection.getCollectionParentName(),
+					actual.getCollectionParentName());
 			Assert.assertEquals(collection.getComments(), actual.getComments());
 			Assert.assertEquals(collection.getInfo1(), actual.getInfo1());
 			Assert.assertEquals(collection.getInfo2(), actual.getInfo2());
-			Assert.assertEquals(collection.getObjectPath(), actual.getObjectPath());
-			Assert.assertEquals(collection.getCreatedAt(), actual.getCreatedAt());
-			Assert.assertEquals(collection.getModifiedAt(), actual.getModifiedAt());
-			Assert.assertEquals(collection.getSpecColType(), actual.getSpecColType());
-			
-			Assert.assertFalse("no children listed", actual.getChildren().isEmpty());
+			Assert.assertEquals(collection.getObjectPath(),
+					actual.getObjectPath());
+			Assert.assertEquals(collection.getCreatedAt(),
+					actual.getCreatedAt());
+			Assert.assertEquals(collection.getModifiedAt(),
+					actual.getModifiedAt());
+			Assert.assertEquals(collection.getSpecColType(),
+					actual.getSpecColType());
+
+			Assert.assertFalse("no children listed", actual.getChildren()
+					.isEmpty());
 
 		} finally {
 			// When HttpClient instance is no longer needed,
@@ -366,7 +400,7 @@ public class CollectionServiceTest implements ApplicationContextAware {
 		}
 
 	}
-	
+
 	@Test
 	public void testGetCollectionXmlWithListing() throws Exception {
 		String testDirName = "testGetCollectionXmlWithListing";
@@ -386,7 +420,7 @@ public class CollectionServiceTest implements ApplicationContextAware {
 		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(
 				irodsAccount).instanceIRODSFile(targetIrodsCollection);
 		collFile.mkdirs();
-		
+
 		String myTarget = "";
 		IRODSFile irodsFile;
 
@@ -408,7 +442,7 @@ public class CollectionServiceTest implements ApplicationContextAware {
 		sb.append("?contentType=application/xml");
 		sb.append("&listing=true");
 		sb.append("&offset=0");
-		
+
 		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
 				.httpClientSetup(irodsAccount, testingProperties);
 		try {
@@ -426,8 +460,11 @@ public class CollectionServiceTest implements ApplicationContextAware {
 			System.out.println("XML>>>");
 			System.out.println(entityData);
 			Assert.assertNotNull("null xml returned", entity);
-			Assert.assertTrue("did not get expected xml stuff", entityData.indexOf("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><ns2:collection xmlns:ns2=\"http://irods.org/irods-rest\" ") > -1);
-		
+			Assert.assertTrue(
+					"did not get expected xml stuff",
+					entityData
+							.indexOf("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><ns2:collection xmlns:ns2=\"http://irods.org/irods-rest\" ") > -1);
+
 		} finally {
 			// When HttpClient instance is no longer needed,
 			// shut down the connection manager to ensure
@@ -437,5 +474,73 @@ public class CollectionServiceTest implements ApplicationContextAware {
 
 	}
 
+	@Test
+	public void testGetCollectionMetadataListingJson() throws Exception {
+		String testDirName = "testGetCollectionMetadataListingJson";
+
+		String targetIrodsCollection = testingPropertiesHelper
+				.buildIRODSCollectionAbsolutePathFromTestProperties(
+						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
+								+ testDirName);
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
+				.getIRODSAccessObjectFactory();
+		CollectionAO collectionAO = accessObjectFactory
+				.getCollectionAO(irodsAccount);
+
+		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(
+				irodsAccount).instanceIRODSFile(targetIrodsCollection);
+		collFile.mkdirs();
+
+		// initialize the AVU data
+		String expectedAttribName = "testmdattrib1".toUpperCase();
+		String expectedAttribValue = "testmdvalue1";
+		String expectedAttribUnits = "test1mdunits";
+		AvuData avuData = AvuData.instance(expectedAttribName,
+				expectedAttribValue, expectedAttribUnits);
+		collectionAO.deleteAVUMetadata(targetIrodsCollection, avuData);
+
+		collectionAO.addAVUMetadata(targetIrodsCollection, avuData);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/collection");
+		sb.append(collFile.getAbsolutePath());
+		sb.append("/metadata");
+		sb.append("?contentType=application/json");
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
+
+			HttpGet httpget = new HttpGet(sb.toString());
+			httpget.addHeader("accept", "application/json");
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpget, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+			Assert.assertNotNull(entity);
+			String entityData = EntityUtils.toString(entity);
+			EntityUtils.consume(entity);
+			System.out.println("JSON>>>");
+			System.out.println(entityData);
+			ObjectMapper objectMapper = new ObjectMapper();
+			MetadataListing actual = objectMapper.readValue(entityData,
+					MetadataListing.class);
+
+			Assert.assertNotNull("null metadata listing found", actual);
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+	}
 
 }
