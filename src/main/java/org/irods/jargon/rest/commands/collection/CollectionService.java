@@ -7,9 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Named;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -17,8 +19,10 @@ import javax.ws.rs.QueryParam;
 
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.JargonException;
+import org.irods.jargon.core.pub.BulkAVUOperationResponse;
 import org.irods.jargon.core.pub.CollectionAO;
 import org.irods.jargon.core.pub.CollectionAndDataObjectListAndSearchAO;
+import org.irods.jargon.core.pub.domain.AvuData;
 import org.irods.jargon.core.pub.domain.Collection;
 import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry;
 import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry.ObjectType;
@@ -29,6 +33,8 @@ import org.irods.jargon.rest.domain.CollectionData;
 import org.irods.jargon.rest.domain.FileListingEntry;
 import org.irods.jargon.rest.domain.MetadataEntry;
 import org.irods.jargon.rest.domain.MetadataListing;
+import org.irods.jargon.rest.domain.MetadataOperation;
+import org.irods.jargon.rest.domain.MetadataOperationResultEntry;
 import org.jboss.resteasy.annotations.providers.jaxb.json.Mapped;
 import org.jboss.resteasy.annotations.providers.jaxb.json.XmlNsMap;
 import org.slf4j.Logger;
@@ -52,6 +58,9 @@ public class CollectionService extends AbstractIrodsService {
 	 * 
 	 * @param authorization
 	 *            <code>String</code> with the basic auth header
+	 * @param path
+	 *            <code>String</code> with the iRODS absolute path derived from
+	 *            the URL extra path information
 	 * @param offset
 	 *            <code>int</code> with an optional (default = 0) offset for any
 	 *            listing
@@ -154,6 +163,15 @@ public class CollectionService extends AbstractIrodsService {
 		}
 	}
 
+	/**
+	 * @param authorization
+	 *            <code>String</code> with the basic auth header
+	 * @param path
+	 *            <code>String</code> with the iRODS absolute path derived from
+	 *            the URL extra path information
+	 * @return
+	 * @throws JargonException
+	 */
 	@GET
 	@Path("{path:.*}/metadata")
 	@Produces({ "application/xml", "application/json" })
@@ -216,4 +234,93 @@ public class CollectionService extends AbstractIrodsService {
 		}
 	}
 
+	/**
+	 * Do a bulk metadata add operation for the given collection. This takes a
+	 * list of AVU entries in the PUT request body, and will attempt to add each
+	 * AVU.
+	 * <p/>
+	 * A response body will log the disposition of each AVU add attempt, and any
+	 * errors for an individual attempt are noted by the returned status and
+	 * message for each entry. This allows partial success.
+	 * 
+	 * @param authorization
+	 *            <code>String</code> with the basic auth header
+	 * @param path
+	 *            <code>String</code> with the iRODS absolute path derived from
+	 *            the URL extra path information
+	 * @param metadataEntries
+	 *            <code>List</code> of {@link MetadataEntry} that is derived
+	 *            from the request body
+	 * @return response body derived from a <code>List</code> of
+	 *         {@link MetadataOperationResultEntry}
+	 * @throws JargonException
+	 */
+	@PUT
+	@Path("{path:.*}/metadata")
+	@Consumes({ "application/xml", "application/json" })
+	@Produces({ "application/xml", "application/json" })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	public List<MetadataOperationResultEntry> addCollectionMetadata(
+			@HeaderParam("Authorization") final String authorization,
+			@PathParam("path") final String path,
+			final MetadataOperation metadataOperation) throws JargonException {
+
+		log.info("addCollectionMetadata()");
+
+		if (authorization == null || authorization.isEmpty()) {
+			throw new IllegalArgumentException("null or empty authorization");
+		}
+
+		if (path == null || path.isEmpty()) {
+			throw new IllegalArgumentException("null or empty path");
+		}
+
+		if (metadataOperation == null) {
+			throw new IllegalArgumentException("null metadataOperation");
+		}
+
+		StringBuilder sb = new StringBuilder();
+		sb.append('/');
+		sb.append(path);
+
+		try {
+			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
+			CollectionAO collectionAO = getIrodsAccessObjectFactory()
+					.getCollectionAO(irodsAccount);
+
+			log.info("marshalling into AvuData...");
+			List<AvuData> avuDatas = new ArrayList<AvuData>();
+			List<MetadataOperationResultEntry> metadataOperationResultEntries = new ArrayList<MetadataOperationResultEntry>();
+
+			for (MetadataEntry metadataEntry : metadataOperation
+					.getMetadataEntries()) {
+				avuDatas.add(AvuData.instance(metadataEntry.getAttribute(),
+						metadataEntry.getValue(), metadataEntry.getUnit()));
+			}
+
+			log.info("doing bulk add operation");
+			List<BulkAVUOperationResponse> bulkAVUOperationResponses = collectionAO
+					.addBulkAVUMetadataToCollection(sb.toString(), avuDatas);
+			log.info("responses:{}", bulkAVUOperationResponses);
+
+			log.info("marshalling response into rest domain...");
+			MetadataOperationResultEntry resultEntry;
+			for (BulkAVUOperationResponse response : bulkAVUOperationResponses) {
+				resultEntry = new MetadataOperationResultEntry();
+				resultEntry.setAttributeString(response.getAvuData()
+						.getAttribute());
+				resultEntry.setMessage(response.getMessage());
+				resultEntry.setResultStatus(response.getResultStatus());
+				resultEntry.setUnit(response.getAvuData().getUnit());
+				resultEntry.setValueString(response.getAvuData().getValue());
+				metadataOperationResultEntries.add(resultEntry);
+				log.info("result entry added:{}", resultEntry);
+			}
+			log.info("complete...");
+			return metadataOperationResultEntries;
+
+		} finally {
+			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
+		}
+	}
 }

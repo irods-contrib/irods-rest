@@ -25,3 +25,21 @@ Note that the following bug and feature requests are logged in GForge with relat
 ==Features==
 
 *[#1787] DFC development of a REST API
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+notes:
+
+look at xml schema generation?  
+http://www.thaiopensource.com/relaxng/trang.html
