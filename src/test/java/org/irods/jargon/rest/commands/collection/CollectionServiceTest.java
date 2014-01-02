@@ -3,8 +3,12 @@
  */
 package org.irods.jargon.rest.commands.collection;
 
+import java.io.StringWriter;
 import java.net.URLEncoder;
 import java.util.Properties;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
 
 import junit.framework.Assert;
 
@@ -166,6 +170,103 @@ public class CollectionServiceTest implements ApplicationContextAware {
 			Assert.assertNotNull(entity);
 			String entityData = EntityUtils.toString(entity);
 			EntityUtils.consume(entity);
+			System.out.println("JSON>>>");
+			System.out.println(entityData);
+			ObjectMapper objectMapper = new ObjectMapper();
+			CollectionData actual = objectMapper.readValue(entityData,
+					CollectionData.class);
+
+			Collection collection = collectionAO
+					.findByAbsolutePath(targetIrodsCollection);
+
+			Assert.assertEquals(collection.getCollectionId(),
+					actual.getCollectionId());
+			Assert.assertEquals(collection.getCollectionInheritance(),
+					actual.getCollectionInheritance());
+			Assert.assertEquals(collection.getCollectionMapId(),
+					actual.getCollectionMapId());
+			Assert.assertEquals(collection.getCollectionName(),
+					actual.getCollectionName());
+			Assert.assertEquals(collection.getCollectionOwnerName(),
+					actual.getCollectionOwnerName());
+			Assert.assertEquals(collection.getCollectionOwnerZone(),
+					actual.getCollectionOwnerZone());
+			Assert.assertEquals(collection.getCollectionParentName(),
+					actual.getCollectionParentName());
+			Assert.assertEquals(collection.getComments(), actual.getComments());
+			Assert.assertEquals(collection.getInfo1(), actual.getInfo1());
+			Assert.assertEquals(collection.getInfo2(), actual.getInfo2());
+			Assert.assertEquals(collection.getObjectPath(),
+					actual.getObjectPath());
+			Assert.assertEquals(collection.getCreatedAt(),
+					actual.getCreatedAt());
+			Assert.assertEquals(collection.getModifiedAt(),
+					actual.getModifiedAt());
+			Assert.assertEquals(collection.getSpecColType(),
+					actual.getSpecColType());
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+	}
+
+	@Test
+	public void testAddNewCollection() throws Exception {
+		String testDirName = "testAddNewCollection";
+
+		String targetIrodsCollection = testingPropertiesHelper
+				.buildIRODSCollectionAbsolutePathFromTestProperties(
+						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
+								+ testDirName);
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
+				.getIRODSAccessObjectFactory();
+		CollectionAO collectionAO = accessObjectFactory
+				.getCollectionAO(irodsAccount);
+
+		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(
+				irodsAccount).instanceIRODSFile(targetIrodsCollection);
+		collFile.mkdirs();
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/collection");
+		sb.append(collFile.getAbsolutePath());
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
+
+			HttpPut httpPut = new HttpPut(sb.toString());
+			httpPut.addHeader("accept", "application/json");
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpPut, clientAndContext.getHttpContext());
+
+			HttpEntity entity = response.getEntity();
+			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+			Assert.assertNotNull(entity);
+			String entityData = EntityUtils.toString(entity);
+			EntityUtils.consume(entity);
+
+			// test a second put for idempotency
+
+			response = clientAndContext.getHttpClient().execute(httpPut,
+					clientAndContext.getHttpContext());
+
+			entity = response.getEntity();
+			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+			Assert.assertNotNull(entity);
+			entityData = EntityUtils.toString(entity);
+			EntityUtils.consume(entity);
+
 			System.out.println("JSON>>>");
 			System.out.println(entityData);
 			ObjectMapper objectMapper = new ObjectMapper();
@@ -618,7 +719,7 @@ public class CollectionServiceTest implements ApplicationContextAware {
 	}
 
 	@Test
-	public void testBulkAddCollectionAVUJson() throws Exception {
+	public void testBulkAddCollectionAVUSendJson() throws Exception {
 		String testDirName = "testBulkAddCollectionAVUJson";
 
 		String targetIrodsCollection = testingPropertiesHelper
@@ -697,6 +798,95 @@ public class CollectionServiceTest implements ApplicationContextAware {
 
 			Assert.assertEquals("did not get two response entries", 2,
 					actual.length);
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+
+	}
+
+	@Test
+	public void testBulkAddCollectionAVUSendXML() throws Exception {
+		String testDirName = "testBulkAddCollectionAVUSendXML";
+
+		String targetIrodsCollection = testingPropertiesHelper
+				.buildIRODSCollectionAbsolutePathFromTestProperties(
+						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
+								+ testDirName);
+
+		String testAvuAttrib1 = "testBulkAddCollectionAVUSendXMLAttr1";
+		String testAvuValue1 = "testBulkAddCollectionAVUSendXMLValue1";
+		String testAvuUnit1 = "testBulkAddCollectionAVUSendXMLUnit1";
+
+		String testAvuAttrib2 = "testBulkAddCollectionAVUSendXMLAttr2";
+		String testAvuValue2 = "testBulkAddCollectionAVUSendXMLValue2";
+		String testAvuUnit2 = "testBulkAddCollectionAVUSendXMLUnit2";
+
+		MetadataOperation metadataOperation = new MetadataOperation();
+
+		MetadataEntry metadataEntry = new MetadataEntry();
+		metadataEntry.setAttribute(testAvuAttrib1);
+		metadataEntry.setValue(testAvuValue1);
+		metadataEntry.setUnit(testAvuUnit1);
+		metadataOperation.getMetadataEntries().add(metadataEntry);
+
+		metadataEntry = new MetadataEntry();
+		metadataEntry.setAttribute(testAvuAttrib2);
+		metadataEntry.setValue(testAvuValue2);
+		metadataEntry.setUnit(testAvuUnit2);
+		metadataOperation.getMetadataEntries().add(metadataEntry);
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
+				.getIRODSAccessObjectFactory();
+
+		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(
+				irodsAccount).instanceIRODSFile(targetIrodsCollection);
+		collFile.mkdirs();
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/collection");
+		sb.append(collFile.getAbsolutePath());
+		sb.append("/metadata");
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+
+		try {
+
+			HttpPut httpPut = new HttpPut(sb.toString());
+			httpPut.addHeader("accept", "application/xml");
+			httpPut.addHeader("Content-Type", "application/xml");
+
+			final JAXBContext context = JAXBContext
+					.newInstance(MetadataOperation.class);
+
+			final Marshaller marshaller = context.createMarshaller();
+
+			final StringWriter stringWriter = new StringWriter();
+			marshaller.marshal(metadataOperation, stringWriter);
+
+			String body = stringWriter.toString();
+			System.out.println(body);
+
+			httpPut.setEntity(new StringEntity(body));
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpPut, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+			String entityData = EntityUtils.toString(entity);
+
+			System.out.println(entityData);
+
+			Assert.assertNotNull("no response body found", entityData);
 
 		} finally {
 			// When HttpClient instance is no longer needed,

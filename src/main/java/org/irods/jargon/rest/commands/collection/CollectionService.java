@@ -24,6 +24,7 @@ import org.irods.jargon.core.pub.CollectionAO;
 import org.irods.jargon.core.pub.CollectionAndDataObjectListAndSearchAO;
 import org.irods.jargon.core.pub.domain.AvuData;
 import org.irods.jargon.core.pub.domain.Collection;
+import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry;
 import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry.ObjectType;
 import org.irods.jargon.core.query.JargonQueryException;
@@ -53,7 +54,7 @@ public class CollectionService extends AbstractIrodsService {
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
 	/**
-	 * Retreive information about a collection, and optionally return a listing
+	 * Retrieve information about a collection, and optionally return a listing
 	 * of data within the collection as xml or json.
 	 * 
 	 * @param authorization
@@ -157,6 +158,92 @@ public class CollectionService extends AbstractIrodsService {
 				}
 				log.info("listing added...");
 			}
+			return collectionData;
+		} finally {
+			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
+		}
+	}
+
+	/**
+	 * Add a new collection (mkdir), based on an HTTP PUT operation using the
+	 * provided path information.
+	 * <p/>
+	 * Note that this operation is idempotent and can be invoked more than once.
+	 * If a directory already exists, it will be silently ignored.
+	 * <p/>
+	 * This method will return basic metadata about the collection that was to
+	 * be created, as in the <code>getCollectionData</code> method.
+	 * 
+	 * @param authorization
+	 *            <code>String</code> with the basic auth header
+	 * @param path
+	 *            <code>String</code> with the iRODS absolute path derived from
+	 *            the URL extra path information
+	 * @return {@link CollectionData} marshaled in the appropriate format.
+	 * @throws JargonException
+	 */
+	@PUT
+	@Path("{path:.*}")
+	@Produces({ "application/xml", "application/json" })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	public CollectionData addCollection(
+			@HeaderParam("Authorization") final String authorization,
+			@PathParam("path") final String path) throws JargonException {
+
+		log.info("addCollection()");
+
+		if (authorization == null || authorization.isEmpty()) {
+			throw new IllegalArgumentException("null or empty authorization");
+		}
+
+		if (path == null || path.isEmpty()) {
+			throw new IllegalArgumentException("null or empty path");
+		}
+
+		try {
+			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
+			CollectionAO collectionAO = getIrodsAccessObjectFactory()
+					.getCollectionAO(irodsAccount);
+
+			StringBuilder sBuilder = new StringBuilder();
+			sBuilder.append('/');
+			sBuilder.append(path);
+
+			IRODSFile collectionFile = this.getIrodsAccessObjectFactory()
+					.getIRODSFileFactory(irodsAccount)
+					.instanceIRODSFile(sBuilder.toString());
+
+			log.info("making directory at path:{}",
+					collectionFile.getAbsolutePath());
+			collectionFile.mkdirs();
+
+			log.info("dirs created, get data about collection for response...");
+
+			Collection collection = collectionAO.findByAbsolutePath(sBuilder
+					.toString());
+
+			log.info("found collection, marshall the data:{}", collection);
+			CollectionData collectionData = new CollectionData();
+			collectionData.setCollectionId(collection.getCollectionId());
+			collectionData.setCollectionInheritance(collection
+					.getCollectionInheritance());
+			collectionData.setCollectionMapId(collection.getCollectionMapId());
+			collectionData.setCollectionName(collection.getCollectionName());
+			collectionData.setCollectionOwnerName(collection
+					.getCollectionOwnerName());
+			collectionData.setCollectionOwnerZone(collection
+					.getCollectionOwnerZone());
+			collectionData.setCollectionParentName(collection
+					.getCollectionParentName());
+			collectionData.setComments(collection.getComments());
+			collectionData.setCreatedAt(collection.getCreatedAt());
+			collectionData.setInfo1(collection.getInfo1());
+			collectionData.setInfo2(collection.getInfo2());
+			collectionData.setObjectPath(collection.getObjectPath());
+			collectionData.setModifiedAt(collection.getModifiedAt());
+			collectionData.setSpecColType(collection.getSpecColType());
+			log.info("collectionData:{}", collectionData);
+
 			return collectionData;
 		} finally {
 			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
