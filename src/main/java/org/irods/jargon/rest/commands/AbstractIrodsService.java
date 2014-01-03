@@ -52,17 +52,31 @@ public abstract class AbstractIrodsService {
 	public void setRestConfiguration(final RestConfiguration restConfiguration) {
 		this.restConfiguration = restConfiguration;
 	}
-	
+
 	/**
-	 * Method delegates to utility to turn the authorization header into an iRODS account
-	 * @param authorization <code>String</code> with the basic auth headers
+	 * Method delegates to utility to turn the authorization header into an
+	 * iRODS account
+	 * 
+	 * @param authorization
+	 *            <code>String</code> with the basic auth headers
 	 * @return {@link IRODSAccount} that corresponds to the authorization
 	 * @throws JargonException
 	 */
-	protected IRODSAccount retrieveIrodsAccountFromAuthentication(final String authorization) throws JargonException {
-		return RestAuthUtils
-			.getIRODSAccountFromBasicAuthValues(authorization,
-					getRestConfiguration());
+	protected IRODSAccount retrieveIrodsAccountFromAuthentication(
+			final String authorization) throws JargonException {
+		return RestAuthUtils.getIRODSAccountFromBasicAuthValues(authorization,
+				getRestConfiguration());
+	}
+
+	/**
+	 * Get the encoding set in the jargon properties
+	 * 
+	 * @return <code>String</code> with the configured encoding
+	 * @throws JargonException
+	 */
+	protected String retrieveEncoding() throws JargonException {
+		return this.getIrodsAccessObjectFactory().getJargonProperties()
+				.getEncoding();
 	}
 
 }

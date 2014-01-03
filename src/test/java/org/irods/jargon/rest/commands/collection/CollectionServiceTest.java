@@ -4,7 +4,6 @@
 package org.irods.jargon.rest.commands.collection;
 
 import java.io.StringWriter;
-import java.net.URLEncoder;
 import java.util.Properties;
 
 import javax.xml.bind.JAXBContext;
@@ -14,6 +13,7 @@ import junit.framework.Assert;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
@@ -33,6 +33,8 @@ import org.irods.jargon.rest.domain.MetadataEntry;
 import org.irods.jargon.rest.domain.MetadataListing;
 import org.irods.jargon.rest.domain.MetadataOperation;
 import org.irods.jargon.rest.domain.MetadataOperationResultEntry;
+import org.irods.jargon.rest.domain.MetadataQueryResultEntry;
+import org.irods.jargon.rest.utils.DataUtils;
 import org.irods.jargon.rest.utils.RestTestingProperties;
 import org.irods.jargon.testutils.TestingPropertiesHelper;
 import org.jboss.resteasy.core.Dispatcher;
@@ -148,13 +150,9 @@ public class CollectionServiceTest implements ApplicationContextAware {
 		sb.append("http://localhost:");
 		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
 				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
-		sb.append("/collection");
-		sb.append(collFile.getAbsolutePath());
-		sb.append("?contentType=application/json");
-		// sb.append("&uri=");
-		// sb.append(collFile.toURI().toString());
-		// sb.append("&listing=false");
-		// sb.append("&offset=0");
+		sb.append("/collection/");
+		sb.append(DataUtils.encodeIrodsAbsolutePath(collFile.getAbsolutePath(),
+				accessObjectFactory.getJargonProperties().getEncoding()));
 
 		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
 				.httpClientSetup(irodsAccount, testingProperties);
@@ -237,8 +235,9 @@ public class CollectionServiceTest implements ApplicationContextAware {
 		sb.append("http://localhost:");
 		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
 				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
-		sb.append("/collection");
-		sb.append(collFile.getAbsolutePath());
+		sb.append("/collection/");
+		sb.append(DataUtils.encodeIrodsAbsolutePath(collFile.getAbsolutePath(),
+				accessObjectFactory.getJargonProperties().getEncoding()));
 
 		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
 				.httpClientSetup(irodsAccount, testingProperties);
@@ -310,18 +309,17 @@ public class CollectionServiceTest implements ApplicationContextAware {
 		}
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test
 	public void testGetCollectionJsonNoListingQMarkInNameAndSpaces()
 			throws Exception {
-		String testDirName = "how about this?/&that/testGetCollectionJsonNoListingQMarkInNameAndSpaces";
+		String testDirName = "how about this!!!!(/$that/testGetCollectionJsonNoListingQMarkInNameAndSpaces";
 
 		String targetIrodsCollection = testingPropertiesHelper
 				.buildIRODSCollectionAbsolutePathFromTestProperties(
 						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
 								+ testDirName);
 
-		targetIrodsCollection = URLEncoder.encode(targetIrodsCollection);
+		// targetIrodsCollection = URLEncoder.encode(targetIrodsCollection);
 
 		IRODSAccount irodsAccount = testingPropertiesHelper
 				.buildIRODSAccountFromTestProperties(testingProperties);
@@ -338,13 +336,9 @@ public class CollectionServiceTest implements ApplicationContextAware {
 		sb.append("http://localhost:");
 		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
 				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
-		sb.append("/collection");
-		sb.append(collFile.getAbsolutePath());
-		sb.append("?contentType=application/json");
-		// sb.append("&uri=");
-		// sb.append(collFile.toURI().toString());
-		// sb.append("&listing=false");
-		// sb.append("&offset=0");
+		sb.append("/collection/");
+		sb.append(DataUtils.encodeIrodsAbsolutePath(collFile.getAbsolutePath(),
+				accessObjectFactory.getJargonProperties().getEncoding()));
 
 		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
 				.httpClientSetup(irodsAccount, testingProperties);
@@ -441,10 +435,9 @@ public class CollectionServiceTest implements ApplicationContextAware {
 		sb.append("http://localhost:");
 		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
 				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
-		sb.append("/collection");
+		sb.append("/collection/");
 		sb.append(collFile.getAbsolutePath());
-		sb.append("?contentType=application/json");
-		sb.append("&listing=true");
+		sb.append("?listing=true");
 		sb.append("&offset=0");
 
 		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
@@ -544,8 +537,9 @@ public class CollectionServiceTest implements ApplicationContextAware {
 		sb.append("http://localhost:");
 		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
 				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
-		sb.append("/collection");
-		sb.append(collFile.getAbsolutePath());
+		sb.append("/collection/");
+		sb.append(DataUtils.encodeIrodsAbsolutePath(collFile.getAbsolutePath(),
+				accessObjectFactory.getJargonProperties().getEncoding()));
 		sb.append("?contentType=application/xml");
 		sb.append("&listing=true");
 		sb.append("&offset=0");
@@ -705,10 +699,8 @@ public class CollectionServiceTest implements ApplicationContextAware {
 			System.out.println("XML>>>");
 			System.out.println(entityData);
 			Assert.assertNotNull("null xml returned", entity);
-			Assert.assertTrue(
-					"did not get expected xml stuff",
-					entityData
-							.indexOf("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><ns2:collection xmlns:ns2=\"http://irods.org/irods-rest\" ") > -1);
+			Assert.assertTrue("did not get expected xml stuff",
+					entityData.indexOf("<?xml version=\"1.0\"") > -1);
 
 		} finally {
 			// When HttpClient instance is no longer needed,
@@ -827,13 +819,13 @@ public class CollectionServiceTest implements ApplicationContextAware {
 
 		MetadataOperation metadataOperation = new MetadataOperation();
 
-		MetadataEntry metadataEntry = new MetadataEntry();
+		MetadataQueryResultEntry metadataEntry = new MetadataQueryResultEntry();
 		metadataEntry.setAttribute(testAvuAttrib1);
 		metadataEntry.setValue(testAvuValue1);
 		metadataEntry.setUnit(testAvuUnit1);
 		metadataOperation.getMetadataEntries().add(metadataEntry);
 
-		metadataEntry = new MetadataEntry();
+		metadataEntry = new MetadataQueryResultEntry();
 		metadataEntry.setAttribute(testAvuAttrib2);
 		metadataEntry.setValue(testAvuValue2);
 		metadataEntry.setUnit(testAvuUnit2);
@@ -895,5 +887,65 @@ public class CollectionServiceTest implements ApplicationContextAware {
 			clientAndContext.getHttpClient().getConnectionManager().shutdown();
 		}
 
+	}
+
+	@Test
+	public void testDeleteCollection() throws Exception {
+		String testDirName = "testDeleteCollection";
+
+		String targetIrodsCollection = testingPropertiesHelper
+				.buildIRODSCollectionAbsolutePathFromTestProperties(
+						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
+								+ testDirName);
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
+				.getIRODSAccessObjectFactory();
+
+		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(
+				irodsAccount).instanceIRODSFile(targetIrodsCollection);
+		collFile.mkdirs();
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/collection");
+		sb.append(collFile.getAbsolutePath());
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
+
+			HttpDelete httpDelete = new HttpDelete(sb.toString());
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpDelete, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			Assert.assertEquals(204, response.getStatusLine().getStatusCode());
+			EntityUtils.consume(entity);
+			System.out.println("JSON>>>");
+
+			collFile.reset();
+			Assert.assertFalse("expected collection to be gone",
+					collFile.exists());
+
+			// check for idempotency
+			httpDelete = new HttpDelete(sb.toString());
+
+			response = clientAndContext.getHttpClient().execute(httpDelete,
+					clientAndContext.getHttpContext());
+			entity = response.getEntity();
+			Assert.assertEquals(204, response.getStatusLine().getStatusCode());
+
+			EntityUtils.consume(entity);
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
 	}
 }

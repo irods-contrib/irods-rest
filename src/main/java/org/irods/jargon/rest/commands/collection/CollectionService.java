@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.inject.Named;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -33,9 +34,11 @@ import org.irods.jargon.rest.commands.AbstractIrodsService;
 import org.irods.jargon.rest.domain.CollectionData;
 import org.irods.jargon.rest.domain.FileListingEntry;
 import org.irods.jargon.rest.domain.MetadataEntry;
+import org.irods.jargon.rest.domain.MetadataQueryResultEntry;
 import org.irods.jargon.rest.domain.MetadataListing;
 import org.irods.jargon.rest.domain.MetadataOperation;
 import org.irods.jargon.rest.domain.MetadataOperationResultEntry;
+import org.irods.jargon.rest.utils.DataUtils;
 import org.jboss.resteasy.annotations.providers.jaxb.json.Mapped;
 import org.jboss.resteasy.annotations.providers.jaxb.json.XmlNsMap;
 import org.slf4j.Logger;
@@ -98,12 +101,12 @@ public class CollectionService extends AbstractIrodsService {
 					.getCollectionAO(irodsAccount);
 			// log.info("looking up collection with URI:{}", uri);
 
-			StringBuilder sBuilder = new StringBuilder();
-			sBuilder.append('/');
-			sBuilder.append(path);
-
-			Collection collection = collectionAO.findByAbsolutePath(sBuilder
-					.toString());
+			String decodedPathString = DataUtils
+					.buildDecodedPathFromURLPathInfo(path,
+							this.retrieveEncoding());
+			log.info("decoded path:{}", decodedPathString);
+			Collection collection = collectionAO
+					.findByAbsolutePath(decodedPathString);
 
 			log.info("found collection, marshall the data:{}", collection);
 			CollectionData collectionData = new CollectionData();
@@ -205,13 +208,12 @@ public class CollectionService extends AbstractIrodsService {
 			CollectionAO collectionAO = getIrodsAccessObjectFactory()
 					.getCollectionAO(irodsAccount);
 
-			StringBuilder sBuilder = new StringBuilder();
-			sBuilder.append('/');
-			sBuilder.append(path);
+			String decodedPath = DataUtils.buildDecodedPathFromURLPathInfo(
+					path, this.retrieveEncoding());
 
 			IRODSFile collectionFile = this.getIrodsAccessObjectFactory()
 					.getIRODSFileFactory(irodsAccount)
-					.instanceIRODSFile(sBuilder.toString());
+					.instanceIRODSFile(decodedPath);
 
 			log.info("making directory at path:{}",
 					collectionFile.getAbsolutePath());
@@ -219,8 +221,8 @@ public class CollectionService extends AbstractIrodsService {
 
 			log.info("dirs created, get data about collection for response...");
 
-			Collection collection = collectionAO.findByAbsolutePath(sBuilder
-					.toString());
+			Collection collection = collectionAO
+					.findByAbsolutePath(decodedPath);
 
 			log.info("found collection, marshall the data:{}", collection);
 			CollectionData collectionData = new CollectionData();
@@ -277,24 +279,24 @@ public class CollectionService extends AbstractIrodsService {
 			throw new IllegalArgumentException("null or empty path");
 		}
 
-		StringBuilder sb = new StringBuilder();
-		sb.append('/');
-		sb.append(path);
+		String decodedPathString = DataUtils.buildDecodedPathFromURLPathInfo(
+				path, this.retrieveEncoding());
 
 		try {
+			log.error("decoded path:{}", decodedPathString);
 			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
 			CollectionAO collectionAO = getIrodsAccessObjectFactory()
 					.getCollectionAO(irodsAccount);
 
 			log.info("listing metadata");
-			List<MetadataEntry> metadataEntries = new ArrayList<MetadataEntry>();
+			List<MetadataQueryResultEntry> metadataEntries = new ArrayList<MetadataQueryResultEntry>();
 			try {
 				List<MetaDataAndDomainData> metadataList = collectionAO
-						.findMetadataValuesForCollection(sb.toString());
+						.findMetadataValuesForCollection(decodedPathString);
 
-				MetadataEntry entry;
+				MetadataQueryResultEntry entry;
 				for (MetaDataAndDomainData metadata : metadataList) {
-					entry = new MetadataEntry();
+					entry = new MetadataQueryResultEntry();
 					entry.setCount(metadata.getCount());
 					entry.setLastResult(metadata.isLastResult());
 					entry.setTotalRecords(metadata.getTotalRecords());
@@ -336,7 +338,7 @@ public class CollectionService extends AbstractIrodsService {
 	 *            <code>String</code> with the iRODS absolute path derived from
 	 *            the URL extra path information
 	 * @param metadataEntries
-	 *            <code>List</code> of {@link MetadataEntry} that is derived
+	 *            <code>List</code> of {@link MetadataQueryResultEntry} that is derived
 	 *            from the request body
 	 * @return response body derived from a <code>List</code> of
 	 *         {@link MetadataOperationResultEntry}
@@ -405,6 +407,74 @@ public class CollectionService extends AbstractIrodsService {
 			}
 			log.info("complete...");
 			return metadataOperationResultEntries;
+
+		} finally {
+			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
+		}
+	}
+
+	/**
+	 * Delete the given collection. This is equivalent to a rmdir command. A
+	 * parameter is available to do the operation with the force option enabled.
+	 * <p/>
+	 * This is an idempotent method, and if there is not a diretory to delete,
+	 * it will silently ignore this.
+	 * <p/>
+	 * Note that there is no need to return a body, so this method will return
+	 * an HTTP 204 with no body information
+	 * 
+	 * @param authorization
+	 *            <code>String</code> with the basic auth header
+	 * @param path
+	 *            <code>String</code> with the iRODS absolute path derived from
+	 *            the URL extra path information
+	 * @param force
+	 *            <code>boolean</code> that indicates whether the force option
+	 *            is enabled on deletion
+	 * @throws JargonException
+	 */
+	@DELETE
+	@Path("{path:.*}")
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	public void removeCollection(
+			@HeaderParam("Authorization") final String authorization,
+			@PathParam("path") final String path,
+			@QueryParam("force") @DefaultValue("false") final boolean force)
+			throws JargonException {
+
+		log.info("removeCollection()");
+
+		if (authorization == null || authorization.isEmpty()) {
+			throw new IllegalArgumentException("null or empty authorization");
+		}
+
+		if (path == null || path.isEmpty()) {
+			throw new IllegalArgumentException("null or empty path");
+		}
+
+		try {
+			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
+
+			StringBuilder sBuilder = new StringBuilder();
+			sBuilder.append('/');
+			sBuilder.append(path);
+
+			IRODSFile collectionFile = this.getIrodsAccessObjectFactory()
+					.getIRODSFileFactory(irodsAccount)
+					.instanceIRODSFile(sBuilder.toString());
+
+			log.info("removing directory at path:{}",
+					collectionFile.getAbsolutePath());
+
+			if (force) {
+				log.info("using force option...");
+				collectionFile.deleteWithForceOption();
+			} else {
+				log.info("not using force option...");
+				collectionFile.delete();
+			}
+
+			log.info("completed delete operation");
 
 		} finally {
 			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
