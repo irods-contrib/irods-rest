@@ -84,7 +84,6 @@ public class DataObjectService extends AbstractIrodsService {
 			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
 			DataObjectAO dataObjectAO = getIrodsAccessObjectFactory()
 					.getDataObjectAO(irodsAccount);
-			// log.info("looking up collection with URI:{}", uri);
 
 			String decodedPathString = DataUtils
 					.buildDecodedPathFromURLPathInfo(path,
@@ -211,7 +210,7 @@ public class DataObjectService extends AbstractIrodsService {
 			throws JargonException {
 
 		Map<String, List<InputPart>> uploadForm = input.getFormDataMap();
-		List<InputPart> inputParts = uploadForm.get("uploadFile");
+		List<InputPart> inputParts = uploadForm.get("uploadedFile");
 
 		if (inputParts == null) {
 			throw new IllegalArgumentException(

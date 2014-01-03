@@ -312,7 +312,7 @@ public class CollectionServiceTest implements ApplicationContextAware {
 	@Test
 	public void testGetCollectionJsonNoListingQMarkInNameAndSpaces()
 			throws Exception {
-		String testDirName = "how about this!!!!(/$that/testGetCollectionJsonNoListingQMarkInNameAndSpaces";
+		String testDirName = "how about this!!!!(/$that/&=testGetCollectionJsonNoListingQMarkInNameAndSpaces";
 
 		String targetIrodsCollection = testingPropertiesHelper
 				.buildIRODSCollectionAbsolutePathFromTestProperties(
