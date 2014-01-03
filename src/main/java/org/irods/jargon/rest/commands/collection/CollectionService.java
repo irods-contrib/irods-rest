@@ -12,6 +12,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -34,10 +35,10 @@ import org.irods.jargon.rest.commands.AbstractIrodsService;
 import org.irods.jargon.rest.domain.CollectionData;
 import org.irods.jargon.rest.domain.FileListingEntry;
 import org.irods.jargon.rest.domain.MetadataEntry;
-import org.irods.jargon.rest.domain.MetadataQueryResultEntry;
 import org.irods.jargon.rest.domain.MetadataListing;
 import org.irods.jargon.rest.domain.MetadataOperation;
 import org.irods.jargon.rest.domain.MetadataOperationResultEntry;
+import org.irods.jargon.rest.domain.MetadataQueryResultEntry;
 import org.irods.jargon.rest.utils.DataUtils;
 import org.jboss.resteasy.annotations.providers.jaxb.json.Mapped;
 import org.jboss.resteasy.annotations.providers.jaxb.json.XmlNsMap;
@@ -324,6 +325,109 @@ public class CollectionService extends AbstractIrodsService {
 	}
 
 	/**
+	 * Do a bulk metadata delete operation for the given collection. This takes
+	 * a list of AVU entries in the POST request body, and will attempt to
+	 * delete each AVU.
+	 * <p/>
+	 * A response body will log the disposition of each AVU delete attempt, and
+	 * any errors for an individual attempt are noted by the returned status and
+	 * message for each entry. This allows partial success.
+	 * <p/>
+	 * Note that this is an idempotent request, so that deletes of non-existent
+	 * AVU data will be gracefully handed.
+	 * <p/>
+	 * A word of explanation is in order, given that the delete operation is
+	 * accomplished with a POST HTTP verb. AVU data is free form and is often
+	 * full of delimiters and slash characters, and of arbitrary size, making
+	 * them unsuitable for inclusion in a URL, even in encoded form. For this
+	 * reason, the operations are expressed by the included request body. HTTP
+	 * DELETE verbs are ambiguous, but the consensus seems to be that DELETE
+	 * verbs should not include a body, and are sometimes treated as a POST
+	 * anyhow. So we had to fudge the 'pure' REST approach to accomodate the
+	 * wide range of AVU data that exists.
+	 * 
+	 * @param authorization
+	 *            <code>String</code> with the basic auth header
+	 * @param path
+	 *            <code>String</code> with the iRODS absolute path derived from
+	 *            the URL extra path information
+	 * @param metadataEntries
+	 *            <code>List</code> of {@link MetadataQueryResultEntry} that is
+	 *            derived from the request body
+	 * @return response body derived from a <code>List</code> of
+	 *         {@link MetadataOperationResultEntry}
+	 * @throws JargonException
+	 */
+	@POST
+	@Path("{path:.*}/metadata")
+	@Consumes({ "application/xml", "application/json" })
+	@Produces({ "application/xml", "application/json" })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	public List<MetadataOperationResultEntry> deleteCollectionMetadata(
+			@HeaderParam("Authorization") final String authorization,
+			@PathParam("path") final String path,
+			final MetadataOperation metadataOperation) throws JargonException {
+
+		log.info("deleteCollectionMetadata()");
+
+		if (authorization == null || authorization.isEmpty()) {
+			throw new IllegalArgumentException("null or empty authorization");
+		}
+
+		if (path == null || path.isEmpty()) {
+			throw new IllegalArgumentException("null or empty path");
+		}
+
+		if (metadataOperation == null) {
+			throw new IllegalArgumentException("null metadataOperation");
+		}
+
+		String decodedPathString = DataUtils.buildDecodedPathFromURLPathInfo(
+				path, this.retrieveEncoding());
+
+		try {
+			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
+			CollectionAO collectionAO = getIrodsAccessObjectFactory()
+					.getCollectionAO(irodsAccount);
+
+			log.info("marshalling into AvuData...");
+			List<AvuData> avuDatas = new ArrayList<AvuData>();
+			List<MetadataOperationResultEntry> metadataOperationResultEntries = new ArrayList<MetadataOperationResultEntry>();
+
+			for (MetadataEntry metadataEntry : metadataOperation
+					.getMetadataEntries()) {
+				avuDatas.add(AvuData.instance(metadataEntry.getAttribute(),
+						metadataEntry.getValue(), metadataEntry.getUnit()));
+			}
+
+			log.info("doing bulk add operation");
+			List<BulkAVUOperationResponse> bulkAVUOperationResponses = collectionAO
+					.deleteBulkAVUMetadataToCollection(decodedPathString,
+							avuDatas);
+			log.info("responses:{}", bulkAVUOperationResponses);
+
+			log.info("marshalling response into rest domain...");
+			MetadataOperationResultEntry resultEntry;
+			for (BulkAVUOperationResponse response : bulkAVUOperationResponses) {
+				resultEntry = new MetadataOperationResultEntry();
+				resultEntry.setAttributeString(response.getAvuData()
+						.getAttribute());
+				resultEntry.setMessage(response.getMessage());
+				resultEntry.setResultStatus(response.getResultStatus());
+				resultEntry.setUnit(response.getAvuData().getUnit());
+				resultEntry.setValueString(response.getAvuData().getValue());
+				metadataOperationResultEntries.add(resultEntry);
+				log.info("result entry added:{}", resultEntry);
+			}
+			log.info("complete...");
+			return metadataOperationResultEntries;
+
+		} finally {
+			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
+		}
+	}
+
+	/**
 	 * Do a bulk metadata add operation for the given collection. This takes a
 	 * list of AVU entries in the PUT request body, and will attempt to add each
 	 * AVU.
@@ -338,8 +442,8 @@ public class CollectionService extends AbstractIrodsService {
 	 *            <code>String</code> with the iRODS absolute path derived from
 	 *            the URL extra path information
 	 * @param metadataEntries
-	 *            <code>List</code> of {@link MetadataQueryResultEntry} that is derived
-	 *            from the request body
+	 *            <code>List</code> of {@link MetadataQueryResultEntry} that is
+	 *            derived from the request body
 	 * @return response body derived from a <code>List</code> of
 	 *         {@link MetadataOperationResultEntry}
 	 * @throws JargonException
@@ -368,9 +472,8 @@ public class CollectionService extends AbstractIrodsService {
 			throw new IllegalArgumentException("null metadataOperation");
 		}
 
-		StringBuilder sb = new StringBuilder();
-		sb.append('/');
-		sb.append(path);
+		String decodedPathString = DataUtils.buildDecodedPathFromURLPathInfo(
+				path, this.retrieveEncoding());
 
 		try {
 			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
@@ -389,7 +492,7 @@ public class CollectionService extends AbstractIrodsService {
 
 			log.info("doing bulk add operation");
 			List<BulkAVUOperationResponse> bulkAVUOperationResponses = collectionAO
-					.addBulkAVUMetadataToCollection(sb.toString(), avuDatas);
+					.addBulkAVUMetadataToCollection(decodedPathString, avuDatas);
 			log.info("responses:{}", bulkAVUOperationResponses);
 
 			log.info("marshalling response into rest domain...");
@@ -455,13 +558,13 @@ public class CollectionService extends AbstractIrodsService {
 		try {
 			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
 
-			StringBuilder sBuilder = new StringBuilder();
-			sBuilder.append('/');
-			sBuilder.append(path);
+			String decodedPathString = DataUtils
+					.buildDecodedPathFromURLPathInfo(path,
+							this.retrieveEncoding());
 
 			IRODSFile collectionFile = this.getIrodsAccessObjectFactory()
 					.getIRODSFileFactory(irodsAccount)
-					.instanceIRODSFile(sBuilder.toString());
+					.instanceIRODSFile(decodedPathString);
 
 			log.info("removing directory at path:{}",
 					collectionFile.getAbsolutePath());

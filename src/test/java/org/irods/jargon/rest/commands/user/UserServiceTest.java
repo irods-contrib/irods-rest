@@ -266,9 +266,9 @@ public class UserServiceTest implements ApplicationContextAware {
 	@Test
 	public void testAddUserByAdmin() throws Exception {
 
-		String testUser = "testAddUserByAdmin2";
+		String testUser = "testAddUserByAdminRest";
 		String testPassword = "test123";
-		String testDn = "testDNForaddubyAdmin2";
+		String testDn = "testDNForaddubyAdminRest";
 		IRODSAccount irodsAccount = testingPropertiesHelper
 				.buildIRODSAccountFromTestProperties(testingProperties);
 
