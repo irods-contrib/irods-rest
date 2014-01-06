@@ -645,6 +645,76 @@ public class CollectionServiceTest implements ApplicationContextAware {
 	}
 
 	@Test
+	public void testGetCollectionMetadataListingJsonWithMetadataInFileName()
+			throws Exception {
+		String testDirName = "blah/metadata/blahblah/metadata/testGetCollectionMetadataListingJsonWithMetadataInFileName";
+
+		String targetIrodsCollection = testingPropertiesHelper
+				.buildIRODSCollectionAbsolutePathFromTestProperties(
+						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
+								+ testDirName);
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
+				.getIRODSAccessObjectFactory();
+		CollectionAO collectionAO = accessObjectFactory
+				.getCollectionAO(irodsAccount);
+
+		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(
+				irodsAccount).instanceIRODSFile(targetIrodsCollection);
+		collFile.mkdirs();
+
+		// initialize the AVU data
+		String expectedAttribName = "testmdattrib1".toUpperCase();
+		String expectedAttribValue = "testmdvalue1";
+		String expectedAttribUnits = "test1mdunits";
+		AvuData avuData = AvuData.instance(expectedAttribName,
+				expectedAttribValue, expectedAttribUnits);
+		collectionAO.deleteAVUMetadata(targetIrodsCollection, avuData);
+
+		collectionAO.addAVUMetadata(targetIrodsCollection, avuData);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/collection");
+		sb.append(collFile.getAbsolutePath());
+		sb.append("/metadata");
+		sb.append("?contentType=application/json");
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
+
+			HttpGet httpget = new HttpGet(sb.toString());
+			httpget.addHeader("accept", "application/json");
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpget, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+			Assert.assertNotNull(entity);
+			String entityData = EntityUtils.toString(entity);
+			EntityUtils.consume(entity);
+			System.out.println("JSON>>>");
+			System.out.println(entityData);
+			ObjectMapper objectMapper = new ObjectMapper();
+			MetadataListing actual = objectMapper.readValue(entityData,
+					MetadataListing.class);
+
+			Assert.assertNotNull("null metadata listing found", actual);
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+	}
+
+	@Test
 	public void testGetCollectionMetadataListingXML() throws Exception {
 		String testDirName = "testGetCollectionMetadataListingXML";
 
