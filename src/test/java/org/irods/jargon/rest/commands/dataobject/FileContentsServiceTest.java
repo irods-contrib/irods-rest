@@ -4,12 +4,14 @@
 package org.irods.jargon.rest.commands.dataobject;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.Properties;
 
 import junit.framework.Assert;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
@@ -17,6 +19,7 @@ import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.util.EntityUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.irods.jargon.core.connection.IRODSAccount;
+import org.irods.jargon.core.pub.DataTransferOperations;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.core.pub.io.IRODSFile;
@@ -189,6 +192,115 @@ public class FileContentsServiceTest implements ApplicationContextAware {
 					irodsAccount).instanceIRODSFile(targetIrodsFile);
 			Assert.assertTrue("should have created the file on upload",
 					actual.exists());
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+	}
+
+	@Test
+	public void testDownloadDataObjectData() throws Exception {
+		// generate a local scratch file
+		long length = 100 * 1024;
+		String testFileName = "testDownloadDataObjectData.dat";
+		String absPath = scratchFileUtils
+				.createAndReturnAbsoluteScratchPath(IRODS_TEST_SUBDIR_PATH);
+		String localFileName = FileGenerator
+				.generateFileOfFixedLengthGivenName(absPath, testFileName,
+						length);
+
+		String targetIrodsFile = testingPropertiesHelper
+				.buildIRODSCollectionAbsolutePathFromTestProperties(
+						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
+								+ testFileName);
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
+				.getIRODSAccessObjectFactory();
+
+		DataTransferOperations dto = accessObjectFactory
+				.getDataTransferOperations(irodsAccount);
+		dto.putOperation(localFileName, targetIrodsFile, "", null, null);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/fileContents/");
+		sb.append(DataUtils.encodeIrodsAbsolutePath(targetIrodsFile,
+				accessObjectFactory.getJargonProperties().getEncoding()));
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
+
+			HttpGet httpGet = new HttpGet(sb.toString());
+			// httpPost.addHeader("Content-type", "multipart/form-data");
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpGet, clientAndContext.getHttpContext());
+
+			HttpEntity entity = response.getEntity();
+			long len = 0;
+			InputStream inputStream = null;
+
+			if (entity != null) {
+				len = entity.getContentLength();
+				inputStream = entity.getContent();
+				// write the file to whether you want it.
+			}
+			Assert.assertEquals("invalid content length returned", length, len);
+
+			Assert.assertNotNull("null input stream returned", inputStream);
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+	}
+
+	@Test
+	public void testDownloadDataObjectDataNotExists() throws Exception {
+
+		String testFileName = "testDownloadDataObjectDataNotExists.dat";
+
+		String targetIrodsFile = testingPropertiesHelper
+				.buildIRODSCollectionAbsolutePathFromTestProperties(
+						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
+								+ testFileName);
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
+				.getIRODSAccessObjectFactory();
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/fileContents/");
+		sb.append(DataUtils.encodeIrodsAbsolutePath(targetIrodsFile,
+				accessObjectFactory.getJargonProperties().getEncoding()));
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
+
+			HttpGet httpGet = new HttpGet(sb.toString());
+			// httpPost.addHeader("Content-type", "multipart/form-data");
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpGet, clientAndContext.getHttpContext());
+
+			Assert.assertEquals(404, response.getStatusLine().getStatusCode());
 
 		} finally {
 			// When HttpClient instance is no longer needed,

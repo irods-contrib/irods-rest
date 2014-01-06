@@ -89,7 +89,6 @@ public class DataObjectService extends AbstractIrodsService {
 			log.info("found dataObject, marshall the data:{}", dataObject);
 			DataObjectData dataObjectData = DataObjectServiceUtils
 					.buildDataObjectValuesFromIrodsData(dataObject);
-
 			log.info("got data object data:{}", dataObjectData);
 
 			return dataObjectData;

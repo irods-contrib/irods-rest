@@ -459,8 +459,7 @@ public class UserGroupServiceTest implements ApplicationContextAware {
 		}
 
 	}
-	
-	
+
 	@Test
 	public void testRemoveUserFromGroupNotInGroup() throws Exception {
 
@@ -525,9 +524,10 @@ public class UserGroupServiceTest implements ApplicationContextAware {
 		}
 
 	}
-	
+
 	@Test
-	public void testRemoveUserFromGroupNotInGroupAndNotExists() throws Exception {
+	public void testRemoveUserFromGroupNotInGroupAndNotExists()
+			throws Exception {
 
 		IRODSAccount irodsAccount = testingPropertiesHelper
 				.buildIRODSAccountFromTestProperties(testingProperties);
@@ -535,7 +535,6 @@ public class UserGroupServiceTest implements ApplicationContextAware {
 		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
 				.httpClientSetup(irodsAccount, testingProperties);
 
-		
 		String userGroup = testingProperties
 				.getProperty(TestingPropertiesHelper.IRODS_USER_GROUP_KEY);
 		irodsAccount.getZone();
@@ -579,7 +578,6 @@ public class UserGroupServiceTest implements ApplicationContextAware {
 		}
 
 	}
-
 
 	@Test
 	public void testRemoveUserFromGroupHyphenated() throws Exception {
@@ -626,9 +624,11 @@ public class UserGroupServiceTest implements ApplicationContextAware {
 		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
 				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
 		sb.append("/user_group/");
-		sb.append(URLEncoder.encode(testUserGroupName));
+		sb.append(URLEncoder.encode(testUserGroupName, userAO
+				.getJargonProperties().getEncoding()));
 		sb.append("/user/");
-		sb.append(URLEncoder.encode(testUserName));
+		sb.append(URLEncoder.encode(testUserName, userAO.getJargonProperties()
+				.getEncoding()));
 
 		System.out.println("request url:" + sb.toString());
 

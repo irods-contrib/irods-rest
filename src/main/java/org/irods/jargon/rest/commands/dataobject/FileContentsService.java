@@ -3,18 +3,26 @@
  */
 package org.irods.jargon.rest.commands.dataobject;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.Map;
 
 import javax.inject.Named;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.JargonException;
@@ -83,6 +91,15 @@ public class FileContentsService extends AbstractIrodsService {
 			@PathParam("path") final String path,
 			final MultipartFormDataInput input) throws JargonException {
 
+		log.info("uploadFile()");
+
+		if (authorization == null || authorization.isEmpty()) {
+			throw new IllegalArgumentException("null or empty authorization");
+		}
+
+		if (path == null || path.isEmpty()) {
+			throw new IllegalArgumentException("null or empty path");
+		}
 		Map<String, List<InputPart>> uploadForm = input.getFormDataMap();
 		List<InputPart> inputParts = uploadForm.get("uploadFile");
 
@@ -109,20 +126,21 @@ public class FileContentsService extends AbstractIrodsService {
 		String decodedPathString = DataUtils.buildDecodedPathFromURLPathInfo(
 				path, retrieveEncoding());
 
-		IRODSFile dataFile = getIrodsAccessObjectFactory().getIRODSFileFactory(
-				irodsAccount).instanceIRODSFile(decodedPathString);
-
-		InputPart inputPart = inputParts.get(0);
-		Stream2StreamAO stream2StreamAO = getIrodsAccessObjectFactory()
-				.getStream2StreamAO(irodsAccount);
-		DataObjectAO dataObjectAO = getIrodsAccessObjectFactory()
-				.getDataObjectAO(irodsAccount);
-		log.info("creating target output stream to irods..");
-		IRODSFileOutputStream outputStream = getIrodsAccessObjectFactory()
-				.getIRODSFileFactory(irodsAccount)
-				.instanceIRODSFileOutputStream(dataFile);
-
 		try {
+
+			IRODSFile dataFile = getIrodsAccessObjectFactory()
+					.getIRODSFileFactory(irodsAccount).instanceIRODSFile(
+							decodedPathString);
+
+			InputPart inputPart = inputParts.get(0);
+			Stream2StreamAO stream2StreamAO = getIrodsAccessObjectFactory()
+					.getStream2StreamAO(irodsAccount);
+			DataObjectAO dataObjectAO = getIrodsAccessObjectFactory()
+					.getDataObjectAO(irodsAccount);
+			log.info("creating target output stream to irods..");
+			IRODSFileOutputStream outputStream = getIrodsAccessObjectFactory()
+					.getIRODSFileFactory(irodsAccount)
+					.instanceIRODSFileOutputStream(dataFile);
 
 			log.info("getting input stream for file...");
 			// convert the uploaded file to inputstream
@@ -146,7 +164,91 @@ public class FileContentsService extends AbstractIrodsService {
 		} catch (IOException e) {
 			log.error("io exception streaming file data", e);
 			throw new JargonException("io exception streaming file data", e);
+		} finally {
+			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
 		}
 	}
 
+	/**
+	 * Download the iRODS file data to the client
+	 * 
+	 * @param authorization
+	 *            <code>String</code> with the basic auth header
+	 * @param path
+	 *            <code>String</code> with the iRODS absolute path derived from
+	 *            the URL extra path information
+	 * @return
+	 * @throws JargonException
+	 */
+	@GET
+	@Path("{path:.*}")
+	@Produces(MediaType.APPLICATION_OCTET_STREAM)
+	public void getFile(
+			@HeaderParam("Authorization") final String authorization,
+			@PathParam("path") final String path,
+			@Context final HttpServletResponse response) throws JargonException {
+
+		log.info("getFile()");
+
+		if (authorization == null || authorization.isEmpty()) {
+			throw new IllegalArgumentException("null or empty authorization");
+		}
+
+		if (path == null || path.isEmpty()) {
+			throw new IllegalArgumentException("null or empty path");
+		}
+
+		IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
+
+		/*
+		 * The path param in the URL gives the target file in iRODS, there is
+		 * only one
+		 */
+
+		String decodedPathString = DataUtils.buildDecodedPathFromURLPathInfo(
+				path, retrieveEncoding());
+
+		log.info("decoded path:{}", decodedPathString);
+
+		try {
+			IRODSFile irodsFile = getIrodsAccessObjectFactory()
+					.getIRODSFileFactory(irodsAccount).instanceIRODSFile(
+							decodedPathString);
+
+			if (!irodsFile.exists()) {
+				log.info("file does not exist");
+				throw new WebApplicationException(
+						HttpURLConnection.HTTP_NOT_FOUND);
+			}
+
+			InputStream input = getIrodsAccessObjectFactory()
+					.getIRODSFileFactory(irodsAccount)
+					.instanceIRODSFileInputStream(irodsFile);
+
+			int contentLength = (int) irodsFile.length();
+
+			response.setContentType("application/octet-stream");
+			response.setContentLength(contentLength);
+			response.setHeader("Content-disposition", "attachment; filename=\""
+					+ decodedPathString + "\"");
+
+			OutputStream output;
+			try {
+				output = new BufferedOutputStream(response.getOutputStream());
+			} catch (IOException ioe) {
+				log.error(
+						"io exception getting output stream to download file",
+						ioe);
+				throw new JargonException("exception downloading iRODS data",
+						ioe);
+			}
+			Stream2StreamAO stream2StreamAO = getIrodsAccessObjectFactory()
+					.getStream2StreamAO(irodsAccount);
+			stream2StreamAO.streamToStreamCopyUsingStandardIO(input, output);
+		} finally {
+			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
+
+		}
+
+	}
 }
