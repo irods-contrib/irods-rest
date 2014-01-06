@@ -34,7 +34,7 @@ public class ServerInfo {
 		return initializeDate;
 	}
 
-	public void setInitializeDate(Date initializeDate) {
+	public void setInitializeDate(final Date initializeDate) {
 		this.initializeDate = initializeDate;
 	}
 
@@ -42,7 +42,7 @@ public class ServerInfo {
 		return icatEnabled;
 	}
 
-	public void setIcatEnabled(IcatEnabled icatEnabled) {
+	public void setIcatEnabled(final IcatEnabled icatEnabled) {
 		this.icatEnabled = icatEnabled;
 	}
 
@@ -50,7 +50,7 @@ public class ServerInfo {
 		return serverBootTime;
 	}
 
-	public void setServerBootTime(int serverBootTime) {
+	public void setServerBootTime(final int serverBootTime) {
 		this.serverBootTime = serverBootTime;
 	}
 
@@ -58,7 +58,7 @@ public class ServerInfo {
 		return relVersion;
 	}
 
-	public void setRelVersion(String relVersion) {
+	public void setRelVersion(final String relVersion) {
 		this.relVersion = relVersion;
 	}
 
@@ -66,7 +66,7 @@ public class ServerInfo {
 		return apiVersion;
 	}
 
-	public void setApiVersion(String apiVersion) {
+	public void setApiVersion(final String apiVersion) {
 		this.apiVersion = apiVersion;
 	}
 
@@ -74,7 +74,7 @@ public class ServerInfo {
 		return rodsZone;
 	}
 
-	public void setRodsZone(String rodsZone) {
+	public void setRodsZone(final String rodsZone) {
 		this.rodsZone = rodsZone;
 	}
 
@@ -82,7 +82,7 @@ public class ServerInfo {
 		return currentServerTime;
 	}
 
-	public void setCurrentServerTime(long currentServerTime) {
+	public void setCurrentServerTime(final long currentServerTime) {
 		this.currentServerTime = currentServerTime;
 	}
 

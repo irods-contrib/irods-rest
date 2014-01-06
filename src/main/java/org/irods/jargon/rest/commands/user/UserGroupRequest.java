@@ -33,7 +33,7 @@ public class UserGroupRequest {
 		return userGroupName;
 	}
 
-	public void setUserGroupName(String userGroupName) {
+	public void setUserGroupName(final String userGroupName) {
 		this.userGroupName = userGroupName;
 	}
 
@@ -41,7 +41,7 @@ public class UserGroupRequest {
 		return zone;
 	}
 
-	public void setZone(String zone) {
+	public void setZone(final String zone) {
 		this.zone = zone;
 	}
 

@@ -112,7 +112,8 @@ public class RestConfiguration {
 	 * @param smimeEncryptAdminFunctions
 	 *            the smimeEncryptAdminFunctions to set
 	 */
-	public void setSmimeEncryptAdminFunctions(boolean smimeEncryptAdminFunctions) {
+	public void setSmimeEncryptAdminFunctions(
+			final boolean smimeEncryptAdminFunctions) {
 		this.smimeEncryptAdminFunctions = smimeEncryptAdminFunctions;
 	}
 
@@ -127,7 +128,7 @@ public class RestConfiguration {
 	 * @param privateCertAbsPath
 	 *            the privateCertAbsPath to set
 	 */
-	public void setPrivateCertAbsPath(String privateCertAbsPath) {
+	public void setPrivateCertAbsPath(final String privateCertAbsPath) {
 		this.privateCertAbsPath = privateCertAbsPath;
 	}
 
@@ -142,7 +143,7 @@ public class RestConfiguration {
 	 * @param publicKeyAbsPath
 	 *            the publicKeyAbsPath to set
 	 */
-	public void setPublicKeyAbsPath(String publicKeyAbsPath) {
+	public void setPublicKeyAbsPath(final String publicKeyAbsPath) {
 		this.publicKeyAbsPath = publicKeyAbsPath;
 	}
 
@@ -150,7 +151,7 @@ public class RestConfiguration {
 		return webInterfaceURL;
 	}
 
-	public void setWebInterfaceURL(String webInterfaceURL) {
+	public void setWebInterfaceURL(final String webInterfaceURL) {
 		this.webInterfaceURL = webInterfaceURL;
 	}
 

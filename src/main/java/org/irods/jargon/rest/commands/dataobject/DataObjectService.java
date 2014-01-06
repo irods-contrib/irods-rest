@@ -81,8 +81,7 @@ public class DataObjectService extends AbstractIrodsService {
 					.getDataObjectAO(irodsAccount);
 
 			String decodedPathString = DataUtils
-					.buildDecodedPathFromURLPathInfo(path,
-							this.retrieveEncoding());
+					.buildDecodedPathFromURLPathInfo(path, retrieveEncoding());
 			log.info("decoded path:{}", decodedPathString);
 			DataObject dataObject = dataObjectAO
 					.findByAbsolutePath(decodedPathString);
@@ -135,12 +134,11 @@ public class DataObjectService extends AbstractIrodsService {
 			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
 
 			String decodedPathString = DataUtils
-					.buildDecodedPathFromURLPathInfo(path,
-							this.retrieveEncoding());
+					.buildDecodedPathFromURLPathInfo(path, retrieveEncoding());
 
-			IRODSFile dataFile = this.getIrodsAccessObjectFactory()
-					.getIRODSFileFactory(irodsAccount)
-					.instanceIRODSFile(decodedPathString);
+			IRODSFile dataFile = getIrodsAccessObjectFactory()
+					.getIRODSFileFactory(irodsAccount).instanceIRODSFile(
+							decodedPathString);
 
 			log.info("removing directory at path:{}",
 					dataFile.getAbsolutePath());

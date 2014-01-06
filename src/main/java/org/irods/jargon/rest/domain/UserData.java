@@ -67,18 +67,18 @@ public class UserData {
 			throw new IllegalArgumentException("null restConfiguration");
 		}
 
-		this.comment = user.getComment();
-		this.createTime = user.getCreateTime();
-		this.id = user.getId();
-		this.info = user.getInfo();
-		this.modifyTime = user.getModifyTime();
-		this.name = user.getName();
-		this.userDN = user.getUserDN();
-		this.userType = user.getUserType();
-		this.zone = user.getZone();
-		this.irodsEnv = ConfigurationUtils.buildIrodsEnvForConfigAndUser(
+		comment = user.getComment();
+		createTime = user.getCreateTime();
+		id = user.getId();
+		info = user.getInfo();
+		modifyTime = user.getModifyTime();
+		name = user.getName();
+		userDN = user.getUserDN();
+		userType = user.getUserType();
+		zone = user.getZone();
+		irodsEnv = ConfigurationUtils.buildIrodsEnvForConfigAndUser(
 				restConfiguration, user.getName());
-		this.webAccessURL = restConfiguration.getWebInterfaceURL();
+		webAccessURL = restConfiguration.getWebInterfaceURL();
 
 	}
 
@@ -257,7 +257,7 @@ public class UserData {
 		return irodsEnv;
 	}
 
-	public void setIrodsEnv(String irodsEnv) {
+	public void setIrodsEnv(final String irodsEnv) {
 		this.irodsEnv = irodsEnv;
 	}
 
@@ -266,7 +266,7 @@ public class UserData {
 		return webAccessURL;
 	}
 
-	public void setWebAccessURL(String webAccessURL) {
+	public void setWebAccessURL(final String webAccessURL) {
 		this.webAccessURL = webAccessURL;
 	}
 

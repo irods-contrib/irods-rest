@@ -50,7 +50,7 @@ public class MetadataOperationResultEntry {
 	 * @param resultStatus
 	 *            the resultStatus to set
 	 */
-	public void setResultStatus(ResultStatus resultStatus) {
+	public void setResultStatus(final ResultStatus resultStatus) {
 		this.resultStatus = resultStatus;
 	}
 
@@ -66,7 +66,7 @@ public class MetadataOperationResultEntry {
 	 * @param message
 	 *            the message to set
 	 */
-	public void setMessage(String message) {
+	public void setMessage(final String message) {
 		this.message = message;
 	}
 
@@ -82,7 +82,7 @@ public class MetadataOperationResultEntry {
 	 * @param attributeString
 	 *            the attributeString to set
 	 */
-	public void setAttributeString(String attributeString) {
+	public void setAttributeString(final String attributeString) {
 		this.attributeString = attributeString;
 	}
 
@@ -98,7 +98,7 @@ public class MetadataOperationResultEntry {
 	 * @param valueString
 	 *            the valueString to set
 	 */
-	public void setValueString(String valueString) {
+	public void setValueString(final String valueString) {
 		this.valueString = valueString;
 	}
 
@@ -114,7 +114,7 @@ public class MetadataOperationResultEntry {
 	 * @param unit
 	 *            the unit to set
 	 */
-	public void setUnit(String unit) {
+	public void setUnit(final String unit) {
 		this.unit = unit;
 	}
 

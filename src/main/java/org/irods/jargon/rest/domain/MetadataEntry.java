@@ -49,7 +49,7 @@ public class MetadataEntry {
 	 * @param attribute
 	 *            the attribute to set
 	 */
-	public void setAttribute(String attribute) {
+	public void setAttribute(final String attribute) {
 		this.attribute = attribute;
 	}
 
@@ -57,7 +57,7 @@ public class MetadataEntry {
 	 * @param value
 	 *            the value to set
 	 */
-	public void setValue(String value) {
+	public void setValue(final String value) {
 		this.value = value;
 	}
 
@@ -65,7 +65,7 @@ public class MetadataEntry {
 	 * @param unit
 	 *            the unit to set
 	 */
-	public void setUnit(String unit) {
+	public void setUnit(final String unit) {
 		this.unit = unit;
 	}
 

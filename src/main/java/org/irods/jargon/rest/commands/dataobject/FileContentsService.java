@@ -52,6 +52,27 @@ public class FileContentsService extends AbstractIrodsService {
 
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
+	/**
+	 * Do a straight upload of the contents to an iRODS file.
+	 * <p/>
+	 * This POST operation looks for a mulit-part file attachment (a single
+	 * file) with a name of <code>uploadFile</code> in the multipart form data.
+	 * See the companion JUnit test for an Apache HTTP client invocation
+	 * example.
+	 * 
+	 * @param authorization
+	 *            <code>String</code> with the basic auth header
+	 * @param path
+	 *            <code>String</code> with the iRODS absolute path derived from
+	 *            the URL extra path information
+	 * @param input
+	 *            {@link MultipartFormDataInput} provided by the RESTEasy
+	 *            framework
+	 * @return {@link DataObjectData} marshaled in the appropriate format. This
+	 *         reflects the new iRODS file created and can serve as a
+	 *         confirmation
+	 * @throws JargonException
+	 */
 	@POST
 	@Path("{path:.*}")
 	@Consumes("multipart/form-data")
@@ -59,8 +80,8 @@ public class FileContentsService extends AbstractIrodsService {
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
 	public DataObjectData uploadFile(
 			@HeaderParam("Authorization") final String authorization,
-			@PathParam("path") final String path, MultipartFormDataInput input)
-			throws JargonException {
+			@PathParam("path") final String path,
+			final MultipartFormDataInput input) throws JargonException {
 
 		Map<String, List<InputPart>> uploadForm = input.getFormDataMap();
 		List<InputPart> inputParts = uploadForm.get("uploadFile");
@@ -86,19 +107,18 @@ public class FileContentsService extends AbstractIrodsService {
 		 */
 
 		String decodedPathString = DataUtils.buildDecodedPathFromURLPathInfo(
-				path, this.retrieveEncoding());
+				path, retrieveEncoding());
 
-		IRODSFile dataFile = this.getIrodsAccessObjectFactory()
-				.getIRODSFileFactory(irodsAccount)
-				.instanceIRODSFile(decodedPathString);
+		IRODSFile dataFile = getIrodsAccessObjectFactory().getIRODSFileFactory(
+				irodsAccount).instanceIRODSFile(decodedPathString);
 
 		InputPart inputPart = inputParts.get(0);
-		Stream2StreamAO stream2StreamAO = this.getIrodsAccessObjectFactory()
+		Stream2StreamAO stream2StreamAO = getIrodsAccessObjectFactory()
 				.getStream2StreamAO(irodsAccount);
-		DataObjectAO dataObjectAO = this.getIrodsAccessObjectFactory()
+		DataObjectAO dataObjectAO = getIrodsAccessObjectFactory()
 				.getDataObjectAO(irodsAccount);
 		log.info("creating target output stream to irods..");
-		IRODSFileOutputStream outputStream = this.getIrodsAccessObjectFactory()
+		IRODSFileOutputStream outputStream = getIrodsAccessObjectFactory()
 				.getIRODSFileFactory(irodsAccount)
 				.instanceIRODSFileOutputStream(dataFile);
 

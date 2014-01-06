@@ -67,7 +67,7 @@ public class UserAddActionResponse {
 	}
 
 	public void setUserAddActionResponseNumericCode(
-			int userAddActionResponseNumericCode) {
+			final int userAddActionResponseNumericCode) {
 		this.userAddActionResponseNumericCode = userAddActionResponseNumericCode;
 	}
 
@@ -76,9 +76,9 @@ public class UserAddActionResponse {
 	 *            the userAddActionResponse to set
 	 */
 	public void setUserAddActionResponse(
-			UserAddActionResponseCode userAddActionResponse) {
+			final UserAddActionResponseCode userAddActionResponse) {
 		this.userAddActionResponse = userAddActionResponse;
-		this.userAddActionResponseNumericCode = userAddActionResponse.ordinal();
+		userAddActionResponseNumericCode = userAddActionResponse.ordinal();
 	}
 
 	/**
@@ -93,7 +93,7 @@ public class UserAddActionResponse {
 	 * @param message
 	 *            the message to set
 	 */
-	public void setMessage(String message) {
+	public void setMessage(final String message) {
 		this.message = message;
 	}
 
@@ -109,7 +109,7 @@ public class UserAddActionResponse {
 	 * @param userName
 	 *            the userName to set
 	 */
-	public void setUserName(String userName) {
+	public void setUserName(final String userName) {
 		this.userName = userName;
 	}
 
@@ -118,7 +118,7 @@ public class UserAddActionResponse {
 		return webAccessURL;
 	}
 
-	public void setWebAccessURL(String webAccessURL) {
+	public void setWebAccessURL(final String webAccessURL) {
 		this.webAccessURL = webAccessURL;
 	}
 
@@ -127,7 +127,7 @@ public class UserAddActionResponse {
 		return irodsEnv;
 	}
 
-	public void setIrodsEnv(String irodsEnv) {
+	public void setIrodsEnv(final String irodsEnv) {
 		this.irodsEnv = irodsEnv;
 	}
 

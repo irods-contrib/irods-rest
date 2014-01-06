@@ -50,7 +50,8 @@ public class MetadataListing {
 	 * @param metadataEntries
 	 *            the metadataEntries to set
 	 */
-	public void setMetadataEntries(List<MetadataQueryResultEntry> metadataEntries) {
+	public void setMetadataEntries(
+			final List<MetadataQueryResultEntry> metadataEntries) {
 		this.metadataEntries = metadataEntries;
 	}
 
@@ -67,7 +68,7 @@ public class MetadataListing {
 	 *            the objectType to set
 	 */
 	public void setObjectType(
-			CollectionAndDataObjectListingEntry.ObjectType objectType) {
+			final CollectionAndDataObjectListingEntry.ObjectType objectType) {
 		this.objectType = objectType;
 	}
 
@@ -83,7 +84,7 @@ public class MetadataListing {
 	 * @param uniqueNameString
 	 *            the uniqueNameString to set
 	 */
-	public void setUniqueNameString(String uniqueNameString) {
+	public void setUniqueNameString(final String uniqueNameString) {
 		this.uniqueNameString = uniqueNameString;
 	}
 

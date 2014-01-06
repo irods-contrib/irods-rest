@@ -4,8 +4,9 @@ import org.irods.jargon.core.exception.JargonException;
 
 /**
  * General exception in rest processing
+ * 
  * @author Mike Conway - DICE (www.irods.org)
- *
+ * 
  */
 public class IrodsRestException extends JargonException {
 
@@ -17,14 +18,14 @@ public class IrodsRestException extends JargonException {
 	/**
 	 * @param message
 	 */
-	public IrodsRestException(String message) {
+	public IrodsRestException(final String message) {
 		super(message);
 	}
 
 	/**
 	 * @param cause
 	 */
-	public IrodsRestException(Throwable cause) {
+	public IrodsRestException(final Throwable cause) {
 		super(cause);
 	}
 
@@ -32,7 +33,7 @@ public class IrodsRestException extends JargonException {
 	 * @param message
 	 * @param cause
 	 */
-	public IrodsRestException(String message, Throwable cause) {
+	public IrodsRestException(final String message, final Throwable cause) {
 		super(message, cause);
 	}
 
@@ -40,7 +41,8 @@ public class IrodsRestException extends JargonException {
 	 * @param cause
 	 * @param underlyingIRODSExceptionCode
 	 */
-	public IrodsRestException(Throwable cause, int underlyingIRODSExceptionCode) {
+	public IrodsRestException(final Throwable cause,
+			final int underlyingIRODSExceptionCode) {
 		super(cause, underlyingIRODSExceptionCode);
 	}
 
@@ -48,7 +50,8 @@ public class IrodsRestException extends JargonException {
 	 * @param message
 	 * @param underlyingIRODSExceptionCode
 	 */
-	public IrodsRestException(String message, int underlyingIRODSExceptionCode) {
+	public IrodsRestException(final String message,
+			final int underlyingIRODSExceptionCode) {
 		super(message, underlyingIRODSExceptionCode);
 	}
 
@@ -57,8 +60,8 @@ public class IrodsRestException extends JargonException {
 	 * @param cause
 	 * @param underlyingIRODSExceptionCode
 	 */
-	public IrodsRestException(String message, Throwable cause,
-			int underlyingIRODSExceptionCode) {
+	public IrodsRestException(final String message, final Throwable cause,
+			final int underlyingIRODSExceptionCode) {
 		super(message, cause, underlyingIRODSExceptionCode);
 	}
 

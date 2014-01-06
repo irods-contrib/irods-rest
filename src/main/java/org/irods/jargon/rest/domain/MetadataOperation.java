@@ -33,7 +33,7 @@ public class MetadataOperation {
 	 * @param metadataEntries
 	 *            the metadataEntries to set
 	 */
-	public void setMetadataEntries(List<MetadataEntry> metadataEntries) {
+	public void setMetadataEntries(final List<MetadataEntry> metadataEntries) {
 		this.metadataEntries = metadataEntries;
 	}
 

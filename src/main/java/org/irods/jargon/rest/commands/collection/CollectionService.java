@@ -72,7 +72,11 @@ public class CollectionService extends AbstractIrodsService {
 	 * @param isListing
 	 *            <code>boolean</code> with an optional (default=false)
 	 *            parameter that will cause a listing of collection children
+	 * @param listingType
+	 *            <code>String</code> that should be 'both', 'data',
+	 *            'collections', indicating what sort of child data to return
 	 * @return {@link CollectionData} marshaled in the appropriate format.
+	 * 
 	 * @throws JargonException
 	 */
 	@GET
@@ -83,7 +87,8 @@ public class CollectionService extends AbstractIrodsService {
 			@HeaderParam("Authorization") final String authorization,
 			@PathParam("path") final String path,
 			@QueryParam("offset") @DefaultValue("0") final int offset,
-			@QueryParam("listing") @DefaultValue("false") final boolean isListing)
+			@QueryParam("listing") @DefaultValue("false") final boolean isListing,
+			@QueryParam("listType") @DefaultValue("both") final String listingType)
 			throws JargonException {
 
 		log.info("getCollectionData()");
@@ -103,8 +108,7 @@ public class CollectionService extends AbstractIrodsService {
 			// log.info("looking up collection with URI:{}", uri);
 
 			String decodedPathString = DataUtils
-					.buildDecodedPathFromURLPathInfo(path,
-							this.retrieveEncoding());
+					.buildDecodedPathFromURLPathInfo(path, retrieveEncoding());
 			log.info("decoded path:{}", decodedPathString);
 			Collection collection = collectionAO
 					.findByAbsolutePath(decodedPathString);
@@ -137,10 +141,31 @@ public class CollectionService extends AbstractIrodsService {
 				CollectionAndDataObjectListAndSearchAO collectionAndDataObjectListAndSearchAO = getIrodsAccessObjectFactory()
 						.getCollectionAndDataObjectListAndSearchAO(irodsAccount);
 				FileListingEntry fileListingEntry;
+				List<CollectionAndDataObjectListingEntry> entries;
 
-				for (CollectionAndDataObjectListingEntry entry : collectionAndDataObjectListAndSearchAO
-						.listCollectionsUnderPath(collection.getAbsolutePath(),
-								offset)) {
+				if (listingType.equals("both")) {
+					log.info("listing colls and data objects");
+					entries = collectionAndDataObjectListAndSearchAO
+							.listDataObjectsAndCollectionsUnderPath(collection
+									.getAbsolutePath());
+				} else if (listingType.equals("data")) {
+					log.info("listing data objects");
+					entries = collectionAndDataObjectListAndSearchAO
+							.listDataObjectsUnderPath(
+									collection.getAbsolutePath(), offset);
+				} else if (listingType.equals("collections")) {
+					log.info("listing collections");
+					entries = collectionAndDataObjectListAndSearchAO
+							.listCollectionsUnderPath(
+									collection.getAbsolutePath(), offset);
+
+				} else {
+					throw new IllegalArgumentException(
+							"invalid listing type, should be both, collections, data");
+				}
+
+				for (CollectionAndDataObjectListingEntry entry : entries) {
+					log.info("adding entry:{}", entry);
 					fileListingEntry = new FileListingEntry();
 					fileListingEntry.setCount(entry.getCount());
 					fileListingEntry.setCreatedAt(entry.getCreatedAt());
@@ -210,11 +235,11 @@ public class CollectionService extends AbstractIrodsService {
 					.getCollectionAO(irodsAccount);
 
 			String decodedPath = DataUtils.buildDecodedPathFromURLPathInfo(
-					path, this.retrieveEncoding());
+					path, retrieveEncoding());
 
-			IRODSFile collectionFile = this.getIrodsAccessObjectFactory()
-					.getIRODSFileFactory(irodsAccount)
-					.instanceIRODSFile(decodedPath);
+			IRODSFile collectionFile = getIrodsAccessObjectFactory()
+					.getIRODSFileFactory(irodsAccount).instanceIRODSFile(
+							decodedPath);
 
 			log.info("making directory at path:{}",
 					collectionFile.getAbsolutePath());
@@ -281,7 +306,7 @@ public class CollectionService extends AbstractIrodsService {
 		}
 
 		String decodedPathString = DataUtils.buildDecodedPathFromURLPathInfo(
-				path, this.retrieveEncoding());
+				path, retrieveEncoding());
 
 		try {
 			log.error("decoded path:{}", decodedPathString);
@@ -383,7 +408,7 @@ public class CollectionService extends AbstractIrodsService {
 		}
 
 		String decodedPathString = DataUtils.buildDecodedPathFromURLPathInfo(
-				path, this.retrieveEncoding());
+				path, retrieveEncoding());
 
 		try {
 			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
@@ -473,7 +498,7 @@ public class CollectionService extends AbstractIrodsService {
 		}
 
 		String decodedPathString = DataUtils.buildDecodedPathFromURLPathInfo(
-				path, this.retrieveEncoding());
+				path, retrieveEncoding());
 
 		try {
 			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
@@ -559,12 +584,11 @@ public class CollectionService extends AbstractIrodsService {
 			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
 
 			String decodedPathString = DataUtils
-					.buildDecodedPathFromURLPathInfo(path,
-							this.retrieveEncoding());
+					.buildDecodedPathFromURLPathInfo(path, retrieveEncoding());
 
-			IRODSFile collectionFile = this.getIrodsAccessObjectFactory()
-					.getIRODSFileFactory(irodsAccount)
-					.instanceIRODSFile(decodedPathString);
+			IRODSFile collectionFile = getIrodsAccessObjectFactory()
+					.getIRODSFileFactory(irodsAccount).instanceIRODSFile(
+							decodedPathString);
 
 			log.info("removing directory at path:{}",
 					collectionFile.getAbsolutePath());

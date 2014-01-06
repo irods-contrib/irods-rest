@@ -75,7 +75,7 @@ public abstract class AbstractIrodsService {
 	 * @throws JargonException
 	 */
 	protected String retrieveEncoding() throws JargonException {
-		return this.getIrodsAccessObjectFactory().getJargonProperties()
+		return getIrodsAccessObjectFactory().getJargonProperties()
 				.getEncoding();
 	}
 

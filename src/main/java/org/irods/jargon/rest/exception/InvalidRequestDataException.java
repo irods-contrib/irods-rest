@@ -4,7 +4,7 @@ package org.irods.jargon.rest.exception;
  * Data is missing from a request, or is invalid.
  * 
  * @author Mike Conway - DICE (www.irods.org)
- *
+ * 
  */
 public class InvalidRequestDataException extends IrodsRestException {
 
@@ -16,14 +16,14 @@ public class InvalidRequestDataException extends IrodsRestException {
 	/**
 	 * @param message
 	 */
-	public InvalidRequestDataException(String message) {
+	public InvalidRequestDataException(final String message) {
 		super(message);
 	}
 
 	/**
 	 * @param cause
 	 */
-	public InvalidRequestDataException(Throwable cause) {
+	public InvalidRequestDataException(final Throwable cause) {
 		super(cause);
 	}
 
@@ -31,7 +31,8 @@ public class InvalidRequestDataException extends IrodsRestException {
 	 * @param message
 	 * @param cause
 	 */
-	public InvalidRequestDataException(String message, Throwable cause) {
+	public InvalidRequestDataException(final String message,
+			final Throwable cause) {
 		super(message, cause);
 	}
 
@@ -39,8 +40,8 @@ public class InvalidRequestDataException extends IrodsRestException {
 	 * @param cause
 	 * @param underlyingIRODSExceptionCode
 	 */
-	public InvalidRequestDataException(Throwable cause,
-			int underlyingIRODSExceptionCode) {
+	public InvalidRequestDataException(final Throwable cause,
+			final int underlyingIRODSExceptionCode) {
 		super(cause, underlyingIRODSExceptionCode);
 	}
 
@@ -48,8 +49,8 @@ public class InvalidRequestDataException extends IrodsRestException {
 	 * @param message
 	 * @param underlyingIRODSExceptionCode
 	 */
-	public InvalidRequestDataException(String message,
-			int underlyingIRODSExceptionCode) {
+	public InvalidRequestDataException(final String message,
+			final int underlyingIRODSExceptionCode) {
 		super(message, underlyingIRODSExceptionCode);
 	}
 
@@ -58,8 +59,8 @@ public class InvalidRequestDataException extends IrodsRestException {
 	 * @param cause
 	 * @param underlyingIRODSExceptionCode
 	 */
-	public InvalidRequestDataException(String message, Throwable cause,
-			int underlyingIRODSExceptionCode) {
+	public InvalidRequestDataException(final String message,
+			final Throwable cause, final int underlyingIRODSExceptionCode) {
 		super(message, cause, underlyingIRODSExceptionCode);
 	}
 

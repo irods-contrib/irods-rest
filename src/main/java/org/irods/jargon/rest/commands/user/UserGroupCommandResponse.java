@@ -40,7 +40,7 @@ public class UserGroupCommandResponse extends GenericCommandResponse {
 	}
 
 	public void setUserGroupCommandStatus(
-			UserGroupCommandStatus userGroupCommandStatus) {
+			final UserGroupCommandStatus userGroupCommandStatus) {
 		this.userGroupCommandStatus = userGroupCommandStatus;
 	}
 

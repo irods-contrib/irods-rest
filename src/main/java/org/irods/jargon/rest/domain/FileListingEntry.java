@@ -142,7 +142,8 @@ public class FileListingEntry {
 	 * @return <code>String</code> with the absolute path to the file or
 	 *         collection under the parent.
 	 */
-	@XmlElement	public String getPathOrName() {
+	@XmlElement
+	public String getPathOrName() {
 		return pathOrName;
 	}
 
@@ -155,7 +156,8 @@ public class FileListingEntry {
 	 * 
 	 * @return <code>ObjectType</code> enum value
 	 */
-	@XmlElement	public ObjectType getObjectType() {
+	@XmlElement
+	public ObjectType getObjectType() {
 		return objectType;
 	}
 
@@ -273,7 +275,8 @@ public class FileListingEntry {
 	 *         special object path. If this is a soft link, this reflects the
 	 *         canonical iRODS path.
 	 */
-	@XmlElement	public String getSpecialObjectPath() {
+	@XmlElement
+	public String getSpecialObjectPath() {
 		return specialObjectPath;
 	}
 

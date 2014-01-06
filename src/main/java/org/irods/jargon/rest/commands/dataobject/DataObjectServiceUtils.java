@@ -22,7 +22,7 @@ public class DataObjectServiceUtils {
 	 * @return {@link DataObjectData}
 	 */
 	public static DataObjectData buildDataObjectValuesFromIrodsData(
-			DataObject dataObject) {
+			final DataObject dataObject) {
 		DataObjectData dataObjectData = new DataObjectData();
 
 		dataObjectData.setChecksum(dataObject.getChecksum());

@@ -5,22 +5,23 @@ package org.irods.jargon.rest.commands.user;
 
 /**
  * Request to add or remove a user from/to the given user group
+ * 
  * @author Mike Conway - DICE (www.irods.org)
- *
+ * 
  */
 public class UserGroupMembershipRequest {
 
-	
 	private String userName = "";
 	private String userGroup = "";
 	private String zone = "";
-	
+
 	/**
 	 * 
 	 */
 	public UserGroupMembershipRequest() {
 	}
-	
+
+	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("UserGroupMembershipRequest");
@@ -32,7 +33,7 @@ public class UserGroupMembershipRequest {
 		sb.append(zone);
 		return sb.toString();
 	}
-	
+
 	/**
 	 * @return the userName
 	 */
@@ -41,9 +42,10 @@ public class UserGroupMembershipRequest {
 	}
 
 	/**
-	 * @param userName the userName to set
+	 * @param userName
+	 *            the userName to set
 	 */
-	public void setUserName(String userName) {
+	public void setUserName(final String userName) {
 		this.userName = userName;
 	}
 
@@ -55,9 +57,10 @@ public class UserGroupMembershipRequest {
 	}
 
 	/**
-	 * @param userGroup the userGroup to set
+	 * @param userGroup
+	 *            the userGroup to set
 	 */
-	public void setUserGroup(String userGroup) {
+	public void setUserGroup(final String userGroup) {
 		this.userGroup = userGroup;
 	}
 
@@ -69,9 +72,10 @@ public class UserGroupMembershipRequest {
 	}
 
 	/**
-	 * @param zone the zone to set
+	 * @param zone
+	 *            the zone to set
 	 */
-	public void setZone(String zone) {
+	public void setZone(final String zone) {
 		this.zone = zone;
 	}
 

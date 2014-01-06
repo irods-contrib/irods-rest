@@ -206,7 +206,8 @@ public class CollectionData {
 	/**
 	 * @return the info1
 	 */
-	@XmlElement	public String getInfo1() {
+	@XmlElement
+	public String getInfo1() {
 		return info1;
 	}
 
@@ -237,7 +238,8 @@ public class CollectionData {
 	/**
 	 * @return the createdAt
 	 */
-	@XmlElement	public Date getCreatedAt() {
+	@XmlElement
+	public Date getCreatedAt() {
 		return createdAt;
 	}
 
@@ -252,7 +254,8 @@ public class CollectionData {
 	/**
 	 * @return the modifiedAt
 	 */
-	@XmlElement	public Date getModifiedAt() {
+	@XmlElement
+	public Date getModifiedAt() {
 		return modifiedAt;
 	}
 
@@ -283,6 +286,7 @@ public class CollectionData {
 	/**
 	 * @return the children
 	 */
+	@XmlElement
 	public List<FileListingEntry> getChildren() {
 		return children;
 	}
