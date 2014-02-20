@@ -34,6 +34,7 @@ import org.irods.jargon.rest.domain.MetadataListing;
 import org.irods.jargon.rest.domain.MetadataOperation;
 import org.irods.jargon.rest.domain.MetadataOperationResultEntry;
 import org.irods.jargon.rest.domain.MetadataQueryResultEntry;
+import org.irods.jargon.rest.domain.PermissionListing;
 import org.irods.jargon.rest.utils.DataUtils;
 import org.irods.jargon.rest.utils.RestTestingProperties;
 import org.irods.jargon.testutils.TestingPropertiesHelper;
@@ -1018,4 +1019,61 @@ public class CollectionServiceTest implements ApplicationContextAware {
 			clientAndContext.getHttpClient().getConnectionManager().shutdown();
 		}
 	}
+
+	@Test
+	public void testGetCollectionAclJson() throws Exception {
+		String testDirName = "testGetCollectionAclJson";
+
+		String targetIrodsCollection = testingPropertiesHelper
+				.buildIRODSCollectionAbsolutePathFromTestProperties(
+						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
+								+ testDirName);
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
+				.getIRODSAccessObjectFactory();
+
+		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(
+				irodsAccount).instanceIRODSFile(targetIrodsCollection);
+		collFile.mkdirs();
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/collection/");
+		sb.append(collFile.getAbsolutePath());
+		sb.append("/acl");
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
+
+			HttpGet httpget = new HttpGet(sb.toString());
+			httpget.addHeader("accept", "application/json");
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpget, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+			Assert.assertNotNull(entity);
+			String entityData = EntityUtils.toString(entity);
+			EntityUtils.consume(entity);
+			System.out.println("JSON>>>");
+			System.out.println(entityData);
+			ObjectMapper objectMapper = new ObjectMapper();
+			PermissionListing actual = objectMapper.readValue(entityData,
+					PermissionListing.class);
+
+			Assert.assertNotNull("no permission listing returned", actual);
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+
+	}
+
 }

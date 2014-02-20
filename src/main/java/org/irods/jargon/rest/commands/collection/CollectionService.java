@@ -645,8 +645,7 @@ public class CollectionService extends AbstractIrodsService {
 
 			CollectionAclFunctions collectionAclFunctions = getServiceFunctionFactory()
 					.instanceCollectionAclFunctions(irodsAccount);
-			return collectionAclFunctions.listPermissions(irodsAccount,
-					decodedPathString);
+			return collectionAclFunctions.listPermissions(decodedPathString);
 
 		} finally {
 			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
