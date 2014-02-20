@@ -5,6 +5,7 @@ import java.util.Properties;
 import junit.framework.Assert;
 
 import org.irods.jargon.core.connection.IRODSAccount;
+import org.irods.jargon.core.exception.FileNotFoundException;
 import org.irods.jargon.core.pub.CollectionAO;
 import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.core.pub.io.IRODSFile;
@@ -52,6 +53,29 @@ public class CollectionAclFunctionsImplTest {
 				irodsFileSystem.getIRODSAccessObjectFactory());
 
 		collectionAclFunctionsImpl.listPermissions(null);
+
+	}
+
+	@Test(expected = FileNotFoundException.class)
+	public void testListCollectionAclsNotFound() throws Exception {
+
+		String testCollectionName = "testListCollectionAclsNotFound";
+
+		String targetIrodsCollection = testingPropertiesHelper
+				.buildIRODSCollectionAbsolutePathFromTestProperties(
+						testingProperties, IRODS_TEST_SUBDIR_PATH + "/"
+								+ testCollectionName);
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+
+		RestConfiguration restConfiguration = new RestConfiguration();
+
+		CollectionAclFunctionsImpl collectionAclFunctionsImpl = new CollectionAclFunctionsImpl(
+				restConfiguration, irodsAccount,
+				irodsFileSystem.getIRODSAccessObjectFactory());
+
+		collectionAclFunctionsImpl.listPermissions(targetIrodsCollection);
 
 	}
 

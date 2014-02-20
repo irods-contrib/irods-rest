@@ -21,6 +21,7 @@ import org.irods.jargon.core.pub.domain.DataObject;
 import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.rest.commands.AbstractIrodsService;
 import org.irods.jargon.rest.domain.DataObjectData;
+import org.irods.jargon.rest.domain.PermissionListing;
 import org.irods.jargon.rest.utils.DataUtils;
 import org.jboss.resteasy.annotations.providers.jaxb.json.Mapped;
 import org.jboss.resteasy.annotations.providers.jaxb.json.XmlNsMap;
@@ -151,6 +152,49 @@ public class DataObjectService extends AbstractIrodsService {
 			}
 
 			log.info("completed delete operation");
+
+		} finally {
+			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
+		}
+	}
+
+	/**
+	 * Retrieve a representation of the ACLs associated with a data object
+	 * 
+	 * @param authorization
+	 *            <code>String</code> with the basic auth header
+	 * @param path
+	 *            <code>String</code> with the iRODS absolute path derived from
+	 *            the URL extra path information
+	 * @return
+	 * @throws JargonException
+	 */
+	@GET
+	@Path("{path:.*}/acl")
+	@Produces({ "application/xml", "application/json" })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	public PermissionListing getDataObjectAcl(
+			@HeaderParam("Authorization") final String authorization,
+			@PathParam("path") final String path) throws JargonException {
+
+		log.info("getDataObjectAcl()");
+
+		if (authorization == null || authorization.isEmpty()) {
+			throw new IllegalArgumentException("null or empty authorization");
+		}
+
+		if (path == null || path.isEmpty()) {
+			throw new IllegalArgumentException("null or empty path");
+		}
+
+		try {
+			String decodedPathString = DataUtils
+					.buildDecodedPathFromURLPathInfo(path, retrieveEncoding());
+			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
+
+			DataObjectAclFunctions dataObjectAclFunctions = getServiceFunctionFactory()
+					.instanceDataObjectAclFunctions(irodsAccount);
+			return dataObjectAclFunctions.listPermissions(decodedPathString);
 
 		} finally {
 			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();

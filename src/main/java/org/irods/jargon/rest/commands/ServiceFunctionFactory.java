@@ -3,6 +3,7 @@ package org.irods.jargon.rest.commands;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.rest.commands.collection.CollectionAclFunctions;
+import org.irods.jargon.rest.commands.dataobject.DataObjectAclFunctions;
 import org.irods.jargon.rest.configuration.RestConfiguration;
 
 /**
@@ -42,9 +43,19 @@ public interface ServiceFunctionFactory {
 	 * 
 	 * @param irodsAccount
 	 *            {@link IRODSAccount} for current connection
-	 * @return
+	 * @return {@link CollectionAclFunctions}
 	 */
 	CollectionAclFunctions instanceCollectionAclFunctions(
 			final IRODSAccount irodsAccount);
+
+	/**
+	 * Create an object that manages data object ACL data
+	 * 
+	 * @param irodsAccount
+	 *            {@link IRODSAccount} for current connection
+	 * @return {@link DataObjectAclFunctions}
+	 */
+	DataObjectAclFunctions instanceDataObjectAclFunctions(
+			IRODSAccount irodsAccount);
 
 }

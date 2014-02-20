@@ -7,6 +7,8 @@ import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.rest.commands.collection.CollectionAclFunctions;
 import org.irods.jargon.rest.commands.collection.CollectionAclFunctionsImpl;
+import org.irods.jargon.rest.commands.dataobject.DataObjectAclFunctions;
+import org.irods.jargon.rest.commands.dataobject.DataObjectAclFunctionsImpl;
 import org.irods.jargon.rest.configuration.RestConfiguration;
 
 /**
@@ -43,6 +45,16 @@ public class ServiceFunctionFactoryImpl implements ServiceFunctionFactory {
 		}
 
 		return new CollectionAclFunctionsImpl(restConfiguration, irodsAccount,
+				irodsAccessObjectFactory);
+	}
+
+	@Override
+	public DataObjectAclFunctions instanceDataObjectAclFunctions(
+			final IRODSAccount irodsAccount) {
+		if (irodsAccount == null) {
+			throw new IllegalArgumentException("null irodsAccount");
+		}
+		return new DataObjectAclFunctionsImpl(restConfiguration, irodsAccount,
 				irodsAccessObjectFactory);
 	}
 

@@ -1,14 +1,14 @@
 /**
  * 
  */
-package org.irods.jargon.rest.commands.collection;
+package org.irods.jargon.rest.commands.dataobject;
 
 import java.util.List;
 
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.FileNotFoundException;
 import org.irods.jargon.core.exception.JargonException;
-import org.irods.jargon.core.pub.CollectionAO;
+import org.irods.jargon.core.pub.DataObjectAO;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.core.pub.domain.UserFilePermission;
 import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry.ObjectType;
@@ -20,18 +20,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Backing services for operating on collection ACLs and permissions
+ * ACL functions services (business processes) for use by the Data Objects REST
+ * facade
  * 
  * @author Mike Conway - DICE (www.irods.org)
  * 
  */
-public class CollectionAclFunctionsImpl extends AbstractServiceFunction
-		implements CollectionAclFunctions {
+public class DataObjectAclFunctionsImpl extends AbstractServiceFunction
+		implements DataObjectAclFunctions {
 
 	private static final Logger log = LoggerFactory
-			.getLogger(CollectionAclFunctionsImpl.class);
+			.getLogger(DataObjectAclFunctionsImpl.class);
 
-	public CollectionAclFunctionsImpl(RestConfiguration restConfiguration,
+	/**
+	 * @param restConfiguration
+	 * @param irodsAccount
+	 * @param irodsAccessObjectFactory
+	 */
+	public DataObjectAclFunctionsImpl(RestConfiguration restConfiguration,
 			IRODSAccount irodsAccount,
 			IRODSAccessObjectFactory irodsAccessObjectFactory) {
 		super(restConfiguration, irodsAccount, irodsAccessObjectFactory);
@@ -40,7 +46,7 @@ public class CollectionAclFunctionsImpl extends AbstractServiceFunction
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.irods.jargon.rest.commands.collection.CollectionAclFunctions#
+	 * @see org.irods.jargon.rest.commands.dataobject.DataObjectAclFunctions#
 	 * listPermissions(java.lang.String)
 	 */
 	@Override
@@ -55,18 +61,20 @@ public class CollectionAclFunctionsImpl extends AbstractServiceFunction
 
 		log.info("absolutePath:{}", absolutePath);
 
-		log.info("get collection AO and permissions list");
-		CollectionAO collectionAO = this.getIrodsAccessObjectFactory()
-				.getCollectionAO(getIrodsAccount());
-		List<UserFilePermission> permissions = collectionAO
-				.listPermissionsForCollection(absolutePath);
-		log.info("get inheritance...");
-		boolean inheritance = collectionAO
-				.isCollectionSetForPermissionInheritance(absolutePath);
+		log.info("get data object AO and permissions list");
+		DataObjectAO dataObjectAO = this.getIrodsAccessObjectFactory()
+				.getDataObjectAO(getIrodsAccount());
+
+		log.info("doing a check to see if this exists at all, will throw file not found exception if not");
+		dataObjectAO.findByAbsolutePath(absolutePath);
+
+		List<UserFilePermission> permissions = dataObjectAO
+				.listPermissionsForDataObject(absolutePath);
+
 		PermissionListing permissionListing = new PermissionListing();
 		permissionListing.setAbsolutePathString(absolutePath);
-		permissionListing.setInheritance(inheritance);
-		permissionListing.setObjectType(ObjectType.COLLECTION);
+		permissionListing.setInheritance(false);
+		permissionListing.setObjectType(ObjectType.DATA_OBJECT);
 
 		PermissionEntry entry;
 		for (UserFilePermission permission : permissions) {
