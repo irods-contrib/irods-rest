@@ -22,6 +22,9 @@ public abstract class AbstractIrodsService {
 	@Inject
 	RestConfiguration restConfiguration;
 
+	@Inject
+	ServiceFunctionFactory serviceFunctionFactory;
+
 	/**
 	 * @return the irodsAccessObjectFactory
 	 */
@@ -77,6 +80,22 @@ public abstract class AbstractIrodsService {
 	protected String retrieveEncoding() throws JargonException {
 		return getIrodsAccessObjectFactory().getJargonProperties()
 				.getEncoding();
+	}
+
+	/**
+	 * @return the serviceFunctionFactory
+	 */
+	public ServiceFunctionFactory getServiceFunctionFactory() {
+		return serviceFunctionFactory;
+	}
+
+	/**
+	 * @param serviceFunctionFactory
+	 *            the serviceFunctionFactory to set
+	 */
+	public void setServiceFunctionFactory(
+			ServiceFunctionFactory serviceFunctionFactory) {
+		this.serviceFunctionFactory = serviceFunctionFactory;
 	}
 
 }

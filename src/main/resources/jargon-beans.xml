@@ -21,12 +21,17 @@
 		class="org.irods.jargon.core.pub.IRODSAccessObjectFactoryImpl">
 		<beans:constructor-arg ref="irodsSession" />
 	</beans:bean>
+	
+	<beans:bean id="serviceFunctionFactory" class="org.irods.jargon.rest.commands.ServiceFunctionFactoryImpl">
+		<beans:property name="irodsAccessObjectFactory" ref="irodsAccessObjectFactory"/>
+		<beans:property name="restConfiguration" ref="restConfiguration"/>
+	</beans:bean>
 
 	<beans:bean id="restConfiguration"
 		class="org.irods.jargon.rest.configuration.RestConfiguration">
-		<beans:property name="irodsHost" value="fedZone1" />
+		<beans:property name="irodsHost" value="localhost" />
 		<beans:property name="irodsPort" value="1247" />
-		<beans:property name="irodsZone" value="fedZone1" />
+		<beans:property name="irodsZone" value="test1" />
 		<beans:property name="defaultStorageResource" value="test1-resc" />
 		<beans:property name="privateCertAbsPath" value="c:/temp/test-certs/private.pem" />
 		<beans:property name="publicKeyAbsPath" value="c:/temp/test-certs/public.pem" />

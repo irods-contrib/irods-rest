@@ -39,6 +39,7 @@ import org.irods.jargon.rest.domain.MetadataListing;
 import org.irods.jargon.rest.domain.MetadataOperation;
 import org.irods.jargon.rest.domain.MetadataOperationResultEntry;
 import org.irods.jargon.rest.domain.MetadataQueryResultEntry;
+import org.irods.jargon.rest.domain.PermissionListing;
 import org.irods.jargon.rest.utils.DataUtils;
 import org.jboss.resteasy.annotations.providers.jaxb.json.Mapped;
 import org.jboss.resteasy.annotations.providers.jaxb.json.XmlNsMap;
@@ -607,4 +608,49 @@ public class CollectionService extends AbstractIrodsService {
 			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
 		}
 	}
+
+	/**
+	 * Retrieve a representation of the ACLs associated with a collection
+	 * 
+	 * @param authorization
+	 *            <code>String</code> with the basic auth header
+	 * @param path
+	 *            <code>String</code> with the iRODS absolute path derived from
+	 *            the URL extra path information
+	 * @return
+	 * @throws JargonException
+	 */
+	@GET
+	@Path("{path:.*}/acl")
+	@Produces({ "application/xml", "application/json" })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	public PermissionListing getCollectionAcl(
+			@HeaderParam("Authorization") final String authorization,
+			@PathParam("path") final String path) throws JargonException {
+
+		log.info("getCollectionAcl()");
+
+		if (authorization == null || authorization.isEmpty()) {
+			throw new IllegalArgumentException("null or empty authorization");
+		}
+
+		if (path == null || path.isEmpty()) {
+			throw new IllegalArgumentException("null or empty path");
+		}
+
+		try {
+			String decodedPathString = DataUtils
+					.buildDecodedPathFromURLPathInfo(path, retrieveEncoding());
+			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
+
+			CollectionAclFunctions collectionAclFunctions = getServiceFunctionFactory()
+					.instanceCollectionAclFunctions(irodsAccount);
+			return collectionAclFunctions.listPermissions(irodsAccount,
+					decodedPathString);
+
+		} finally {
+			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
+		}
+	}
+
 }
