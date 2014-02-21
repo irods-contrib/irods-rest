@@ -9,6 +9,8 @@ import org.irods.jargon.rest.commands.collection.CollectionAclFunctions;
 import org.irods.jargon.rest.commands.collection.CollectionAclFunctionsImpl;
 import org.irods.jargon.rest.commands.dataobject.DataObjectAclFunctions;
 import org.irods.jargon.rest.commands.dataobject.DataObjectAclFunctionsImpl;
+import org.irods.jargon.rest.commands.dataobject.DataObjectAvuFunctions;
+import org.irods.jargon.rest.commands.dataobject.DataObjectAvuFunctionsImpl;
 import org.irods.jargon.rest.configuration.RestConfiguration;
 
 /**
@@ -48,6 +50,13 @@ public class ServiceFunctionFactoryImpl implements ServiceFunctionFactory {
 				irodsAccessObjectFactory);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.irods.jargon.rest.commands.ServiceFunctionFactory#
+	 * instanceDataObjectAclFunctions
+	 * (org.irods.jargon.core.connection.IRODSAccount)
+	 */
 	@Override
 	public DataObjectAclFunctions instanceDataObjectAclFunctions(
 			final IRODSAccount irodsAccount) {
@@ -55,6 +64,23 @@ public class ServiceFunctionFactoryImpl implements ServiceFunctionFactory {
 			throw new IllegalArgumentException("null irodsAccount");
 		}
 		return new DataObjectAclFunctionsImpl(restConfiguration, irodsAccount,
+				irodsAccessObjectFactory);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.irods.jargon.rest.commands.ServiceFunctionFactory#
+	 * instanceDataObjectAvuFunctions
+	 * (org.irods.jargon.core.connection.IRODSAccount)
+	 */
+	@Override
+	public DataObjectAvuFunctions instanceDataObjectAvuFunctions(
+			final IRODSAccount irodsAccount) {
+		if (irodsAccount == null) {
+			throw new IllegalArgumentException("null irodsAccount");
+		}
+		return new DataObjectAvuFunctionsImpl(restConfiguration, irodsAccount,
 				irodsAccessObjectFactory);
 	}
 

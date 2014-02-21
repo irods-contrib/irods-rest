@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * @author Mike Conway - DICE (www.irods.org)
  * 
  */
-public class DataObjectAvuFunctionsImpl extends AbstractServiceFunction {
+public class DataObjectAvuFunctionsImpl extends AbstractServiceFunction implements DataObjectAvuFunctions {
 
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -42,6 +42,10 @@ public class DataObjectAvuFunctionsImpl extends AbstractServiceFunction {
 		super(restConfiguration, irodsAccount, irodsAccessObjectFactory);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.irods.jargon.rest.commands.dataobject.DataObjectAvuFunctions#listDataObjectMetadata(java.lang.String)
+	 */
+	@Override
 	public MetadataListing listDataObjectMetadata(final String absolutePath)
 			throws FileNotFoundException, JargonException {
 

@@ -21,6 +21,7 @@ import org.irods.jargon.core.pub.domain.DataObject;
 import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.rest.commands.AbstractIrodsService;
 import org.irods.jargon.rest.domain.DataObjectData;
+import org.irods.jargon.rest.domain.MetadataListing;
 import org.irods.jargon.rest.domain.PermissionListing;
 import org.irods.jargon.rest.utils.DataUtils;
 import org.jboss.resteasy.annotations.providers.jaxb.json.Mapped;
@@ -195,6 +196,52 @@ public class DataObjectService extends AbstractIrodsService {
 			DataObjectAclFunctions dataObjectAclFunctions = getServiceFunctionFactory()
 					.instanceDataObjectAclFunctions(irodsAccount);
 			return dataObjectAclFunctions.listPermissions(decodedPathString);
+
+		} finally {
+			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
+		}
+	}
+
+	/**
+	 * @param authorization
+	 *            <code>String</code> with the basic auth header
+	 * @param path
+	 *            <code>String</code> with the iRODS absolute path derived from
+	 *            the URL extra path information
+	 * @return
+	 * @throws JargonException
+	 */
+	@GET
+	@Path("{path:.*}/metadata")
+	@Produces({ "application/xml", "application/json" })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	public MetadataListing getDataObjectMetadata(
+			@HeaderParam("Authorization") final String authorization,
+			@PathParam("path") final String path) throws JargonException {
+
+		log.info("getDataObjectMetadata()");
+
+		if (authorization == null || authorization.isEmpty()) {
+			throw new IllegalArgumentException("null or empty authorization");
+		}
+
+		if (path == null || path.isEmpty()) {
+			throw new IllegalArgumentException("null or empty path");
+		}
+
+		String decodedPathString = DataUtils.buildDecodedPathFromURLPathInfo(
+				path, retrieveEncoding());
+
+		try {
+			log.error("decoded path:{}", decodedPathString);
+			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
+
+			log.info("listing metadata");
+			DataObjectAvuFunctions dataObjectAvuFunctions = this
+					.getServiceFunctionFactory()
+					.instanceDataObjectAvuFunctions(irodsAccount);
+			return dataObjectAvuFunctions
+					.listDataObjectMetadata(decodedPathString);
 
 		} finally {
 			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();

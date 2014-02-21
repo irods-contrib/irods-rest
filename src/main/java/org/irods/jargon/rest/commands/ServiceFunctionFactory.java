@@ -4,6 +4,7 @@ import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.rest.commands.collection.CollectionAclFunctions;
 import org.irods.jargon.rest.commands.dataobject.DataObjectAclFunctions;
+import org.irods.jargon.rest.commands.dataobject.DataObjectAvuFunctions;
 import org.irods.jargon.rest.configuration.RestConfiguration;
 
 /**
@@ -56,6 +57,16 @@ public interface ServiceFunctionFactory {
 	 * @return {@link DataObjectAclFunctions}
 	 */
 	DataObjectAclFunctions instanceDataObjectAclFunctions(
+			IRODSAccount irodsAccount);
+
+	/**
+	 * Create an object that manages data object AVU data
+	 * 
+	 * @param irodsAccount
+	 *            {@link IRODSAccount} for current connection
+	 * @return {@link DataObjectAvuFunctions}
+	 */
+	DataObjectAvuFunctions instanceDataObjectAvuFunctions(
 			IRODSAccount irodsAccount);
 
 }

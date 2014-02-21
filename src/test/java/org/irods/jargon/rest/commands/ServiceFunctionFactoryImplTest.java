@@ -8,6 +8,7 @@ import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.rest.commands.collection.CollectionAclFunctions;
 import org.irods.jargon.rest.commands.dataobject.DataObjectAclFunctions;
+import org.irods.jargon.rest.commands.dataobject.DataObjectAvuFunctions;
 import org.irods.jargon.rest.configuration.RestConfiguration;
 import org.irods.jargon.testutils.TestingPropertiesHelper;
 import org.junit.AfterClass;
@@ -68,4 +69,24 @@ public class ServiceFunctionFactoryImplTest {
 		Assert.assertNotNull(actual);
 
 	}
+
+	@Test
+	public void testInstanceDataObjectAvuService() {
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccessObjectFactory irodsAccessObjectFactory = Mockito
+				.mock(IRODSAccessObjectFactory.class);
+		RestConfiguration restConfiguration = new RestConfiguration();
+
+		ServiceFunctionFactory serviceFunctionFactory = new ServiceFunctionFactoryImpl();
+		serviceFunctionFactory
+				.setIrodsAccessObjectFactory(irodsAccessObjectFactory);
+		serviceFunctionFactory.setRestConfiguration(restConfiguration);
+
+		DataObjectAvuFunctions actual = serviceFunctionFactory
+				.instanceDataObjectAvuFunctions(irodsAccount);
+		Assert.assertNotNull(actual);
+
+	}
+
 }
