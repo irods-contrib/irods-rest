@@ -9,13 +9,16 @@ import java.util.List;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.FileNotFoundException;
 import org.irods.jargon.core.exception.JargonException;
+import org.irods.jargon.core.pub.BulkAVUOperationResponse;
 import org.irods.jargon.core.pub.DataObjectAO;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
+import org.irods.jargon.core.pub.domain.AvuData;
 import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry.ObjectType;
 import org.irods.jargon.core.query.MetaDataAndDomainData;
 import org.irods.jargon.rest.commands.AbstractServiceFunction;
 import org.irods.jargon.rest.configuration.RestConfiguration;
 import org.irods.jargon.rest.domain.MetadataListing;
+import org.irods.jargon.rest.domain.MetadataOperationResultEntry;
 import org.irods.jargon.rest.domain.MetadataQueryResultEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +30,8 @@ import org.slf4j.LoggerFactory;
  * @author Mike Conway - DICE (www.irods.org)
  * 
  */
-public class DataObjectAvuFunctionsImpl extends AbstractServiceFunction implements DataObjectAvuFunctions {
+public class DataObjectAvuFunctionsImpl extends AbstractServiceFunction
+		implements DataObjectAvuFunctions {
 
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -42,8 +46,11 @@ public class DataObjectAvuFunctionsImpl extends AbstractServiceFunction implemen
 		super(restConfiguration, irodsAccount, irodsAccessObjectFactory);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.irods.jargon.rest.commands.dataobject.DataObjectAvuFunctions#listDataObjectMetadata(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.irods.jargon.rest.commands.dataobject.DataObjectAvuFunctions#
+	 * listDataObjectMetadata(java.lang.String)
 	 */
 	@Override
 	public MetadataListing listDataObjectMetadata(final String absolutePath)
@@ -79,4 +86,56 @@ public class DataObjectAvuFunctionsImpl extends AbstractServiceFunction implemen
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.irods.jargon.rest.commands.dataobject.DataObjectAvuFunctions#
+	 * addAvuMetadata(java.lang.String, java.util.List)
+	 */
+	@Override
+	public List<MetadataOperationResultEntry> addAvuMetadata(
+			final String absolutePath, final List<AvuData> avuData)
+			throws FileNotFoundException, JargonException {
+
+		log.info("addAvuMetadata()");
+
+		if (absolutePath == null || absolutePath.isEmpty()) {
+			throw new IllegalArgumentException(
+					"null or empty iRODS absolute path");
+		}
+
+		if (avuData == null) {
+			throw new IllegalArgumentException(
+					"null or empty metadataOperation");
+		}
+
+		log.info("absolutePath:{}", absolutePath);
+
+		DataObjectAO dataObjectAO = this.getIrodsAccessObjectFactory()
+				.getDataObjectAO(getIrodsAccount());
+
+		List<MetadataOperationResultEntry> metadataOperationResultEntries = new ArrayList<MetadataOperationResultEntry>();
+
+		List<BulkAVUOperationResponse> responses = dataObjectAO
+				.addBulkAVUMetadataToDataObject(absolutePath, avuData);
+
+		log.info("responses:{}", responses);
+
+		log.info("marshalling response into rest domain...");
+		MetadataOperationResultEntry resultEntry;
+		for (BulkAVUOperationResponse response : responses) {
+			resultEntry = new MetadataOperationResultEntry();
+			resultEntry
+					.setAttributeString(response.getAvuData().getAttribute());
+			resultEntry.setMessage(response.getMessage());
+			resultEntry.setResultStatus(response.getResultStatus());
+			resultEntry.setUnit(response.getAvuData().getUnit());
+			resultEntry.setValueString(response.getAvuData().getValue());
+			metadataOperationResultEntries.add(resultEntry);
+			log.info("result entry added:{}", resultEntry);
+		}
+		log.info("complete...");
+		return metadataOperationResultEntries;
+
+	}
 }

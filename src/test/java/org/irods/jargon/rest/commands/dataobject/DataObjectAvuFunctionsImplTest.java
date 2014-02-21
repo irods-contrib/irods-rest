@@ -1,5 +1,8 @@
 package org.irods.jargon.rest.commands.dataobject;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import junit.framework.Assert;
@@ -10,8 +13,10 @@ import org.irods.jargon.core.pub.DataTransferOperations;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.core.pub.domain.AvuData;
+import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.rest.configuration.RestConfiguration;
 import org.irods.jargon.rest.domain.MetadataListing;
+import org.irods.jargon.rest.domain.MetadataOperationResultEntry;
 import org.irods.jargon.testutils.TestingPropertiesHelper;
 import org.irods.jargon.testutils.filemanip.FileGenerator;
 import org.irods.jargon.testutils.filemanip.ScratchFileUtils;
@@ -90,7 +95,7 @@ public class DataObjectAvuFunctionsImplTest {
 
 		RestConfiguration restConfiguration = new RestConfiguration();
 
-		DataObjectAvuFunctionsImpl dataObjectAvuFunctionsImpl = new DataObjectAvuFunctionsImpl(
+		DataObjectAvuFunctions dataObjectAvuFunctionsImpl = new DataObjectAvuFunctionsImpl(
 				restConfiguration, irodsAccount,
 				irodsFileSystem.getIRODSAccessObjectFactory());
 
@@ -104,6 +109,55 @@ public class DataObjectAvuFunctionsImplTest {
 				org.irods.jargon.core.query.CollectionAndDataObjectListingEntry.ObjectType.DATA_OBJECT,
 				listing.getObjectType());
 		Assert.assertFalse(listing.getMetadataEntries().isEmpty());
+
+	}
+
+	@Test
+	public void testBulkAddAvu() throws Exception {
+		String testFileName = "testBulkAddAvu.txt";
+		String expectedAttribName = "testBulkAddAvu";
+		String expectedValueName = "testBulkAddAvu";
+
+		String targetIrodsCollection = testingPropertiesHelper
+				.buildIRODSCollectionAbsolutePathFromTestProperties(
+						testingProperties, IRODS_TEST_SUBDIR_PATH);
+
+		String targetIrodsDataObject = targetIrodsCollection + "/"
+				+ testFileName;
+
+		String absPath = scratchFileUtils
+				.createAndReturnAbsoluteScratchPath(IRODS_TEST_SUBDIR_PATH);
+		String fileNameOrig = FileGenerator.generateFileOfFixedLengthGivenName(
+				absPath, testFileName, 2);
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSFile targetIrodsFile = irodsFileSystem.getIRODSFileFactory(
+				irodsAccount).instanceIRODSFile(targetIrodsCollection);
+		targetIrodsFile.deleteWithForceOption();
+		targetIrodsFile.mkdirs();
+		DataTransferOperations dataTransferOperationsAO = irodsFileSystem
+				.getIRODSAccessObjectFactory().getDataTransferOperations(
+						irodsAccount);
+		dataTransferOperationsAO.putOperation(new File(fileNameOrig),
+				targetIrodsFile, null, null);
+
+		AvuData avuData = AvuData.instance(expectedAttribName,
+				expectedValueName, "");
+		List<AvuData> bulkAvuData = new ArrayList<AvuData>();
+		bulkAvuData.add(avuData);
+
+		RestConfiguration restConfiguration = new RestConfiguration();
+
+		DataObjectAvuFunctions dataObjectAvuFunctionsImpl = new DataObjectAvuFunctionsImpl(
+				restConfiguration, irodsAccount,
+				irodsFileSystem.getIRODSAccessObjectFactory());
+
+		List<MetadataOperationResultEntry> responses = dataObjectAvuFunctionsImpl
+				.addAvuMetadata(targetIrodsDataObject, bulkAvuData);
+
+		Assert.assertNotNull(responses);
+		Assert.assertFalse(responses.isEmpty());
 
 	}
 

@@ -3,11 +3,16 @@
  */
 package org.irods.jargon.rest.commands.dataobject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Named;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -17,11 +22,16 @@ import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.FileNotFoundException;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.DataObjectAO;
+import org.irods.jargon.core.pub.domain.AvuData;
 import org.irods.jargon.core.pub.domain.DataObject;
 import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.rest.commands.AbstractIrodsService;
 import org.irods.jargon.rest.domain.DataObjectData;
+import org.irods.jargon.rest.domain.MetadataEntry;
 import org.irods.jargon.rest.domain.MetadataListing;
+import org.irods.jargon.rest.domain.MetadataOperation;
+import org.irods.jargon.rest.domain.MetadataOperationResultEntry;
+import org.irods.jargon.rest.domain.MetadataQueryResultEntry;
 import org.irods.jargon.rest.domain.PermissionListing;
 import org.irods.jargon.rest.utils.DataUtils;
 import org.jboss.resteasy.annotations.providers.jaxb.json.Mapped;
@@ -242,6 +252,75 @@ public class DataObjectService extends AbstractIrodsService {
 					.instanceDataObjectAvuFunctions(irodsAccount);
 			return dataObjectAvuFunctions
 					.listDataObjectMetadata(decodedPathString);
+
+		} finally {
+			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
+		}
+	}
+
+	/**
+	 * Do a bulk metadata add operation for the given data object. This takes a
+	 * list of AVU entries in the PUT request body, and will attempt to add each
+	 * AVU.
+	 * <p/>
+	 * A response body will log the disposition of each AVU add attempt, and any
+	 * errors for an individual attempt are noted by the returned status and
+	 * message for each entry. This allows partial success.
+	 * 
+	 * @param authorization
+	 *            <code>String</code> with the basic auth header
+	 * @param path
+	 *            <code>String</code> with the iRODS absolute path derived from
+	 *            the URL extra path information
+	 * @param metadataEntries
+	 *            <code>List</code> of {@link MetadataQueryResultEntry} that is
+	 *            derived from the request body
+	 * @return response body derived from a <code>List</code> of
+	 *         {@link MetadataOperationResultEntry}
+	 * @throws JargonException
+	 */
+	@PUT
+	@Path("{path:.*}/metadata")
+	@Consumes({ "application/xml", "application/json" })
+	@Produces({ "application/xml", "application/json" })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	public List<MetadataOperationResultEntry> addCollectionMetadata(
+			@HeaderParam("Authorization") final String authorization,
+			@PathParam("path") final String path,
+			final MetadataOperation metadataOperation) throws JargonException {
+
+		log.info("addCollectionMetadata()");
+
+		if (authorization == null || authorization.isEmpty()) {
+			throw new IllegalArgumentException("null or empty authorization");
+		}
+
+		if (path == null || path.isEmpty()) {
+			throw new IllegalArgumentException("null or empty path");
+		}
+
+		if (metadataOperation == null) {
+			throw new IllegalArgumentException("null metadataOperation");
+		}
+
+		String decodedPathString = DataUtils.buildDecodedPathFromURLPathInfo(
+				path, retrieveEncoding());
+
+		try {
+			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
+
+			log.info("marshalling into AvuData...");
+			List<AvuData> avuDatas = new ArrayList<AvuData>();
+
+			for (MetadataEntry metadataEntry : metadataOperation
+					.getMetadataEntries()) {
+				avuDatas.add(AvuData.instance(metadataEntry.getAttribute(),
+						metadataEntry.getValue(), metadataEntry.getUnit()));
+			}
+			DataObjectAvuFunctions dataObjectAvuFunctions = getServiceFunctionFactory()
+					.instanceDataObjectAvuFunctions(irodsAccount);
+			return dataObjectAvuFunctions.addAvuMetadata(decodedPathString,
+					avuDatas);
 
 		} finally {
 			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
