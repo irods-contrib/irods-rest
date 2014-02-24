@@ -369,7 +369,7 @@ public class CollectionService extends AbstractIrodsService {
 	 * reason, the operations are expressed by the included request body. HTTP
 	 * DELETE verbs are ambiguous, but the consensus seems to be that DELETE
 	 * verbs should not include a body, and are sometimes treated as a POST
-	 * anyhow. So we had to fudge the 'pure' REST approach to accomodate the
+	 * anyhow. So we had to fudge the 'pure' REST approach to accommodate the
 	 * wide range of AVU data that exists.
 	 * 
 	 * @param authorization
@@ -426,9 +426,9 @@ public class CollectionService extends AbstractIrodsService {
 						metadataEntry.getValue(), metadataEntry.getUnit()));
 			}
 
-			log.info("doing bulk add operation");
+			log.info("doing bulk delete operation");
 			List<BulkAVUOperationResponse> bulkAVUOperationResponses = collectionAO
-					.deleteBulkAVUMetadataToCollection(decodedPathString,
+					.deleteBulkAVUMetadataFromCollection(decodedPathString,
 							avuDatas);
 			log.info("responses:{}", bulkAVUOperationResponses);
 

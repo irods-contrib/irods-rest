@@ -1,5 +1,6 @@
 package org.irods.jargon.rest.commands.dataobject;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -9,6 +10,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
@@ -608,6 +610,118 @@ public class DataObjectServiceTest implements ApplicationContextAware {
 			List<MetaDataAndDomainData> actualList = dataObjectAO
 					.findMetadataValuesForDataObject(dataObjectAbsPath);
 			Assert.assertFalse(actualList.isEmpty());
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+
+	}
+
+	@Test
+	public void testBulkDeleteDataObjectAVUSendJson() throws Exception {
+		String testFileName = "testBulkDeleteDataObjectAVUSendJson.dat";
+		String absPath = scratchFileUtils
+				.createAndReturnAbsoluteScratchPath(IRODS_TEST_SUBDIR_PATH);
+		String localFileName = FileGenerator
+				.generateFileOfFixedLengthGivenName(absPath, testFileName, 1);
+
+		String targetIrodsFile = testingPropertiesHelper
+				.buildIRODSCollectionAbsolutePathFromTestProperties(
+						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
+								+ testFileName);
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
+				.getIRODSAccessObjectFactory();
+
+		DataTransferOperations dto = accessObjectFactory
+				.getDataTransferOperations(irodsAccount);
+		dto.putOperation(localFileName, targetIrodsFile, testingProperties
+				.getProperty(TestingPropertiesHelper.IRODS_RESOURCE_KEY), null,
+				null);
+
+		String testAvuAttrib1 = "testBulkDeleteDataObjectAVUSendJsonAttr1";
+		String testAvuValue1 = "testBulkDeleteDataObjectAVUSendJsonValue1";
+		String testAvuUnit1 = "testBulkDeleteDataObjectAVUSendJsonUnit1";
+
+		String testAvuAttrib2 = "testBulkDeleteDataObjectAVUSendJsonAttr2";
+		String testAvuValue2 = "testBulkDeleteDataObjectAVUSendJsonValue2";
+		String testAvuUnit2 = "testBulkDeleteDataObjectAVUSendJsonUnit2";
+
+		DataObjectAO dataObjectAO = accessObjectFactory
+				.getDataObjectAO(irodsAccount);
+		List<AvuData> avuDatas = new ArrayList<AvuData>();
+		avuDatas.add(AvuData.instance(testAvuAttrib1, testAvuValue1,
+				testAvuUnit1));
+		avuDatas.add(AvuData.instance(testAvuAttrib2, testAvuValue2,
+				testAvuUnit2));
+		dataObjectAO.addBulkAVUMetadataToDataObject(targetIrodsFile, avuDatas);
+
+		MetadataOperation metadataOperation = new MetadataOperation();
+
+		MetadataEntry metadataEntry = new MetadataEntry();
+		metadataEntry.setAttribute(testAvuAttrib1);
+		metadataEntry.setValue(testAvuValue1);
+		metadataEntry.setUnit(testAvuUnit1);
+		metadataOperation.getMetadataEntries().add(metadataEntry);
+
+		metadataEntry = new MetadataEntry();
+		metadataEntry.setAttribute(testAvuAttrib2);
+		metadataEntry.setValue(testAvuValue2);
+		metadataEntry.setUnit(testAvuUnit2);
+		metadataOperation.getMetadataEntries().add(metadataEntry);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/dataObject");
+		sb.append(targetIrodsFile);
+		sb.append("/metadata");
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+
+		try {
+
+			HttpPost httpPost = new HttpPost(sb.toString());
+			httpPost.addHeader("accept", "application/json");
+			httpPost.addHeader("Content-Type", "application/json");
+
+			ObjectMapper mapper = new ObjectMapper();
+
+			String body = mapper.writeValueAsString(metadataOperation);
+
+			System.out.println(body);
+
+			httpPost.setEntity(new StringEntity(body));
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpPost, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+			String entityData = EntityUtils.toString(entity);
+
+			System.out.println(entityData);
+
+			MetadataOperationResultEntry[] actual = mapper.readValue(
+					entityData, MetadataOperationResultEntry[].class);
+
+			Assert.assertNotNull("no response body found", actual);
+
+			Assert.assertEquals("did not get two response entries", 2,
+					actual.length);
+
+			// see if metadata is deleted
+			List<MetaDataAndDomainData> datas = dataObjectAO
+					.findMetadataValuesForDataObject(targetIrodsFile);
+			Assert.assertTrue("did not seem to delete metadata",
+					datas.isEmpty());
 
 		} finally {
 			// When HttpClient instance is no longer needed,

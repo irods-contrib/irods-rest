@@ -51,4 +51,25 @@ public interface DataObjectAvuFunctions {
 			final String absolutePath, final List<AvuData> avuData)
 			throws FileNotFoundException, JargonException;
 
+	/**
+	 * Given a list of desired AVUs, delete them from the data object. Note that
+	 * each AVU is deleted separately, and an entry will be added in the
+	 * response for success or failure. An individual AVU that is missing during
+	 * delete will be silently ignored.
+	 * 
+	 * @param absolutePath
+	 *            <code>String</code> with the absolute path to a data object
+	 * @param avuData
+	 *            <code>List</code> of {@link AvuData} to be deleted from the
+	 *            data object
+	 * @return <code>List</code> of {@link MetadataOperationResultEntry} with
+	 *         the outcome of each AVU delete
+	 * @throws FileNotFoundException
+	 *             if the data object is missing
+	 * @throws JargonException
+	 */
+	List<MetadataOperationResultEntry> deleteAvuMetadata(
+			final String absolutePath, final List<AvuData> avuData)
+			throws FileNotFoundException, JargonException;
+
 }

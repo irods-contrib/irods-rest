@@ -161,4 +161,56 @@ public class DataObjectAvuFunctionsImplTest {
 
 	}
 
+	@Test
+	public void testBulkDeleteAvu() throws Exception {
+		String testFileName = "testBulkDeleteAvu.txt";
+		String expectedAttribName = "testBulkDeleteAvu";
+		String expectedValueName = "testBulkDeleteAvu";
+
+		String targetIrodsCollection = testingPropertiesHelper
+				.buildIRODSCollectionAbsolutePathFromTestProperties(
+						testingProperties, IRODS_TEST_SUBDIR_PATH);
+
+		String targetIrodsDataObject = targetIrodsCollection + "/"
+				+ testFileName;
+
+		String absPath = scratchFileUtils
+				.createAndReturnAbsoluteScratchPath(IRODS_TEST_SUBDIR_PATH);
+		String fileNameOrig = FileGenerator.generateFileOfFixedLengthGivenName(
+				absPath, testFileName, 2);
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSFile targetIrodsFile = irodsFileSystem.getIRODSFileFactory(
+				irodsAccount).instanceIRODSFile(targetIrodsCollection);
+		targetIrodsFile.deleteWithForceOption();
+		targetIrodsFile.mkdirs();
+		DataTransferOperations dataTransferOperationsAO = irodsFileSystem
+				.getIRODSAccessObjectFactory().getDataTransferOperations(
+						irodsAccount);
+		dataTransferOperationsAO.putOperation(new File(fileNameOrig),
+				targetIrodsFile, null, null);
+
+		AvuData avuData = AvuData.instance(expectedAttribName,
+				expectedValueName, "");
+		List<AvuData> bulkAvuData = new ArrayList<AvuData>();
+		bulkAvuData.add(avuData);
+
+		RestConfiguration restConfiguration = new RestConfiguration();
+
+		DataObjectAvuFunctions dataObjectAvuFunctionsImpl = new DataObjectAvuFunctionsImpl(
+				restConfiguration, irodsAccount,
+				irodsFileSystem.getIRODSAccessObjectFactory());
+
+		dataObjectAvuFunctionsImpl.addAvuMetadata(targetIrodsDataObject,
+				bulkAvuData);
+
+		List<MetadataOperationResultEntry> responses = dataObjectAvuFunctionsImpl
+				.deleteAvuMetadata(targetIrodsDataObject, bulkAvuData);
+
+		Assert.assertNotNull(responses);
+		Assert.assertFalse(responses.isEmpty());
+
+	}
+
 }

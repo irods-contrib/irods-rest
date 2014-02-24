@@ -4,6 +4,8 @@
 package org.irods.jargon.rest.commands.collection;
 
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import javax.xml.bind.JAXBContext;
@@ -15,6 +17,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
@@ -26,6 +29,7 @@ import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.core.pub.domain.AvuData;
 import org.irods.jargon.core.pub.domain.Collection;
 import org.irods.jargon.core.pub.io.IRODSFile;
+import org.irods.jargon.core.query.MetaDataAndDomainData;
 import org.irods.jargon.rest.auth.DefaultHttpClientAndContext;
 import org.irods.jargon.rest.auth.RestAuthUtils;
 import org.irods.jargon.rest.domain.CollectionData;
@@ -861,6 +865,111 @@ public class CollectionServiceTest implements ApplicationContextAware {
 
 			Assert.assertEquals("did not get two response entries", 2,
 					actual.length);
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+
+	}
+
+	@Test
+	public void testBulkDeleteCollectionAVUSendJson() throws Exception {
+		String testDirName = "testBulkDeleteCollectionAVUSendJson";
+
+		String targetIrodsCollection = testingPropertiesHelper
+				.buildIRODSCollectionAbsolutePathFromTestProperties(
+						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
+								+ testDirName);
+
+		String testAvuAttrib1 = "testBulkAddCollectionAVUJsonAttr1";
+		String testAvuValue1 = "testBulkAddCollectionAVUJsonValue1";
+		String testAvuUnit1 = "testBulkAddCollectionAVUJsonUnit1";
+
+		String testAvuAttrib2 = "testBulkAddCollectionAVUJsonAttr2";
+		String testAvuValue2 = "testBulkAddCollectionAVUJsonValue2";
+		String testAvuUnit2 = "testBulkAddCollectionAVUJsonUnit2";
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
+				.getIRODSAccessObjectFactory();
+
+		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(
+				irodsAccount).instanceIRODSFile(targetIrodsCollection);
+		collFile.mkdirs();
+
+		CollectionAO collectionAO = accessObjectFactory
+				.getCollectionAO(irodsAccount);
+		List<AvuData> avuDatas = new ArrayList<AvuData>();
+		avuDatas.add(AvuData.instance(testAvuAttrib1, testAvuValue1,
+				testAvuUnit1));
+		avuDatas.add(AvuData.instance(testAvuAttrib2, testAvuValue2,
+				testAvuUnit2));
+		collectionAO.addBulkAVUMetadataToCollection(targetIrodsCollection,
+				avuDatas);
+
+		MetadataOperation metadataOperation = new MetadataOperation();
+
+		MetadataEntry metadataEntry = new MetadataEntry();
+		metadataEntry.setAttribute(testAvuAttrib1);
+		metadataEntry.setValue(testAvuValue1);
+		metadataEntry.setUnit(testAvuUnit1);
+		metadataOperation.getMetadataEntries().add(metadataEntry);
+
+		metadataEntry = new MetadataEntry();
+		metadataEntry.setAttribute(testAvuAttrib2);
+		metadataEntry.setValue(testAvuValue2);
+		metadataEntry.setUnit(testAvuUnit2);
+		metadataOperation.getMetadataEntries().add(metadataEntry);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/collection");
+		sb.append(collFile.getAbsolutePath());
+		sb.append("/metadata");
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+
+		try {
+
+			HttpPost httpPost = new HttpPost(sb.toString());
+			httpPost.addHeader("accept", "application/json");
+			httpPost.addHeader("Content-Type", "application/json");
+
+			ObjectMapper mapper = new ObjectMapper();
+
+			String body = mapper.writeValueAsString(metadataOperation);
+
+			System.out.println(body);
+
+			httpPost.setEntity(new StringEntity(body));
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpPost, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+			String entityData = EntityUtils.toString(entity);
+
+			System.out.println(entityData);
+
+			MetadataOperationResultEntry[] actual = mapper.readValue(
+					entityData, MetadataOperationResultEntry[].class);
+
+			Assert.assertNotNull("no response body found", actual);
+
+			Assert.assertEquals("did not get two response entries", 2,
+					actual.length);
+
+			// see if metadata is deleted
+			List<MetaDataAndDomainData> datas = collectionAO
+					.findMetadataValuesForCollection(collFile.getAbsolutePath());
+			Assert.assertTrue("did not seem to delete metadata",
+					datas.isEmpty());
 
 		} finally {
 			// When HttpClient instance is no longer needed,

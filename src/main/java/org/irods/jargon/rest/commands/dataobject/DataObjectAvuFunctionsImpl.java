@@ -90,6 +90,59 @@ public class DataObjectAvuFunctionsImpl extends AbstractServiceFunction
 	 * (non-Javadoc)
 	 * 
 	 * @see org.irods.jargon.rest.commands.dataobject.DataObjectAvuFunctions#
+	 * deleteAvuMetadata(java.lang.String, java.util.List)
+	 */
+	@Override
+	public List<MetadataOperationResultEntry> deleteAvuMetadata(
+			final String absolutePath, final List<AvuData> avuData)
+			throws FileNotFoundException, JargonException {
+
+		log.info("deleteAvuMetadata()");
+
+		if (absolutePath == null || absolutePath.isEmpty()) {
+			throw new IllegalArgumentException(
+					"null or empty iRODS absolute path");
+		}
+
+		if (avuData == null) {
+			throw new IllegalArgumentException(
+					"null or empty metadataOperation");
+		}
+
+		log.info("absolutePath:{}", absolutePath);
+
+		DataObjectAO dataObjectAO = this.getIrodsAccessObjectFactory()
+				.getDataObjectAO(getIrodsAccount());
+
+		List<MetadataOperationResultEntry> metadataOperationResultEntries = new ArrayList<MetadataOperationResultEntry>();
+
+		List<BulkAVUOperationResponse> responses = dataObjectAO
+				.deleteBulkAVUMetadataFromDataObject(absolutePath, avuData);
+
+		log.info("responses:{}", responses);
+
+		log.info("marshalling response into rest domain...");
+		MetadataOperationResultEntry resultEntry;
+		for (BulkAVUOperationResponse response : responses) {
+			resultEntry = new MetadataOperationResultEntry();
+			resultEntry
+					.setAttributeString(response.getAvuData().getAttribute());
+			resultEntry.setMessage(response.getMessage());
+			resultEntry.setResultStatus(response.getResultStatus());
+			resultEntry.setUnit(response.getAvuData().getUnit());
+			resultEntry.setValueString(response.getAvuData().getValue());
+			metadataOperationResultEntries.add(resultEntry);
+			log.info("result entry added:{}", resultEntry);
+		}
+		log.info("complete...");
+		return metadataOperationResultEntries;
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.irods.jargon.rest.commands.dataobject.DataObjectAvuFunctions#
 	 * addAvuMetadata(java.lang.String, java.util.List)
 	 */
 	@Override
