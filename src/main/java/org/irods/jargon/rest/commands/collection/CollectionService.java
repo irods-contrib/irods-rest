@@ -20,7 +20,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
 import org.irods.jargon.core.connection.IRODSAccount;
+import org.irods.jargon.core.exception.FileNotFoundException;
+import org.irods.jargon.core.exception.InvalidUserException;
 import org.irods.jargon.core.exception.JargonException;
+import org.irods.jargon.core.protovalues.FilePermissionEnum;
 import org.irods.jargon.core.pub.BulkAVUOperationResponse;
 import org.irods.jargon.core.pub.CollectionAO;
 import org.irods.jargon.core.pub.CollectionAndDataObjectListAndSearchAO;
@@ -626,7 +629,8 @@ public class CollectionService extends AbstractIrodsService {
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
 	public PermissionListing getCollectionAcl(
 			@HeaderParam("Authorization") final String authorization,
-			@PathParam("path") final String path) throws JargonException {
+			@PathParam("path") final String path) throws FileNotFoundException,
+			JargonException {
 
 		log.info("getCollectionAcl()");
 
@@ -646,6 +650,99 @@ public class CollectionService extends AbstractIrodsService {
 			CollectionAclFunctions collectionAclFunctions = getServiceFunctionFactory()
 					.instanceCollectionAclFunctions(irodsAccount);
 			return collectionAclFunctions.listPermissions(decodedPathString);
+
+		} finally {
+			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
+		}
+	}
+
+	/**
+	 * Add a permission for a collection. This is done as a PUT, but this is
+	 * idempotent, so it can be invoked against a collection that already has a
+	 * permission for a user.
+	 * <p/>
+	 * Note that this method returns void, there is no response body, and as
+	 * such it should return an HTTP 204 code
+	 * 
+	 * @param authorization
+	 *            <code>String</code> with the basic auth header
+	 * @param path
+	 *            <code>String</code> with the absolute path to the iRODS
+	 *            collection
+	 * @param userName
+	 *            <code>String</code> with the user name, which can be in
+	 *            user,zone format, or can be just the user name. Note the '#'
+	 *            character can be mis-interpreted as an anchor in the path, so
+	 *            the delimiter between user and zone should be a , (comma)
+	 *            character instead of the pound '#' character
+	 * @param recursive
+	 *            <code>boolean</code> that indicates the permission should be
+	 *            set recursively
+	 * @param permission
+	 *            <code>String</code> of READ, WRITE, OWN, or NONE
+	 * @throws InvalidUserException
+	 * @throws FileNotFoundException
+	 * @throws JargonException
+	 */
+	@PUT
+	@Path("{path:.*}/acl/{userName}")
+	@Produces({ "application/xml", "application/json" })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	public void addCollectionAcl(
+			@HeaderParam("Authorization") final String authorization,
+			@PathParam("path") final String path,
+			@PathParam("userName") final String userName,
+			@QueryParam("recursive") @DefaultValue("false") final boolean recursive,
+			@QueryParam("permission") @DefaultValue("READ") final String permission)
+			throws InvalidUserException, FileNotFoundException, JargonException {
+
+		log.info("addCollectionAcl()");
+
+		if (authorization == null || authorization.isEmpty()) {
+			throw new IllegalArgumentException("null or empty authorization");
+		}
+
+		if (path == null || path.isEmpty()) {
+			throw new IllegalArgumentException("null or empty path");
+		}
+
+		if (userName == null || userName.isEmpty()) {
+			throw new IllegalArgumentException("null or empty userName");
+		}
+
+		if (permission == null || permission.isEmpty()) {
+			throw new IllegalArgumentException("null or empty permission");
+		}
+
+		FilePermissionEnum filePermissionEnumTranslationEnum = FilePermissionEnum.NULL;
+
+		if (permission.equals("READ")) {
+			filePermissionEnumTranslationEnum = FilePermissionEnum.READ;
+		} else if (permission.equals("WRITE")) {
+			filePermissionEnumTranslationEnum = FilePermissionEnum.WRITE;
+		} else if (permission.equals("OWN")) {
+			filePermissionEnumTranslationEnum = FilePermissionEnum.OWN;
+		} else if (permission.equals("NONE")) {
+			filePermissionEnumTranslationEnum = FilePermissionEnum.NONE;
+		} else {
+			throw new IllegalArgumentException("unknown permission type:"
+					+ permission);
+		}
+
+		String myUserNameString = userName.replace(',', '#');
+
+		try {
+			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
+
+			String decodedPath = DataUtils.buildDecodedPathFromURLPathInfo(
+					path, retrieveEncoding());
+
+			CollectionAclFunctions collectionAclFunctions = getServiceFunctionFactory()
+					.instanceCollectionAclFunctions(irodsAccount);
+			log.info("adding permission");
+			collectionAclFunctions.addPermission(decodedPath, myUserNameString,
+					filePermissionEnumTranslationEnum, recursive);
+			log.info("done");
 
 		} finally {
 			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();

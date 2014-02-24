@@ -16,14 +16,18 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.irods.jargon.core.connection.IRODSAccount;
+import org.irods.jargon.core.packinstr.TransferOptions.ForceOption;
+import org.irods.jargon.core.protovalues.FilePermissionEnum;
 import org.irods.jargon.core.pub.DataObjectAO;
 import org.irods.jargon.core.pub.DataTransferOperations;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.core.pub.domain.AvuData;
 import org.irods.jargon.core.pub.domain.DataObject;
+import org.irods.jargon.core.pub.domain.UserFilePermission;
 import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.core.query.MetaDataAndDomainData;
+import org.irods.jargon.core.transfer.TransferControlBlock;
 import org.irods.jargon.rest.auth.DefaultHttpClientAndContext;
 import org.irods.jargon.rest.auth.RestAuthUtils;
 import org.irods.jargon.rest.domain.DataObjectData;
@@ -641,9 +645,12 @@ public class DataObjectServiceTest implements ApplicationContextAware {
 
 		DataTransferOperations dto = accessObjectFactory
 				.getDataTransferOperations(irodsAccount);
+		TransferControlBlock tcb = accessObjectFactory
+				.buildDefaultTransferControlBlockBasedOnJargonProperties();
+		tcb.getTransferOptions().setForceOption(ForceOption.USE_FORCE);
 		dto.putOperation(localFileName, targetIrodsFile, testingProperties
 				.getProperty(TestingPropertiesHelper.IRODS_RESOURCE_KEY), null,
-				null);
+				tcb);
 
 		String testAvuAttrib1 = "testBulkDeleteDataObjectAVUSendJsonAttr1";
 		String testAvuValue1 = "testBulkDeleteDataObjectAVUSendJsonValue1";
@@ -722,6 +729,73 @@ public class DataObjectServiceTest implements ApplicationContextAware {
 					.findMetadataValuesForDataObject(targetIrodsFile);
 			Assert.assertTrue("did not seem to delete metadata",
 					datas.isEmpty());
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+
+	}
+
+	@Test
+	public void testAddPermission() throws Exception {
+		String testFileName = "testAddPermission.dat";
+		String absPath = scratchFileUtils
+				.createAndReturnAbsoluteScratchPath(IRODS_TEST_SUBDIR_PATH);
+		String localFileName = FileGenerator
+				.generateFileOfFixedLengthGivenName(absPath, testFileName, 1);
+
+		String targetIrodsFile = testingPropertiesHelper
+				.buildIRODSCollectionAbsolutePathFromTestProperties(
+						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
+								+ testFileName);
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccount secondaryAccount = testingPropertiesHelper
+				.buildIRODSAccountFromSecondaryTestProperties(testingProperties);
+
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
+				.getIRODSAccessObjectFactory();
+
+		DataTransferOperations dto = accessObjectFactory
+				.getDataTransferOperations(irodsAccount);
+		dto.putOperation(localFileName, targetIrodsFile, testingProperties
+				.getProperty(TestingPropertiesHelper.IRODS_RESOURCE_KEY), null,
+				null);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/dataObject");
+		sb.append(targetIrodsFile);
+		sb.append("/acl/");
+		sb.append(secondaryAccount.getUserName());
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
+
+			HttpPut httpPut = new HttpPut(sb.toString());
+			httpPut.addHeader("accept", "application/json");
+			httpPut.getParams().setBooleanParameter("recursive", false);
+			httpPut.getParams().setParameter("permission", "READ");
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpPut, clientAndContext.getHttpContext());
+			Assert.assertEquals(204, response.getStatusLine().getStatusCode());
+
+			DataObjectAO dataObjectAO = accessObjectFactory
+					.getDataObjectAO(irodsAccount);
+			UserFilePermission actualFilePermission = dataObjectAO
+					.getPermissionForDataObjectForUserName(targetIrodsFile,
+							secondaryAccount.getUserName());
+			Assert.assertEquals("file permission not set to read",
+					FilePermissionEnum.READ,
+					actualFilePermission.getFilePermissionEnum());
 
 		} finally {
 			// When HttpClient instance is no longer needed,

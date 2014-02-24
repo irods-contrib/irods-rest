@@ -1,7 +1,10 @@
 package org.irods.jargon.rest.commands.collection;
 
 import org.irods.jargon.core.exception.DataNotFoundException;
+import org.irods.jargon.core.exception.FileNotFoundException;
+import org.irods.jargon.core.exception.InvalidUserException;
 import org.irods.jargon.core.exception.JargonException;
+import org.irods.jargon.core.protovalues.FilePermissionEnum;
 import org.irods.jargon.rest.domain.PermissionListing;
 
 /**
@@ -23,5 +26,28 @@ public interface CollectionAclFunctions {
 	 */
 	PermissionListing listPermissions(String absolutePath)
 			throws DataNotFoundException, JargonException;
+
+	/**
+	 * Set a permission for the given user on the given iRODS collection
+	 * 
+	 * @param absolutePath
+	 *            <code>String</code> with the iRODS absolute path to a
+	 *            collection
+	 * @param userName
+	 *            <code>String</code> with a user name, which can be in
+	 *            user#zone format
+	 * @param permission
+	 *            {@link FilePermissionEnum} value for the permission to set
+	 * @param recursive
+	 *            <code>boolean</code> if the permission should be recursively
+	 *            set
+	 * @throws InvalidUserException
+	 *             if the user is not available
+	 * @throws FileNotFoundException
+	 * @throws JargonException
+	 */
+	void addPermission(final String absolutePath, final String userName,
+			final FilePermissionEnum permission, final boolean recursive)
+			throws InvalidUserException, FileNotFoundException, JargonException;
 
 }

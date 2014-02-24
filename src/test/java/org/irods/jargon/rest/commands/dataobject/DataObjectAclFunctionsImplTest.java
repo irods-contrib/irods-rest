@@ -6,9 +6,11 @@ import junit.framework.Assert;
 
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.FileNotFoundException;
+import org.irods.jargon.core.protovalues.FilePermissionEnum;
 import org.irods.jargon.core.pub.DataObjectAOImpl;
 import org.irods.jargon.core.pub.DataTransferOperations;
 import org.irods.jargon.core.pub.IRODSFileSystem;
+import org.irods.jargon.core.pub.domain.UserFilePermission;
 import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry.ObjectType;
 import org.irods.jargon.rest.configuration.RestConfiguration;
 import org.irods.jargon.rest.domain.PermissionListing;
@@ -124,6 +126,51 @@ public class DataObjectAclFunctionsImplTest {
 				listing.getObjectType());
 		Assert.assertFalse("no entries", listing.getPermissionEntries()
 				.isEmpty());
+
+	}
+
+	@Test
+	public void testAddPermission() throws Exception {
+		String testFileName = "testAddPermission.xls";
+		String absPath = scratchFileUtils
+				.createAndReturnAbsoluteScratchPath(IRODS_TEST_SUBDIR_PATH);
+		String fileNameOrig = FileGenerator.generateFileOfFixedLengthGivenName(
+				absPath, testFileName, 2);
+
+		String targetIrodsCollection = testingPropertiesHelper
+				.buildIRODSCollectionAbsolutePathFromTestProperties(
+						testingProperties, IRODS_TEST_SUBDIR_PATH);
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccount secondaryAccount = testingPropertiesHelper
+				.buildIRODSAccountFromSecondaryTestProperties(testingProperties);
+		DataObjectAOImpl dataObjectAO = (DataObjectAOImpl) irodsFileSystem
+				.getIRODSAccessObjectFactory().getDataObjectAO(irodsAccount);
+
+		DataTransferOperations dto = irodsFileSystem
+				.getIRODSAccessObjectFactory().getDataTransferOperations(
+						irodsAccount);
+		dto.putOperation(fileNameOrig, targetIrodsCollection, "", null, null);
+
+		String irodsFilePath = targetIrodsCollection + "/" + testFileName;
+
+		RestConfiguration restConfiguration = new RestConfiguration();
+
+		DataObjectAclFunctionsImpl dataObjectAclFunctionsImpl = new DataObjectAclFunctionsImpl(
+				restConfiguration, irodsAccount,
+				irodsFileSystem.getIRODSAccessObjectFactory());
+
+		FilePermissionEnum expectedFilePermissionEnum = FilePermissionEnum.WRITE;
+
+		dataObjectAclFunctionsImpl.addPermission(irodsFilePath,
+				secondaryAccount.getUserName(), expectedFilePermissionEnum);
+
+		UserFilePermission permission = dataObjectAO
+				.getPermissionForDataObjectForUserName(irodsFilePath,
+						secondaryAccount.getUserName());
+		Assert.assertEquals("did not set expected permission level",
+				expectedFilePermissionEnum, permission.getFilePermissionEnum());
 
 	}
 

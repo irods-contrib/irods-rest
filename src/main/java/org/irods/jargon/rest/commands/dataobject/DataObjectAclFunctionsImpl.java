@@ -7,11 +7,14 @@ import java.util.List;
 
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.FileNotFoundException;
+import org.irods.jargon.core.exception.InvalidUserException;
 import org.irods.jargon.core.exception.JargonException;
+import org.irods.jargon.core.protovalues.FilePermissionEnum;
 import org.irods.jargon.core.pub.DataObjectAO;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.core.pub.domain.UserFilePermission;
 import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry.ObjectType;
+import org.irods.jargon.core.utils.MiscIRODSUtils;
 import org.irods.jargon.rest.commands.AbstractServiceFunction;
 import org.irods.jargon.rest.configuration.RestConfiguration;
 import org.irods.jargon.rest.domain.PermissionEntry;
@@ -89,6 +92,49 @@ public class DataObjectAclFunctionsImpl extends AbstractServiceFunction
 
 		log.info("all data marshaled");
 		return permissionListing;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.irods.jargon.rest.commands.dataobject.DataObjectAclFunctions#
+	 * addPermission(java.lang.String, java.lang.String,
+	 * org.irods.jargon.core.protovalues.FilePermissionEnum)
+	 */
+	@Override
+	public void addPermission(final String absolutePath, final String userName,
+			final FilePermissionEnum permission) throws InvalidUserException,
+			FileNotFoundException, JargonException {
+
+		log.info("addPermission()");
+
+		if (absolutePath == null || absolutePath.isEmpty()) {
+			throw new IllegalArgumentException("null or empty absolutePath");
+		}
+
+		if (userName == null || userName.isEmpty()) {
+			throw new IllegalArgumentException("null or empty userName");
+		}
+
+		if (permission == null) {
+			throw new IllegalArgumentException("null permission");
+		}
+
+		log.info("absolutePath:{}", absolutePath);
+		log.info("userName:{}", userName);
+		log.info("permission:{}", permission);
+
+		DataObjectAO dataObjectAO = this.getIrodsAccessObjectFactory()
+				.getDataObjectAO(getIrodsAccount());
+
+		String userPartString = MiscIRODSUtils.getUserInUserName(userName);
+		String userZoneString = MiscIRODSUtils.getZoneInUserName(userName);
+
+		log.info("setting the permission...");
+		dataObjectAO.setAccessPermission(userZoneString, absolutePath,
+				userPartString, permission);
+		log.info("permission set");
+
 	}
 
 }

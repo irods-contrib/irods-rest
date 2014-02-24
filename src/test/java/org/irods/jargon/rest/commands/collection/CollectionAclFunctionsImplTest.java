@@ -6,8 +6,10 @@ import junit.framework.Assert;
 
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.FileNotFoundException;
+import org.irods.jargon.core.protovalues.FilePermissionEnum;
 import org.irods.jargon.core.pub.CollectionAO;
 import org.irods.jargon.core.pub.IRODSFileSystem;
+import org.irods.jargon.core.pub.domain.UserFilePermission;
 import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry.ObjectType;
 import org.irods.jargon.rest.configuration.RestConfiguration;
@@ -48,7 +50,7 @@ public class CollectionAclFunctionsImplTest {
 
 		RestConfiguration restConfiguration = new RestConfiguration();
 
-		CollectionAclFunctionsImpl collectionAclFunctionsImpl = new CollectionAclFunctionsImpl(
+		CollectionAclFunctions collectionAclFunctionsImpl = new CollectionAclFunctionsImpl(
 				restConfiguration, irodsAccount,
 				irodsFileSystem.getIRODSAccessObjectFactory());
 
@@ -71,7 +73,7 @@ public class CollectionAclFunctionsImplTest {
 
 		RestConfiguration restConfiguration = new RestConfiguration();
 
-		CollectionAclFunctionsImpl collectionAclFunctionsImpl = new CollectionAclFunctionsImpl(
+		CollectionAclFunctions collectionAclFunctionsImpl = new CollectionAclFunctionsImpl(
 				restConfiguration, irodsAccount,
 				irodsFileSystem.getIRODSAccessObjectFactory());
 
@@ -107,7 +109,7 @@ public class CollectionAclFunctionsImplTest {
 
 		RestConfiguration restConfiguration = new RestConfiguration();
 
-		CollectionAclFunctionsImpl collectionAclFunctionsImpl = new CollectionAclFunctionsImpl(
+		CollectionAclFunctions collectionAclFunctionsImpl = new CollectionAclFunctionsImpl(
 				restConfiguration, irodsAccount,
 				irodsFileSystem.getIRODSAccessObjectFactory());
 
@@ -120,5 +122,43 @@ public class CollectionAclFunctionsImplTest {
 				listing.getObjectType());
 		Assert.assertFalse("no entries", listing.getPermissionEntries()
 				.isEmpty());
+	}
+
+	@Test
+	public void testAddCollectionAcl() throws Exception {
+
+		String testCollectionName = "testAddCollectionAcl";
+		IRODSAccount secondaryAccount = testingPropertiesHelper
+				.buildIRODSAccountFromSecondaryTestProperties(testingProperties);
+		FilePermissionEnum expectedPermission = FilePermissionEnum.READ;
+
+		String targetIrodsCollection = testingPropertiesHelper
+				.buildIRODSCollectionAbsolutePathFromTestProperties(
+						testingProperties, IRODS_TEST_SUBDIR_PATH + "/"
+								+ testCollectionName);
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+		CollectionAO collectionAO = irodsFileSystem
+				.getIRODSAccessObjectFactory().getCollectionAO(irodsAccount);
+		IRODSFile irodsFile = irodsFileSystem.getIRODSFileFactory(irodsAccount)
+				.instanceIRODSFile(targetIrodsCollection);
+		irodsFile.mkdirs();
+
+		RestConfiguration restConfiguration = new RestConfiguration();
+
+		CollectionAclFunctions collectionAclFunctionsImpl = new CollectionAclFunctionsImpl(
+				restConfiguration, irodsAccount,
+				irodsFileSystem.getIRODSAccessObjectFactory());
+
+		collectionAclFunctionsImpl.addPermission(targetIrodsCollection,
+				secondaryAccount.getUserName(), expectedPermission, false);
+
+		UserFilePermission actualFilePermission = collectionAO
+				.getPermissionForUserName(targetIrodsCollection,
+						secondaryAccount.getUserName());
+		Assert.assertEquals(expectedPermission,
+				actualFilePermission.getFilePermissionEnum());
+
 	}
 }

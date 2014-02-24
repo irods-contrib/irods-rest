@@ -21,7 +21,9 @@ import javax.ws.rs.QueryParam;
 
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.FileNotFoundException;
+import org.irods.jargon.core.exception.InvalidUserException;
 import org.irods.jargon.core.exception.JargonException;
+import org.irods.jargon.core.protovalues.FilePermissionEnum;
 import org.irods.jargon.core.pub.BulkAVUOperationResponse;
 import org.irods.jargon.core.pub.DataObjectAO;
 import org.irods.jargon.core.pub.domain.AvuData;
@@ -426,6 +428,95 @@ public class DataObjectService extends AbstractIrodsService {
 			}
 			log.info("complete...");
 			return metadataOperationResultEntries;
+
+		} finally {
+			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
+		}
+	}
+
+	/**
+	 * Add a permission for a dataObject. This is done as a PUT, but this is
+	 * idempotent, so it can be invoked against a data object that already has a
+	 * permission for a user, effectively changing the permission.
+	 * <p/>
+	 * Note that this method returns void, there is no response body, and as
+	 * such it should return an HTTP 204 code
+	 * 
+	 * @param authorization
+	 *            <code>String</code> with the basic auth header
+	 * @param path
+	 *            <code>String</code> with the absolute path to the iRODS
+	 *            dataObject
+	 * @param userName
+	 *            <code>String</code> with the user name, which can be in
+	 *            user,zone format, or can be just the user name. Note the '#'
+	 *            character can be mis-interpreted as an anchor in the path, so
+	 *            the delimiter between user and zone should be a , (comma)
+	 *            character instead of the pound '#' character
+	 * @param permission
+	 *            <code>String</code> of READ, WRITE, OWN, or NONE
+	 * @throws InvalidUserException
+	 * @throws FileNotFoundException
+	 * @throws JargonException
+	 */
+	@PUT
+	@Path("{path:.*}/acl/{userName}")
+	@Produces({ "application/xml", "application/json" })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	public void addDataObjectAcl(
+			@HeaderParam("Authorization") final String authorization,
+			@PathParam("path") final String path,
+			@PathParam("userName") final String userName,
+			@QueryParam("permission") @DefaultValue("READ") final String permission)
+			throws InvalidUserException, FileNotFoundException, JargonException {
+
+		log.info("addDataObjectAcl()");
+
+		if (authorization == null || authorization.isEmpty()) {
+			throw new IllegalArgumentException("null or empty authorization");
+		}
+
+		if (path == null || path.isEmpty()) {
+			throw new IllegalArgumentException("null or empty path");
+		}
+
+		if (userName == null || userName.isEmpty()) {
+			throw new IllegalArgumentException("null or empty userName");
+		}
+
+		if (permission == null || permission.isEmpty()) {
+			throw new IllegalArgumentException("null or empty permission");
+		}
+
+		FilePermissionEnum filePermissionEnumTranslationEnum = FilePermissionEnum.NULL;
+
+		if (permission.equals("READ")) {
+			filePermissionEnumTranslationEnum = FilePermissionEnum.READ;
+		} else if (permission.equals("WRITE")) {
+			filePermissionEnumTranslationEnum = FilePermissionEnum.WRITE;
+		} else if (permission.equals("OWN")) {
+			filePermissionEnumTranslationEnum = FilePermissionEnum.OWN;
+		} else if (permission.equals("NONE")) {
+			filePermissionEnumTranslationEnum = FilePermissionEnum.NONE;
+		} else {
+			throw new IllegalArgumentException("unknown permission type:"
+					+ permission);
+		}
+
+		String myUserNameString = userName.replace(',', '#');
+
+		try {
+			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
+
+			String decodedPath = DataUtils.buildDecodedPathFromURLPathInfo(
+					path, retrieveEncoding());
+
+			DataObjectAclFunctions dataObjectAclFunctions = getServiceFunctionFactory()
+					.instanceDataObjectAclFunctions(irodsAccount);
+			log.info("adding permission");
+			dataObjectAclFunctions.addPermission(decodedPath, myUserNameString,
+					filePermissionEnumTranslationEnum);
+			log.info("done");
 
 		} finally {
 			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();

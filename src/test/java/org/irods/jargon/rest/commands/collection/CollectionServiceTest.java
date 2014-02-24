@@ -23,11 +23,13 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.irods.jargon.core.connection.IRODSAccount;
+import org.irods.jargon.core.protovalues.FilePermissionEnum;
 import org.irods.jargon.core.pub.CollectionAO;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.core.pub.domain.AvuData;
 import org.irods.jargon.core.pub.domain.Collection;
+import org.irods.jargon.core.pub.domain.UserFilePermission;
 import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.core.query.MetaDataAndDomainData;
 import org.irods.jargon.rest.auth.DefaultHttpClientAndContext;
@@ -1176,6 +1178,179 @@ public class CollectionServiceTest implements ApplicationContextAware {
 					PermissionListing.class);
 
 			Assert.assertNotNull("no permission listing returned", actual);
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+
+	}
+
+	@Test
+	public void testAddPermission() throws Exception {
+		String testDirName = "testAddPermission";
+
+		String targetIrodsCollection = testingPropertiesHelper
+				.buildIRODSCollectionAbsolutePathFromTestProperties(
+						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
+								+ testDirName);
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccount secondaryAccount = testingPropertiesHelper
+				.buildIRODSAccountFromSecondaryTestProperties(testingProperties);
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
+				.getIRODSAccessObjectFactory();
+
+		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(
+				irodsAccount).instanceIRODSFile(targetIrodsCollection);
+		collFile.mkdirs();
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/collection");
+		sb.append(collFile.getAbsolutePath());
+		sb.append("/acl/");
+		sb.append(secondaryAccount.getUserName());
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
+
+			HttpPut httpPut = new HttpPut(sb.toString());
+			httpPut.addHeader("accept", "application/json");
+			httpPut.getParams().setBooleanParameter("recursive", false);
+			httpPut.getParams().setParameter("permission", "READ");
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpPut, clientAndContext.getHttpContext());
+			Assert.assertEquals(204, response.getStatusLine().getStatusCode());
+
+			CollectionAO collectionAO = accessObjectFactory
+					.getCollectionAO(irodsAccount);
+			UserFilePermission actualFilePermission = collectionAO
+					.getPermissionForUserName(targetIrodsCollection,
+							secondaryAccount.getUserName());
+			Assert.assertEquals("file permission not set to read",
+					FilePermissionEnum.READ,
+					actualFilePermission.getFilePermissionEnum());
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+
+	}
+
+	@Test
+	public void testAddPermissionWithZone() throws Exception {
+		String testDirName = "testAddPermissionWithZone";
+
+		String targetIrodsCollection = testingPropertiesHelper
+				.buildIRODSCollectionAbsolutePathFromTestProperties(
+						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
+								+ testDirName);
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccount secondaryAccount = testingPropertiesHelper
+				.buildIRODSAccountFromSecondaryTestProperties(testingProperties);
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
+				.getIRODSAccessObjectFactory();
+
+		String secondaryUserNameString = secondaryAccount.getUserName() + ","
+				+ secondaryAccount.getZone();
+
+		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(
+				irodsAccount).instanceIRODSFile(targetIrodsCollection);
+		collFile.mkdirs();
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/collection");
+		sb.append(collFile.getAbsolutePath());
+		sb.append("/acl/");
+		sb.append(secondaryUserNameString);
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
+
+			HttpPut httpPut = new HttpPut(sb.toString());
+			httpPut.addHeader("accept", "application/json");
+			httpPut.getParams().setBooleanParameter("recursive", false);
+			httpPut.getParams().setParameter("permission", "READ");
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpPut, clientAndContext.getHttpContext());
+			Assert.assertEquals(204, response.getStatusLine().getStatusCode());
+
+			CollectionAO collectionAO = accessObjectFactory
+					.getCollectionAO(irodsAccount);
+			UserFilePermission actualFilePermission = collectionAO
+					.getPermissionForUserName(targetIrodsCollection,
+							secondaryAccount.getUserName());
+			Assert.assertEquals("file permission not set to read",
+					FilePermissionEnum.READ,
+					actualFilePermission.getFilePermissionEnum());
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+	}
+
+	@Test
+	public void testAddPermissionBogusUser() throws Exception {
+		String testDirName = "testAddPermissionWithZone";
+
+		String targetIrodsCollection = testingPropertiesHelper
+				.buildIRODSCollectionAbsolutePathFromTestProperties(
+						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
+								+ testDirName);
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+
+		String bogusUserString = "bogususerbogusbogusbogus";
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
+				.getIRODSAccessObjectFactory();
+
+		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(
+				irodsAccount).instanceIRODSFile(targetIrodsCollection);
+		collFile.mkdirs();
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/collection");
+		sb.append(collFile.getAbsolutePath());
+		sb.append("/acl/");
+		sb.append(bogusUserString);
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
+
+			HttpPut httpPut = new HttpPut(sb.toString());
+			httpPut.addHeader("accept", "application/json");
+			httpPut.getParams().setBooleanParameter("recursive", false);
+			httpPut.getParams().setParameter("permission", "READ");
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpPut, clientAndContext.getHttpContext());
+			Assert.assertEquals(500, response.getStatusLine().getStatusCode());
+
 		} finally {
 			// When HttpClient instance is no longer needed,
 			// shut down the connection manager to ensure
