@@ -523,4 +523,70 @@ public class DataObjectService extends AbstractIrodsService {
 		}
 	}
 
+	/**
+	 * Delete a permission for a dataObject. This is done as an HTTP DELETE. The
+	 * method is idempotent and can be invoked multiple times, silently ignoring
+	 * an already-deleted permission.
+	 * <p/>
+	 * Note that this method returns void, there is no response body, and as
+	 * such it should return an HTTP 204 code
+	 * 
+	 * @param authorization
+	 *            <code>String</code> with the basic auth header
+	 * @param path
+	 *            <code>String</code> with the absolute path to the iRODS
+	 *            dataObject
+	 * @param userName
+	 *            <code>String</code> with the user name, which can be in
+	 *            user,zone format, or can be just the user name. Note the '#'
+	 *            character can be mis-interpreted as an anchor in the path, so
+	 *            the delimiter between user and zone should be a , (comma)
+	 *            character instead of the pound '#' character
+	 * @throws InvalidUserException
+	 * @throws FileNotFoundException
+	 * @throws JargonException
+	 */
+	@DELETE
+	@Path("{path:.*}/acl/{userName}")
+	@Produces({ "application/xml", "application/json" })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	public void deleteDataObjectAcl(
+			@HeaderParam("Authorization") final String authorization,
+			@PathParam("path") final String path,
+			@PathParam("userName") final String userName)
+			throws InvalidUserException, FileNotFoundException, JargonException {
+
+		log.info("deleteDataObjectAcl()");
+
+		if (authorization == null || authorization.isEmpty()) {
+			throw new IllegalArgumentException("null or empty authorization");
+		}
+
+		if (path == null || path.isEmpty()) {
+			throw new IllegalArgumentException("null or empty path");
+		}
+
+		if (userName == null || userName.isEmpty()) {
+			throw new IllegalArgumentException("null or empty userName");
+		}
+
+		String myUserNameString = userName.replace(',', '#');
+
+		try {
+			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
+
+			String decodedPath = DataUtils.buildDecodedPathFromURLPathInfo(
+					path, retrieveEncoding());
+
+			DataObjectAclFunctions dataObjectAclFunctions = getServiceFunctionFactory()
+					.instanceDataObjectAclFunctions(irodsAccount);
+			log.info("deleting permission");
+			dataObjectAclFunctions.deletePermissionForUser(decodedPath,
+					myUserNameString);
+			log.info("done");
+
+		} finally {
+			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
+		}
+	}
 }

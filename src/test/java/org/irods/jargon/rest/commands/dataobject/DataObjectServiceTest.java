@@ -806,4 +806,78 @@ public class DataObjectServiceTest implements ApplicationContextAware {
 
 	}
 
+	@Test
+	public void testDeletePermission() throws Exception {
+		String testFileName = "testDeletePermission.dat";
+		String absPath = scratchFileUtils
+				.createAndReturnAbsoluteScratchPath(IRODS_TEST_SUBDIR_PATH);
+		String localFileName = FileGenerator
+				.generateFileOfFixedLengthGivenName(absPath, testFileName, 1);
+
+		String targetIrodsFile = testingPropertiesHelper
+				.buildIRODSCollectionAbsolutePathFromTestProperties(
+						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
+								+ testFileName);
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccount secondaryAccount = testingPropertiesHelper
+				.buildIRODSAccountFromSecondaryTestProperties(testingProperties);
+
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
+				.getIRODSAccessObjectFactory();
+
+		DataTransferOperations dto = accessObjectFactory
+				.getDataTransferOperations(irodsAccount);
+		dto.putOperation(localFileName, targetIrodsFile, testingProperties
+				.getProperty(TestingPropertiesHelper.IRODS_RESOURCE_KEY), null,
+				null);
+		DataObjectAO dataObjectAO = irodsFileSystem
+				.getIRODSAccessObjectFactory().getDataObjectAO(irodsAccount);
+
+		dataObjectAO
+				.setAccessPermissionWrite(
+						"",
+						targetIrodsFile,
+						testingProperties
+								.getProperty(TestingPropertiesHelper.IRODS_SECONDARY_USER_KEY));
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/dataObject/");
+		sb.append(DataUtils.encodeIrodsAbsolutePath(targetIrodsFile,
+				accessObjectFactory.getJargonProperties().getEncoding()));
+
+		sb.append("/acl/");
+		sb.append(secondaryAccount.getUserName() + ","
+				+ secondaryAccount.getZone());
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
+
+			HttpDelete httpDelete = new HttpDelete(sb.toString());
+			httpDelete.addHeader("accept", "application/json");
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpDelete, clientAndContext.getHttpContext());
+			Assert.assertEquals(204, response.getStatusLine().getStatusCode());
+
+			UserFilePermission actualFilePermission = dataObjectAO
+					.getPermissionForDataObjectForUserName(targetIrodsFile,
+							secondaryAccount.getUserName());
+			Assert.assertTrue("permission not deleted",
+					actualFilePermission == null);
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+
+	}
+
 }

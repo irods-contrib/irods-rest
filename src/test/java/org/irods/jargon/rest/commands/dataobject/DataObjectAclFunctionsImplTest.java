@@ -174,4 +174,49 @@ public class DataObjectAclFunctionsImplTest {
 
 	}
 
+	@Test
+	public void testDeletePermission() throws Exception {
+		String testFileName = "testDeletePermission.xls";
+		String absPath = scratchFileUtils
+				.createAndReturnAbsoluteScratchPath(IRODS_TEST_SUBDIR_PATH);
+		String fileNameOrig = FileGenerator.generateFileOfFixedLengthGivenName(
+				absPath, testFileName, 2);
+
+		String targetIrodsCollection = testingPropertiesHelper
+				.buildIRODSCollectionAbsolutePathFromTestProperties(
+						testingProperties, IRODS_TEST_SUBDIR_PATH);
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccount secondaryAccount = testingPropertiesHelper
+				.buildIRODSAccountFromSecondaryTestProperties(testingProperties);
+		DataObjectAOImpl dataObjectAO = (DataObjectAOImpl) irodsFileSystem
+				.getIRODSAccessObjectFactory().getDataObjectAO(irodsAccount);
+
+		DataTransferOperations dto = irodsFileSystem
+				.getIRODSAccessObjectFactory().getDataTransferOperations(
+						irodsAccount);
+		dto.putOperation(fileNameOrig, targetIrodsCollection, "", null, null);
+
+		dataObjectAO.setAccessPermissionWrite("", targetIrodsCollection + "/"
+				+ testFileName, testingProperties
+				.getProperty(TestingPropertiesHelper.IRODS_SECONDARY_USER_KEY));
+
+		String irodsFilePath = targetIrodsCollection + "/" + testFileName;
+
+		RestConfiguration restConfiguration = new RestConfiguration();
+
+		DataObjectAclFunctionsImpl dataObjectAclFunctionsImpl = new DataObjectAclFunctionsImpl(
+				restConfiguration, irodsAccount,
+				irodsFileSystem.getIRODSAccessObjectFactory());
+
+		dataObjectAclFunctionsImpl.deletePermissionForUser(irodsFilePath,
+				secondaryAccount.getUserName());
+		UserFilePermission permission = dataObjectAO
+				.getPermissionForDataObjectForUserName(irodsFilePath,
+						secondaryAccount.getUserName());
+		Assert.assertTrue("did not delete the user", permission == null);
+
+	}
+
 }

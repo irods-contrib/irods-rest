@@ -41,4 +41,21 @@ public interface DataObjectAclFunctions {
 			FilePermissionEnum permission) throws InvalidUserException,
 			FileNotFoundException, JargonException;
 
+	/**
+	 * Delete a permission for the given user from the given iRODS collection
+	 * 
+	 * @param absolutePath
+	 *            <code>String</code> with the iRODS absolute path to a
+	 *            collection
+	 * @param userName
+	 *            <code>String</code> with a user name, which can be in
+	 *            user#zone format
+	 * @throws InvalidUserException
+	 *             if the user is not available
+	 * @throws FileNotFoundException
+	 * @throws JargonException
+	 */
+	void deletePermissionForUser(String absolutePath, String userName)
+			throws InvalidUserException, FileNotFoundException, JargonException;
+
 }

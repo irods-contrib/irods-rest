@@ -137,4 +137,41 @@ public class DataObjectAclFunctionsImpl extends AbstractServiceFunction
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.irods.jargon.rest.commands.dataobject.DataObjectAclFunctions#
+	 * deletePermissionForUser(java.lang.String, java.lang.String)
+	 */
+	@Override
+	public void deletePermissionForUser(final String absolutePath,
+			final String userName) throws InvalidUserException,
+			FileNotFoundException, JargonException {
+
+		log.info("deletePermissionForUser()");
+
+		if (absolutePath == null || absolutePath.isEmpty()) {
+			throw new IllegalArgumentException("null or empty absolutePath");
+		}
+
+		if (userName == null || userName.isEmpty()) {
+			throw new IllegalArgumentException("null or empty userName");
+		}
+
+		log.info("absolutePath:{}", absolutePath);
+		log.info("userName:{}", userName);
+
+		DataObjectAO dataObjectAO = this.getIrodsAccessObjectFactory()
+				.getDataObjectAO(getIrodsAccount());
+
+		String userPartString = MiscIRODSUtils.getUserInUserName(userName);
+		String userZoneString = MiscIRODSUtils.getZoneInUserName(userName);
+
+		log.info("removing the permission...");
+		dataObjectAO.removeAccessPermissionsForUser(userZoneString,
+				absolutePath, userPartString);
+		log.info("permission removed");
+
+	}
+
 }
