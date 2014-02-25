@@ -161,4 +161,44 @@ public class CollectionAclFunctionsImplTest {
 				actualFilePermission.getFilePermissionEnum());
 
 	}
+
+	@Test
+	public void testDeleteCollectionAcl() throws Exception {
+
+		String testCollectionName = "testDeleteCollectionAcl";
+
+		String targetIrodsCollection = testingPropertiesHelper
+				.buildIRODSCollectionAbsolutePathFromTestProperties(
+						testingProperties, IRODS_TEST_SUBDIR_PATH + "/"
+								+ testCollectionName);
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+		CollectionAO collectionAO = irodsFileSystem
+				.getIRODSAccessObjectFactory().getCollectionAO(irodsAccount);
+		IRODSFile irodsFile = irodsFileSystem.getIRODSFileFactory(irodsAccount)
+				.instanceIRODSFile(targetIrodsCollection);
+		String secondaryUserName = testingProperties
+				.getProperty(TestingPropertiesHelper.IRODS_SECONDARY_USER_KEY);
+		irodsFile.mkdirs();
+
+		collectionAO.setAccessPermissionRead("", targetIrodsCollection,
+				secondaryUserName, true);
+
+		RestConfiguration restConfiguration = new RestConfiguration();
+
+		CollectionAclFunctions collectionAclFunctionsImpl = new CollectionAclFunctionsImpl(
+				restConfiguration, irodsAccount,
+				irodsFileSystem.getIRODSAccessObjectFactory());
+
+		collectionAclFunctionsImpl.deletePermissionForUser(
+				targetIrodsCollection, secondaryUserName, true);
+
+		UserFilePermission userFilePermission = collectionAO
+				.getPermissionForUserName(targetIrodsCollection,
+						secondaryUserName);
+		Assert.assertTrue("should have deleted permission",
+				userFilePermission == null);
+
+	}
 }

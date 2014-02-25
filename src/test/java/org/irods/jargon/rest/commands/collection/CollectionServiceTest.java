@@ -1248,6 +1248,66 @@ public class CollectionServiceTest implements ApplicationContextAware {
 	}
 
 	@Test
+	public void testDeletePermission() throws Exception {
+		String testDirName = "testDeletePermission";
+
+		String targetIrodsCollection = testingPropertiesHelper
+				.buildIRODSCollectionAbsolutePathFromTestProperties(
+						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
+								+ testDirName);
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
+				.getIRODSAccessObjectFactory();
+		String secondaryUserName = testingProperties
+				.getProperty(TestingPropertiesHelper.IRODS_SECONDARY_USER_KEY);
+		CollectionAO collectionAO = irodsFileSystem
+				.getIRODSAccessObjectFactory().getCollectionAO(irodsAccount);
+
+		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(
+				irodsAccount).instanceIRODSFile(targetIrodsCollection);
+		collFile.mkdirs();
+
+		collectionAO.setAccessPermissionRead("", targetIrodsCollection,
+				secondaryUserName, true);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/collection");
+		sb.append(collFile.getAbsolutePath());
+		sb.append("/acl/");
+		sb.append(secondaryUserName);
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
+
+			HttpDelete httpDelete = new HttpDelete(sb.toString());
+			httpDelete.addHeader("accept", "application/json");
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpDelete, clientAndContext.getHttpContext());
+			Assert.assertEquals(204, response.getStatusLine().getStatusCode());
+
+			UserFilePermission userFilePermission = collectionAO
+					.getPermissionForUserName(targetIrodsCollection,
+							secondaryUserName);
+			Assert.assertTrue("should have deleted permission",
+					userFilePermission == null);
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+
+	}
+
+	@Test
 	public void testAddPermissionWithZone() throws Exception {
 		String testDirName = "testAddPermissionWithZone";
 

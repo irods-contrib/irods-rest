@@ -130,4 +130,42 @@ public class CollectionAclFunctionsImpl extends AbstractServiceFunction
 		return permissionListing;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.irods.jargon.rest.commands.collection.CollectionAclFunctions#
+	 * deletePermissionForUser(java.lang.String, java.lang.String, boolean)
+	 */
+	@Override
+	public void deletePermissionForUser(final String absolutePath,
+			final String userName, final boolean recursive)
+			throws InvalidUserException, FileNotFoundException, JargonException {
+
+		log.info("deletePermissionForUser()");
+
+		if (absolutePath == null || absolutePath.isEmpty()) {
+			throw new IllegalArgumentException("null or empty absolutePath");
+		}
+
+		if (userName == null || userName.isEmpty()) {
+			throw new IllegalArgumentException("null or empty userName");
+		}
+
+		log.info("absolutePath:{}", absolutePath);
+		log.info("userName:{}", userName);
+		log.info("recursive:{}", recursive);
+
+		CollectionAO collectionAO = this.getIrodsAccessObjectFactory()
+				.getCollectionAO(getIrodsAccount());
+
+		String userPartString = MiscIRODSUtils.getUserInUserName(userName);
+		String userZoneString = MiscIRODSUtils.getZoneInUserName(userName);
+
+		log.info("removing the permission...");
+		collectionAO.removeAccessPermissionForUser(userZoneString,
+				absolutePath, userPartString, recursive);
+		log.info("permission removed");
+
+	}
+
 }

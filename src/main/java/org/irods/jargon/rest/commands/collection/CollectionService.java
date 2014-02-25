@@ -749,4 +749,77 @@ public class CollectionService extends AbstractIrodsService {
 		}
 	}
 
+	/**
+	 * Add a permission for a collection. This is done as an HTTP DELETE
+	 * <p/>
+	 * Note that this method returns void, and as a DELETE there is no response
+	 * body. The http invocation will return an HTTP 204 code
+	 * 
+	 * @param authorization
+	 *            <code>String</code> with the basic auth header
+	 * @param path
+	 *            <code>String</code> with the absolute path to the iRODS
+	 *            collection
+	 * @param userName
+	 *            <code>String</code> with the user name, which can be in
+	 *            user,zone format, or can be just the user name. Note the '#'
+	 *            character can be mis-interpreted as an anchor in the path, so
+	 *            the delimiter between user and zone should be a , (comma)
+	 *            character instead of the pound '#' character
+	 * @param recursive
+	 *            <code>boolean</code> that indicates the permission should be
+	 *            set recursively
+	 * @throws InvalidUserException
+	 * @throws FileNotFoundException
+	 * @throws JargonException
+	 */
+	@DELETE
+	@Path("{path:.*}/acl/{userName}")
+	@Produces({ "application/xml", "application/json" })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	public void deleteCollectionAcl(
+			@HeaderParam("Authorization") final String authorization,
+			@PathParam("path") final String path,
+			@PathParam("userName") final String userName,
+			@QueryParam("recursive") @DefaultValue("false") final boolean recursive)
+			throws InvalidUserException, FileNotFoundException, JargonException {
+
+		log.info("deleteCollectionAcl()");
+
+		if (authorization == null || authorization.isEmpty()) {
+			throw new IllegalArgumentException("null or empty authorization");
+		}
+
+		if (path == null || path.isEmpty()) {
+			throw new IllegalArgumentException("null or empty path");
+		}
+
+		if (userName == null || userName.isEmpty()) {
+			throw new IllegalArgumentException("null or empty userName");
+		}
+
+		/*
+		 * User name comes in delim with , instead of # between user and zone so
+		 * as not to be misinterpreted as an anchor
+		 */
+		String myUserNameString = userName.replace(',', '#');
+
+		try {
+			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
+
+			String decodedPath = DataUtils.buildDecodedPathFromURLPathInfo(
+					path, retrieveEncoding());
+
+			CollectionAclFunctions collectionAclFunctions = getServiceFunctionFactory()
+					.instanceCollectionAclFunctions(irodsAccount);
+			log.info("removing permission");
+			collectionAclFunctions.deletePermissionForUser(decodedPath,
+					myUserNameString, recursive);
+			log.info("done");
+
+		} finally {
+			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
+		}
+	}
+
 }

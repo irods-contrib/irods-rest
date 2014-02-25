@@ -50,4 +50,24 @@ public interface CollectionAclFunctions {
 			final FilePermissionEnum permission, final boolean recursive)
 			throws InvalidUserException, FileNotFoundException, JargonException;
 
+	/**
+	 * Delete a permission for the given user on the given iRODS collection
+	 * 
+	 * @param absolutePath
+	 *            <code>String</code> with the iRODS absolute path to a
+	 *            collection
+	 * @param userName
+	 *            <code>String</code> with a user name, which can be in
+	 * @param recursive
+	 *            <code>boolean</code> if the permission should be recursively
+	 *            set
+	 * @throws InvalidUserException
+	 *             if the user is not available
+	 * @throws FileNotFoundException
+	 * @throws JargonException
+	 */
+	void deletePermissionForUser(final String absolutePath,
+			final String userName, final boolean recursive)
+			throws InvalidUserException, FileNotFoundException, JargonException;
+
 }
