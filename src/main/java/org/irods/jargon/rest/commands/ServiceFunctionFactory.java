@@ -5,6 +5,7 @@ import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.rest.commands.collection.CollectionAclFunctions;
 import org.irods.jargon.rest.commands.dataobject.DataObjectAclFunctions;
 import org.irods.jargon.rest.commands.dataobject.DataObjectAvuFunctions;
+import org.irods.jargon.rest.commands.rule.RuleFunctions;
 import org.irods.jargon.rest.configuration.RestConfiguration;
 
 /**
@@ -68,5 +69,14 @@ public interface ServiceFunctionFactory {
 	 */
 	DataObjectAvuFunctions instanceDataObjectAvuFunctions(
 			IRODSAccount irodsAccount);
+
+	/**
+	 * Create an object that can execute iRODS rules
+	 * 
+	 * @param irodsAccount
+	 *            {@link IRODSAccount} for current connection
+	 * @return {@link RuleFunctions}
+	 */
+	RuleFunctions instanceRuleFunctions(IRODSAccount irodsAccount);
 
 }
