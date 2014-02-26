@@ -3,10 +3,9 @@
  */
 package org.irods.jargon.rest.domain;
 
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.irods.jargon.core.rule.IRODSRuleParameter;
+import com.sun.xml.txw2.annotation.XmlElement;
 
 /**
  * Wrapper for <code>IRODSRuleParameter</code> with JAXB annotations
@@ -15,7 +14,10 @@ import org.irods.jargon.core.rule.IRODSRuleParameter;
  * 
  */
 @XmlRootElement(name = "ruleParameter")
-public class RuleParameterWrapper extends IRODSRuleParameter {
+public class RuleParameterWrapper {
+
+	private String name = "";
+	private String value = "";
 
 	/**
 	 * 
@@ -24,75 +26,35 @@ public class RuleParameterWrapper extends IRODSRuleParameter {
 	}
 
 	/**
-	 * @param name
-	 * @param value
+	 * @return the name
 	 */
-	public RuleParameterWrapper(String name, int value) {
-		super(name, value);
-	}
-
-	/**
-	 * @param value
-	 */
-	public RuleParameterWrapper(String value) {
-		super(value);
-	}
-
-	/**
-	 * @param value
-	 */
-	public RuleParameterWrapper(byte[] value) {
-		super(value);
+	@XmlElement
+	public String getName() {
+		return name;
 	}
 
 	/**
 	 * @param name
-	 * @param value
+	 *            the name to set
 	 */
-	public RuleParameterWrapper(String name, String value) {
-		super(name, value);
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	/**
-	 * @param name
+	 * @return the value
+	 */
+	@XmlElement
+	public String getValue() {
+		return value;
+	}
+
+	/**
 	 * @param value
-	 * @param type
+	 *            the value to set
 	 */
-	public RuleParameterWrapper(String name, Object value, String type) {
-		super(name, value, type);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.irods.jargon.core.rule.IRODSRuleParameter#getType()
-	 */
-	@Override
-	@XmlElement
-	public String getType() {
-		return super.getType();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.irods.jargon.core.rule.IRODSRuleParameter#getStringValue()
-	 */
-	@Override
-	@XmlElement
-	public String getStringValue() {
-		return super.getStringValue();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.irods.jargon.core.rule.IRODSRuleParameter#getUniqueName()
-	 */
-	@Override
-	@XmlElement
-	public String getUniqueName() {
-		return super.getUniqueName();
+	public void setValue(String value) {
+		this.value = value;
 	}
 
 }

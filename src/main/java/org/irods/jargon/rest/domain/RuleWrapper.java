@@ -8,6 +8,8 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.irods.jargon.core.pub.RuleProcessingAO.RuleProcessingType;
+
 import com.sun.xml.txw2.annotation.XmlElement;
 
 /**
@@ -19,6 +21,7 @@ import com.sun.xml.txw2.annotation.XmlElement;
 @XmlRootElement(name = "rule")
 public class RuleWrapper {
 
+	private RuleProcessingType ruleProcessingType = RuleProcessingType.INTERNAL;
 	private String ruleAsOriginalText;
 	private List<RuleParameterWrapper> irodsRuleInputParameters = new ArrayList<RuleParameterWrapper>();
 
@@ -58,5 +61,21 @@ public class RuleWrapper {
 	public void setIrodsRuleInputParameters(
 			List<RuleParameterWrapper> irodsRuleInputParameters) {
 		this.irodsRuleInputParameters = irodsRuleInputParameters;
+	}
+
+	/**
+	 * @return the ruleProcessingType
+	 */
+	@XmlElement
+	public RuleProcessingType getRuleProcessingType() {
+		return ruleProcessingType;
+	}
+
+	/**
+	 * @param ruleProcessingType
+	 *            the ruleProcessingType to set
+	 */
+	public void setRuleProcessingType(RuleProcessingType ruleProcessingType) {
+		this.ruleProcessingType = ruleProcessingType;
 	}
 }

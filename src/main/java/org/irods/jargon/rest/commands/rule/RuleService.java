@@ -12,7 +12,6 @@ import javax.ws.rs.Produces;
 
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.JargonException;
-import org.irods.jargon.core.pub.RuleProcessingAO.RuleProcessingType;
 import org.irods.jargon.rest.commands.AbstractIrodsService;
 import org.irods.jargon.rest.domain.RuleExecResultWrapper;
 import org.irods.jargon.rest.domain.RuleWrapper;
@@ -74,7 +73,7 @@ public class RuleService extends AbstractIrodsService {
 			return ruleFunctions.executeRule(
 					ruleWrapper.getRuleAsOriginalText(),
 					ruleWrapper.getIrodsRuleInputParameters(),
-					RuleProcessingType.CLASSIC);
+					ruleWrapper.getRuleProcessingType());
 
 		} finally {
 			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();

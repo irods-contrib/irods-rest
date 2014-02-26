@@ -1,5 +1,7 @@
 package org.irods.jargon.rest.commands.rule;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,7 +78,14 @@ public class RuleFunctionsImpl extends AbstractServiceFunction implements
 
 		List<IRODSRuleParameter> parmsIrodsRuleParameters = new ArrayList<IRODSRuleParameter>();
 		for (RuleParameterWrapper wrapper : inputParameterOverrides) {
-			parmsIrodsRuleParameters.add(wrapper);
+			try {
+				parmsIrodsRuleParameters.add(new IRODSRuleParameter(wrapper
+						.getName(), URLDecoder.decode(wrapper.getValue(), this
+						.getIrodsAccessObjectFactory().getJargonProperties()
+						.getEncoding())));
+			} catch (UnsupportedEncodingException e) {
+				throw new JargonException("encoding not supported", e);
+			}
 		}
 
 		IRODSRuleExecResult execResult = ruleProcessingAO.executeRule(
