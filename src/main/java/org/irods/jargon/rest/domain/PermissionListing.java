@@ -27,13 +27,10 @@ public class PermissionListing {
 	 * Type of iRODS domain object (collection, data object, etc) that this
 	 * metadata belongs to
 	 */
-	@XmlElement
 	private CollectionAndDataObjectListingEntry.ObjectType objectType = ObjectType.UNKNOWN;
 
-	@XmlElement
 	private String absolutePathString = "";
 
-	@XmlElement
 	private boolean inheritance = false;
 
 	/**
@@ -54,6 +51,7 @@ public class PermissionListing {
 	/**
 	 * @return the objectType
 	 */
+	@XmlElement
 	public CollectionAndDataObjectListingEntry.ObjectType getObjectType() {
 		return objectType;
 	}
@@ -70,6 +68,7 @@ public class PermissionListing {
 	/**
 	 * @return the absolutePathString
 	 */
+	@XmlElement
 	public String getAbsolutePathString() {
 		return absolutePathString;
 	}
@@ -85,6 +84,7 @@ public class PermissionListing {
 	/**
 	 * @return the inheritance
 	 */
+	@XmlElement
 	public boolean isInheritance() {
 		return inheritance;
 	}

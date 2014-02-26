@@ -1,9 +1,13 @@
 package org.irods.jargon.rest.commands.rule;
 
 import java.io.File;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
 
 import junit.framework.Assert;
 
@@ -175,6 +179,64 @@ public class RuleServiceTest implements ApplicationContextAware {
 			RuleExecResultWrapper actual = objectMapper.readValue(entityData,
 					RuleExecResultWrapper.class);
 			Assert.assertNotNull("null result", actual);
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+
+	}
+
+	@Test
+	public void testExecuteSimpleNewFormatRuleAsXML() throws Exception {
+		String ruleString = "HelloWorld { \n writeLine(\"stdout\", \"Hello, world!\");\n}\nINPUT null\nOUTPUT ruleExecOut\n";
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/rule");
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
+
+			HttpPost httpPost = new HttpPost(sb.toString());
+			httpPost.addHeader("accept", "application/xml");
+			httpPost.addHeader("Content-Type", "application/xml");
+
+			RuleWrapper ruleWrapper = new RuleWrapper();
+			ruleWrapper.setRuleAsOriginalText(ruleString);
+			ruleWrapper.setRuleProcessingType(RuleProcessingType.INTERNAL);
+
+			final JAXBContext context = JAXBContext
+					.newInstance(RuleWrapper.class);
+
+			final Marshaller marshaller = context.createMarshaller();
+
+			final StringWriter stringWriter = new StringWriter();
+			marshaller.marshal(ruleWrapper, stringWriter);
+
+			String body = stringWriter.toString();
+			System.out.println(body);
+
+			httpPost.setEntity(new StringEntity(body));
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpPost, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+			Assert.assertNotNull(entity);
+			String entityData = EntityUtils.toString(entity);
+			EntityUtils.consume(entity);
+
+			Assert.assertNotNull("null result", entityData);
+			System.out.println("XML>>>");
+			System.out.println(entityData);
 		} finally {
 			// When HttpClient instance is no longer needed,
 			// shut down the connection manager to ensure

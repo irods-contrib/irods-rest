@@ -1,27 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:dataObject xmlns:ns2="http://irods.org/irods-rest"
-	collectionId="614201" id="614202">
-	<checksum />
-	<collectionName>/fedZone1/home/test1/jargon-scratch/RestDataObjectServiceTest
-	</collectionName>
-	<comments />
-	<createdAt>2014-01-06T03:58:35-05:00</createdAt>
-	<dataMapId>0</dataMapId>
-	<dataName>testGetDataObjectDataXML.dat</dataName>
-	<dataOwnerName>test1</dataOwnerName>
-	<dataOwnerZone>fedZone1</dataOwnerZone>
-	<dataPath>/opt/iRODS/iRODS3.3/Vault1/home/test1/jargon-scratch/RestDataObjectServiceTest/testGetDataObjectDataXML.dat
-	</dataPath>
-	<dataReplicationNumber>0</dataReplicationNumber>
-	<dataSize>1</dataSize>
-	<dataStatus />
-	<dataTypeName>generic</dataTypeName>
-	<dataVersion>0</dataVersion>
-	<expiry />
-	<objectPath />
-	<replicationStatus>1</replicationStatus>
-	<resourceGroupName />
-	<resourceName>test1-resc</resourceName>
-	<specColType>NORMAL</specColType>
-	<updatedAt>2014-01-06T03:58:35-05:00</updatedAt>
-</ns2:dataObject>
+<ns2:rule xmlns:ns2="http://irods.org/irods-rest">
+	<ruleAsOriginalText>HelloWorld {
+		writeLine("stdout", "Hello, world!");
+		}
+		INPUT null
+		OUTPUT ruleExecOut
+	</ruleAsOriginalText>
+	<ruleProcessingType>INTERNAL</ruleProcessingType>
+</ns2:rule>
