@@ -55,10 +55,23 @@
 				<checksumPolicy>fail</checksumPolicy>
 			</snapshots>
 		</repository>
+			<repository>
+			<id>dice.repository snaps</id>
+			<name>dice.repository.snapshots</name>
+			<url>https://raw.github.com/DICE-UNC/DICE-Maven/master/snapshots</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+				<checksumPolicy>warn</checksumPolicy>
+			</snapshots>
+		</repository>
 		<repository>
-			<id>renci.repository</id>
-			<name>renci.repository</name>
-			<url>http://ci-dev.renci.org/nexus/content/repositories/public</url>
+			<id>dice.repository</id>
+			<name>dice.repository</name>
+			<url>https://raw.github.com/DICE-UNC/DICE-Maven/master/releases</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
@@ -83,21 +96,7 @@
 		</repository>
 	</repositories>
 	<distributionManagement>
-		<repository>
-			<id>renci.repository</id>
-			<name>renci.repository</name>
-			<url>https://ci-dev.renci.org/nexus/content/repositories/release</url>
-		</repository>
-		<snapshotRepository>
-			<id>renci.snapshots</id>
-			<name>renci.snapshots</name>
-			<url>https://ci-dev.renci.org/nexus/content/repositories/snapshots</url>
-		</snapshotRepository>
-		<site>
-			<id>renci.site</id>
-			<name>renci.site</name>
-			<url>file:///${user.dir}/sites/irodsidrop</url>
-		</site>
+		
 	</distributionManagement>
 	<reporting>
 		<plugins>
