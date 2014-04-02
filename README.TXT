@@ -7,7 +7,6 @@
 
 iRODS Restful API
 =======
-Please go to [[https://code.renci.org/gf/project/irods-rest/]] for the latest news and info.
 
 ==Requirements==
 
@@ -18,7 +17,6 @@ Please go to [[https://code.renci.org/gf/project/irods-rest/]] for the latest ne
 
 irods-rest uses Maven for dependency management.  See the pom.xml file for references to various dependencies.
 
-Note that the following bug and feature requests are logged in GForge with related commit information [[https://code.renci.org/gf/project/irods-rest/tracker/]]
 
 ==Bug Fixes==
 
