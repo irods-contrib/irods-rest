@@ -1,5 +1,5 @@
 package org.irods.jargon.rest.utils;
 public final class RestVersion {
  public static String VERSION="0.0.1-SNAPSHOT";
- public static String BUILD_TIME="20140227-1524";
+ public static String BUILD_TIME="20140714-1135";
 }
