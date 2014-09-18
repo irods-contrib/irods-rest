@@ -29,9 +29,9 @@
 
 	<beans:bean id="restConfiguration"
 		class="org.irods.jargon.rest.configuration.RestConfiguration">
-		<beans:property name="irodsHost" value="fedZone1" />
+		<beans:property name="irodsHost" value="irods331.irods.org" />
 		<beans:property name="irodsPort" value="1247" />
-		<beans:property name="irodsZone" value="fedZone1" />
+		<beans:property name="irodsZone" value="test1" />
 		<beans:property name="defaultStorageResource" value="test1-resc" />
 		<beans:property name="privateCertAbsPath" value="c:/temp/test-certs/private.pem" />
 		<beans:property name="publicKeyAbsPath" value="c:/temp/test-certs/public.pem" />
