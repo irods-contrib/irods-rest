@@ -29,7 +29,7 @@
 
 	<beans:bean id="restConfiguration"
 		class="org.irods.jargon.rest.configuration.RestConfiguration">
-		<beans:property name="irodsHost" value="irods331.irods.org" />
+		<beans:property name="irodsHost" value="consortium.local" />
 		<beans:property name="irodsPort" value="1247" />
 		<beans:property name="irodsZone" value="test1" />
 		<beans:property name="defaultStorageResource" value="test1-resc" />
