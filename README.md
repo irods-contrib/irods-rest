@@ -1,31 +1,25 @@
-*'''Project''': iRODS Rest API
-*'''Date''': 
-*'''Release Version''':
-*'''git tag''': 
+* Project: iRODS Rest API
+* Date: 9/17/2014 
+* Release Version: 4.0.2-RELEASE
+* Git tag: 4.0.2-RELEASE 
 
-==News==
+https://github.com/DICE-UNC/irods-rest
 
-iRODS Restful API
-=======
+iRODS Rest API based on Jargon 4.0.2, certified against iRODS 3.0+ as well as iRODS Consortium 4.0+ releases.  See included docs folder for comprehensive user documentation and install instructions
 
-==Requirements==
-
-*Depends on Java 1.6+
-*Built using Apache Maven2, see POM for dependencies
-
-==Libraries==
-
-irods-rest uses Maven for dependency management.  See the pom.xml file for references to various dependencies.
+See https://github.com/DICE-UNC/irods-rest/issues for support and known issues
 
 
-==Bug Fixes==
+### Requirements
 
-==Features==
+* Depends on Java 1.6+
+* Built using Apache Maven2, see POM for dependencies
 
-*[#1787] DFC development of a REST API
 
+### Bug Fixes
 
-notes:
+### Features
 
-look at xml schema generation?  
-http://www.thaiopensource.com/relaxng/trang.html
+#### 4.0.2 release activites #4
+
+Developed under DFC, initial release using Jargon 4.0.2-RELEASE and providing 3X and 4X compatibility
