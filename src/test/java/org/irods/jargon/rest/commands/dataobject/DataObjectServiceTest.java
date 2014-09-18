@@ -487,14 +487,10 @@ public class DataObjectServiceTest implements ApplicationContextAware {
 			Assert.assertNotNull(entity);
 			String entityData = EntityUtils.toString(entity);
 			EntityUtils.consume(entity);
-			System.out.println("JSON>>>");
+			System.out.println("XML>>>");
 			System.out.println(entityData);
-			ObjectMapper objectMapper = new ObjectMapper();
 
-			PermissionListing actual = objectMapper.readValue(entityData,
-					PermissionListing.class);
-
-			Assert.assertNotNull("no permission listing returned", actual);
+			Assert.assertNotNull("no permission listing returned", entityData);
 
 		} finally {
 			// When HttpClient instance is no longer needed,
