@@ -11,6 +11,8 @@ tmp/**/*
 *.swp
 *~.nib
 local.properties
+testing.properties
+RestVersion.java
 .classpath
 .settings/
 .loadpath
