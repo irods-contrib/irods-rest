@@ -11,8 +11,8 @@
 	<url>https://github.com/DICE-UNC/irods-rest</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<jargon.version>4.0.2-RELEASE</jargon.version>
-		<resteasy.version>3.0.6.Final</resteasy.version>
+		<jargon.version>4.0.2.1-SNAPSHOT</jargon.version>
+		<resteasy.version>3.0.9.Final</resteasy.version>
 		<spring.core.version>3.1.0.RELEASE</spring.core.version>
 		<spring.security.version>3.1.0.RELEASE</spring.security.version>
 	</properties>

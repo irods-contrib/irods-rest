@@ -1,7 +1,7 @@
 * Project: iRODS Rest API
 * Date: 9/17/2014 
-* Release Version: 4.0.2-RELEASE
-* Git tag: 4.0.2-RELEASE 
+* Release Version: 4.0.2.1-SNAPSHOT	
+* Git tag: MASTER
 
 https://github.com/DICE-UNC/irods-rest
 
@@ -20,6 +20,4 @@ See https://github.com/DICE-UNC/irods-rest/issues for support and known issues
 
 ### Features
 
-#### 4.0.2 release activites #4
-
-Developed under DFC, initial release using Jargon 4.0.2-RELEASE and providing 3X and 4X compatibility
+#### #2 CORS header support
