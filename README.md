@@ -1,7 +1,9 @@
 * Project: iRODS Rest API
-* Date: 9/17/2014 
-* Release Version: 4.0.2-RELEASE
-* Git tag: 4.0.2-RELEASE 
+* Date: 
+* Release Version: 4.0.2.1-SNAPSHOT
+* Git tag: 
+
+work in progress
 
 https://github.com/DICE-UNC/irods-rest
 
