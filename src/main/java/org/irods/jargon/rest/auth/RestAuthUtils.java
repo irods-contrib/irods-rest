@@ -15,9 +15,11 @@ import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.BasicHttpContext;
+import org.irods.jargon.core.connection.AuthScheme;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.rest.configuration.RestConfiguration;
+import org.irods.jargon.rest.exception.IrodsRestException;
 import org.irods.jargon.rest.utils.RestTestingProperties;
 import org.irods.jargon.testutils.TestingPropertiesHelper;
 import org.irods.jargon.testutils.TestingUtilsException;
@@ -93,10 +95,30 @@ public class RestAuthUtils {
 			throw new JargonException("user and password not in credentials");
 		}
 
+		log.info("restConfiguration:{}", restConfiguration);
+
+		AuthScheme authScheme;
+		if (restConfiguration.getAuthType() == null
+				|| restConfiguration.getAuthType().isEmpty()) {
+			log.info("unspecified authType, use STANDARD");
+			authScheme = AuthScheme.STANDARD;
+		} else if (restConfiguration.getAuthType().equals(
+				AuthScheme.STANDARD.toString())) {
+			log.info("using standard auth");
+			authScheme = AuthScheme.STANDARD;
+		} else if (restConfiguration.getAuthType().equals(
+				AuthScheme.PAM.toString())) {
+			log.info("using PAM");
+			authScheme = AuthScheme.PAM;
+		} else {
+			log.error("cannot support authScheme:{}", restConfiguration);
+			throw new IrodsRestException("unknown or unsupported auth scheme");
+		}
+
 		return IRODSAccount.instance(restConfiguration.getIrodsHost(),
 				restConfiguration.getIrodsPort(), credentials[0],
 				credentials[1], "", restConfiguration.getIrodsZone(),
-				restConfiguration.getDefaultStorageResource());
+				restConfiguration.getDefaultStorageResource(), authScheme);
 
 	}
 

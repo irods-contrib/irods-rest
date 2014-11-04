@@ -21,3 +21,9 @@ See https://github.com/DICE-UNC/irods-rest/issues for support and known issues
 ### Features
 
 #### #2 CORS header support
+
+Add support for Cross Origin Resource Sharing through customizable configuration
+
+#### Add PAM support #6
+
+Add support for PAM authentication through customizable configuration

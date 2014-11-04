@@ -6,6 +6,8 @@ package org.irods.jargon.rest.configuration;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.irods.jargon.core.connection.AuthScheme;
+
 /**
  * Pojo containing configuration information
  * 
@@ -22,6 +24,10 @@ public class RestConfiguration {
 	private boolean smimeEncryptAdminFunctions = false;
 	private String privateCertAbsPath = "";
 	private String publicKeyAbsPath = "";
+	/**
+	 * AuthScheme to use for accounts, based on {@link AuthScheme}
+	 */
+	private String authType = AuthScheme.STANDARD.toString();
 	/**
 	 * Add CORS headers
 	 */
@@ -280,6 +286,11 @@ public class RestConfiguration {
 			builder.append(publicKeyAbsPath);
 			builder.append(", ");
 		}
+		if (authType != null) {
+			builder.append("authType=");
+			builder.append(authType);
+			builder.append(", ");
+		}
 		builder.append("allowCors=");
 		builder.append(allowCors);
 		builder.append(", ");
@@ -304,6 +315,21 @@ public class RestConfiguration {
 		}
 		builder.append("]");
 		return builder.toString();
+	}
+
+	/**
+	 * @return the authType
+	 */
+	public String getAuthType() {
+		return authType;
+	}
+
+	/**
+	 * @param authType
+	 *            the authType to set
+	 */
+	public void setAuthType(String authType) {
+		this.authType = authType;
 	}
 
 }
