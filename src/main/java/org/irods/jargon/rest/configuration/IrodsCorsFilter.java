@@ -5,6 +5,7 @@ package org.irods.jargon.rest.configuration;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
@@ -26,6 +27,9 @@ public class IrodsCorsFilter extends CorsFilter {
 
 	private final Logger log = LoggerFactory.getLogger(IrodsCorsFilter.class);
 
+	@Inject
+	private RestConfiguration restConfiguration;
+
 	/**
 	 * This is poorly documented in RESTEasy, I'm sure this is not exactly
 	 * right, but at least this is workable! Somebody smarter and more patent
@@ -39,15 +43,79 @@ public class IrodsCorsFilter extends CorsFilter {
 		log.info("cors filter fired (request,response)");
 		// super.filter(requestContext, responseContext);
 
-		responseContext.getHeaders().add("Access-Control-Allow-Origin", "*");
+		if (restConfiguration == null) {
+			throw new IllegalStateException("no RestConfiguration set");
+		}
 
-		responseContext.getHeaders().add("Access-Control-Allow-Credentials",
-				"true");
+		log.debug("restConfiguration:{}", restConfiguration);
 
-		responseContext.getHeaders().add("Access-Control-Allow-Methods",
-				"GET, POST, DELETE, PUT");
+		if (!restConfiguration.isAllowCors()) {
+			log.debug("no CORS processing");
+			return;
+		}
+
+		log.debug("restConfiguration:{}", restConfiguration);
+
+		if (restConfiguration.getCorsOrigins().isEmpty()) {
+			log.debug("default to all origins");
+			responseContext.getHeaders()
+					.add("Access-Control-Allow-Origin", "*");
+		} else {
+			log.debug("building up origin list");
+			StringBuilder sb = new StringBuilder();
+			int ctr = 0;
+			for (String origin : restConfiguration.getCorsOrigins()) {
+				if (ctr++ > 0) {
+					sb.append(',');
+				}
+				sb.append(origin);
+			}
+			responseContext.getHeaders().add("Access-Control-Allow-Origin",
+					sb.toString());
+
+		}
+
+		if (restConfiguration.isCorsAllowCredentials()) {
+			log.debug("allow credentials");
+			responseContext.getHeaders().add(
+					"Access-Control-Allow-Credentials", "true");
+		}
+
+		if (restConfiguration.getCorsMethods().isEmpty()) {
+			log.info("no methods specified, add all");
+			responseContext.getHeaders().add("Access-Control-Allow-Methods",
+					"GET, POST, DELETE, PUT");
+		} else {
+			log.debug("building up cords methods list");
+			StringBuilder sb = new StringBuilder();
+			int ctr = 0;
+			for (String method : restConfiguration.getCorsMethods()) {
+				if (ctr++ > 0) {
+					sb.append(',');
+				}
+				sb.append(method);
+			}
+			responseContext.getHeaders().add("Access-Control-Allow-Methods",
+					sb.toString());
+
+		}
 
 		log.info("set response headers:{}", responseContext.getHeaders());
+	}
+
+	/**
+	 * @return the restConfiguration
+	 */
+	public RestConfiguration getRestConfiguration() {
+		return restConfiguration;
+	}
+
+	/**
+	 * @param restConfiguration
+	 *            the restConfiguration to set
+	 */
+	public void setRestConfiguration(RestConfiguration restConfiguration) {
+		this.restConfiguration = restConfiguration;
 	}
 
 }
