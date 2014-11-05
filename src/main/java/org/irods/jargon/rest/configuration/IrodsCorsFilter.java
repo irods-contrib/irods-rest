@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
@@ -12,6 +13,7 @@ import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.Provider;
 
 import org.jboss.resteasy.spi.CorsHeaders;
 import org.slf4j.Logger;
@@ -20,6 +22,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Handles CORS requests both preflight and simple CORS requests.
  */
+@Named
+@Provider
 @PreMatching
 public class IrodsCorsFilter implements ContainerRequestFilter,
 		ContainerResponseFilter {
