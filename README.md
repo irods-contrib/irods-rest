@@ -27,3 +27,7 @@ Add support for Cross Origin Resource Sharing through customizable configuration
 #### Add PAM support #6
 
 Add support for PAM authentication through customizable configuration
+
+#### add temp password for user #10
+
+New /user/userName/temppassword signatures available to obtain a temporary iRODS password, including in admin mode.
