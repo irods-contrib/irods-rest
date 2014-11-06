@@ -17,6 +17,8 @@ RestVersion.java
 .settings/
 .loadpath
 .DS_Store
+docs/.~lock.iRODSRESTAPIDocumentation.odt#
+
 # External tool builders
 .externalToolBuilders/
 

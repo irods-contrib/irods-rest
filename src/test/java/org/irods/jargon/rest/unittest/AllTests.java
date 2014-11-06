@@ -9,6 +9,7 @@ import org.irods.jargon.rest.commands.dataobject.DataObjectServiceTest;
 import org.irods.jargon.rest.commands.dataobject.FileContentsServiceTest;
 import org.irods.jargon.rest.commands.rule.RuleFunctionsImplTest;
 import org.irods.jargon.rest.commands.rule.RuleServiceTest;
+import org.irods.jargon.rest.commands.user.TemporaryPasswordServiceTest;
 import org.irods.jargon.rest.commands.user.UserGroupServiceTest;
 import org.irods.jargon.rest.commands.user.UserServiceTest;
 import org.irods.jargon.rest.configuration.IrodsCorsFilterTest;
@@ -25,7 +26,8 @@ import org.junit.runners.Suite.SuiteClasses;
 		CollectionAclFunctionsImplTest.class,
 		DataObjectAclFunctionsImplTest.class,
 		DataObjectAvuFunctionsImplTest.class, RuleFunctionsImplTest.class,
-		RuleServiceTest.class, IrodsCorsFilterTest.class })
+		RuleServiceTest.class, IrodsCorsFilterTest.class,
+		TemporaryPasswordServiceTest.class })
 public class AllTests {
 
 }
