@@ -42,7 +42,7 @@ public class IrodsCorsFilter implements ContainerRequestFilter,
 
 	/**
 	 * Put "*" if you want to accept all origins
-	 *
+	 * 
 	 * @return
 	 */
 	public synchronized Set<String> getAllowedOrigins() {
@@ -51,7 +51,7 @@ public class IrodsCorsFilter implements ContainerRequestFilter,
 
 	/**
 	 * Defaults to true
-	 *
+	 * 
 	 * @return
 	 */
 	public synchronized boolean isAllowCredentials() {
@@ -64,7 +64,7 @@ public class IrodsCorsFilter implements ContainerRequestFilter,
 
 	/**
 	 * Will allow all by default
-	 *
+	 * 
 	 * @return
 	 */
 	public synchronized String getAllowedMethods() {
@@ -74,7 +74,7 @@ public class IrodsCorsFilter implements ContainerRequestFilter,
 	/**
 	 * Will allow all by default comma delimited string for
 	 * Access-Control-Allow-Methods
-	 *
+	 * 
 	 * @param allowedMethods
 	 */
 	public synchronized void setAllowedMethods(String allowedMethods) {
@@ -88,7 +88,7 @@ public class IrodsCorsFilter implements ContainerRequestFilter,
 	/**
 	 * Will allow all by default comma delimited string for
 	 * Access-Control-Allow-Headers
-	 *
+	 * 
 	 * @param allowedHeaders
 	 */
 	public synchronized void setAllowedHeaders(String allowedHeaders) {
@@ -109,7 +109,7 @@ public class IrodsCorsFilter implements ContainerRequestFilter,
 
 	/**
 	 * comma delimited list
-	 *
+	 * 
 	 * @param exposedHeaders
 	 */
 	public synchronized void setExposedHeaders(String exposedHeaders) {
@@ -132,9 +132,14 @@ public class IrodsCorsFilter implements ContainerRequestFilter,
 			log.debug("no origin in header, ignore");
 			return;
 		}
+
+		log.debug("origin from header:{}", origin);
+
 		if (requestContext.getMethod().equalsIgnoreCase("OPTIONS")) {
+			log.debug("method is OPTIONS, preflight the request");
 			preflight(origin, requestContext);
 		} else {
+			log.debug("method not OPTIONS, no preflight");
 			checkOrigin(requestContext, origin);
 		}
 	}
@@ -150,6 +155,8 @@ public class IrodsCorsFilter implements ContainerRequestFilter,
 			return;
 		}
 
+		log.debug("cors allowed");
+
 		String origin = requestContext.getHeaderString(CorsHeaders.ORIGIN);
 		if (origin == null
 				|| requestContext.getMethod().equalsIgnoreCase("OPTIONS")
@@ -160,13 +167,20 @@ public class IrodsCorsFilter implements ContainerRequestFilter,
 
 			return;
 		}
+
+		log.debug("proceed with filter()...");
+		log.info("origin was:{}", origin);
+
 		responseContext.getHeaders().putSingle(
 				CorsHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
-		if (allowCredentials)
+		if (allowCredentials) {
+			log.debug("allow credentials set");
 			responseContext.getHeaders().putSingle(
 					CorsHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
+		}
 
 		if (exposedHeaders != null) {
+			log.info("exposed headers:{}", exposedHeaders);
 			responseContext.getHeaders().putSingle(
 					CorsHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, exposedHeaders);
 		}
@@ -182,9 +196,9 @@ public class IrodsCorsFilter implements ContainerRequestFilter,
 			return;
 		}
 
-		log.info("check origin");
+		log.debug("check origin");
 		checkOrigin(requestContext, origin);
-
+		log.debug("origin checked");
 		Response.ResponseBuilder builder = Response.ok();
 		builder.header(CorsHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
 		if (allowCredentials)
@@ -197,10 +211,14 @@ public class IrodsCorsFilter implements ContainerRequestFilter,
 			}
 			builder.header(CorsHeaders.ACCESS_CONTROL_ALLOW_METHODS,
 					requestMethods);
+
 		}
 		String allowHeaders = requestContext
 				.getHeaderString(CorsHeaders.ACCESS_CONTROL_REQUEST_HEADERS);
+
 		if (allowHeaders != null) {
+			log.debug("header for allow methods:{}", allowHeaders);
+
 			if (allowedHeaders != null) {
 				allowHeaders = this.allowedHeaders;
 			}
@@ -209,6 +227,7 @@ public class IrodsCorsFilter implements ContainerRequestFilter,
 		}
 		if (corsMaxAge > -1) {
 			builder.header(CorsHeaders.ACCESS_CONTROL_MAX_AGE, corsMaxAge);
+			log.debug("header for cors max age:{}", corsMaxAge);
 		}
 		requestContext.abortWith(builder.build());
 
@@ -216,6 +235,8 @@ public class IrodsCorsFilter implements ContainerRequestFilter,
 
 	protected void checkOrigin(ContainerRequestContext requestContext,
 			String origin) {
+
+		log.debug("checkOrigin()");
 		if (!allowedOrigins.contains("*") && !allowedOrigins.contains(origin)) {
 			requestContext.setProperty("cors.failure", true);
 			throw new ForbiddenException("Origin not allowed: " + origin);
@@ -233,12 +254,13 @@ public class IrodsCorsFilter implements ContainerRequestFilter,
 
 		this.restConfiguration = restConfiguration;
 
-		log.info(
+		log.debug(
 				"setting up cors filter parameters from new rest configuration:{}",
 				restConfiguration);
 		parseAllowedMethodsFromConfiguration();
 		parseAllowedOriginsFromConfiguration();
 		parseAllowCredentialsFromConfiguration();
+		log.debug("restConfiguration:{}", restConfiguration);
 
 	}
 
