@@ -39,7 +39,7 @@
 		<beans:property name="publicKeyAbsPath" value="c:/temp/test-certs/public.pem" />
 		<beans:property name="webInterfaceURL"
 			value="https://iren-web.renci.org:8443/idrop-web2" />
-		<beans:property name="allowCors" value="false" />
+		<beans:property name="allowCors" value="true" />
 		<beans:property name="corsAllowCredentials" value="false" />
 		<beans:property name="corsOrigins">
 			<util:list id="myList" value-type="java.lang.String">
@@ -47,11 +47,18 @@
 			</util:list>
 		</beans:property>
 		<beans:property name="corsMethods">
-			<util:list id="myList" value-type="java.lang.String">
+			<util:list id="methodsList" value-type="java.lang.String">
 				<beans:value>GET</beans:value>
 				<beans:value>POST</beans:value>
 				<beans:value>DELETE</beans:value>
 				<beans:value>PUT</beans:value>
+			</util:list>
+		</beans:property>
+		<beans:property name="corsAllowedHeaders">
+			<util:list id="headersList" value-type="java.lang.String">
+				<beans:value>x-requested-with</beans:value>
+				<beans:value>x-requested-by</beans:value>
+				
 			</util:list>
 		</beans:property>
 

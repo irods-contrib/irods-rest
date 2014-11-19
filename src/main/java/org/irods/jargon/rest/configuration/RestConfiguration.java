@@ -44,6 +44,10 @@ public class RestConfiguration {
 	 * Allow CORDS credentials
 	 */
 	private boolean corsAllowCredentials = false;
+	/**
+	 * Allowed CORS headers
+	 */
+	private List<String> corsAllowedHeaders = new ArrayList<String>();
 
 	/**
 	 * Optional URL for a web interface to access grid data (typically an
@@ -240,14 +244,8 @@ public class RestConfiguration {
 		this.corsAllowCredentials = corsAllowCredentials;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
-		final int maxLen = 10;
 		StringBuilder builder = new StringBuilder();
 		builder.append("RestConfiguration [");
 		if (irodsHost != null) {
@@ -296,19 +294,22 @@ public class RestConfiguration {
 		builder.append(", ");
 		if (corsOrigins != null) {
 			builder.append("corsOrigins=");
-			builder.append(corsOrigins.subList(0,
-					Math.min(corsOrigins.size(), maxLen)));
+			builder.append(corsOrigins);
 			builder.append(", ");
 		}
 		if (corsMethods != null) {
 			builder.append("corsMethods=");
-			builder.append(corsMethods.subList(0,
-					Math.min(corsMethods.size(), maxLen)));
+			builder.append(corsMethods);
 			builder.append(", ");
 		}
 		builder.append("corsAllowCredentials=");
 		builder.append(corsAllowCredentials);
 		builder.append(", ");
+		if (corsAllowedHeaders != null) {
+			builder.append("corsAllowedHeaders=");
+			builder.append(corsAllowedHeaders);
+			builder.append(", ");
+		}
 		if (webInterfaceURL != null) {
 			builder.append("webInterfaceURL=");
 			builder.append(webInterfaceURL);
@@ -330,6 +331,14 @@ public class RestConfiguration {
 	 */
 	public void setAuthType(String authType) {
 		this.authType = authType;
+	}
+
+	public List<String> getCorsAllowedHeaders() {
+		return corsAllowedHeaders;
+	}
+
+	public void setCorsAllowedHeaders(List<String> corsAllowedHeaders) {
+		this.corsAllowedHeaders = corsAllowedHeaders;
 	}
 
 }

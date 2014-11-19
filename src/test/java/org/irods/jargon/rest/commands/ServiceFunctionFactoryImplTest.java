@@ -27,7 +27,7 @@ public class ServiceFunctionFactoryImplTest {
 		TestingPropertiesHelper testingPropertiesLoader = new TestingPropertiesHelper();
 		testingProperties = testingPropertiesLoader.getTestProperties();
 	}
-
+ 
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
 

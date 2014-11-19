@@ -6,6 +6,7 @@
 bin/**
 tmp/**
 tmp/**/*
+.pmd
 *.tmp
 *.bak
 *.swp
@@ -33,3 +34,4 @@ docs/.~lock.iRODSRESTAPIDocumentation.odt#
 
 #Version file
 src/**/RestVersion.java
+/build

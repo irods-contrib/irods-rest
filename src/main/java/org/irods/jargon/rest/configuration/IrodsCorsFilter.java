@@ -237,10 +237,19 @@ public class IrodsCorsFilter implements ContainerRequestFilter,
 			String origin) {
 
 		log.debug("checkOrigin()");
-		if (!allowedOrigins.contains("*") && !allowedOrigins.contains(origin)) {
+
+		log.debug("origin:{}", origin);
+		log.debug("compared to:{}", allowedOrigins);
+
+		if (allowedOrigins.contains("*")) {
+			log.debug("all origins allowed");
+		} else if (allowedOrigins.contains(origin.trim())) {
+			log.debug("allowed origin matches saved origins");
+		} else {
 			requestContext.setProperty("cors.failure", true);
 			throw new ForbiddenException("Origin not allowed: " + origin);
 		}
+
 	}
 
 	public synchronized RestConfiguration getRestConfiguration() {
@@ -260,7 +269,29 @@ public class IrodsCorsFilter implements ContainerRequestFilter,
 		parseAllowedMethodsFromConfiguration();
 		parseAllowedOriginsFromConfiguration();
 		parseAllowCredentialsFromConfiguration();
+		parseAllowedHeadersFromConfiguration();
 		log.debug("restConfiguration:{}", restConfiguration);
+
+	}
+
+	private void parseAllowedHeadersFromConfiguration() {
+		if (restConfiguration.getCorsAllowedHeaders().isEmpty()) {
+			log.debug("default to x-requested-with");
+			allowedHeaders = "x-requested-with";
+		} else {
+			StringBuilder sb = new StringBuilder();
+			log.debug("building up allowed headers list");
+			int ctr = 0;
+			for (String headers : restConfiguration.getCorsAllowedHeaders()) {
+				if (ctr++ > 0) {
+					sb.append(',');
+				}
+				sb.append(headers);
+			}
+			allowedHeaders = sb.toString();
+		}
+
+		log.info("allowedHeaders:{}", allowedHeaders);
 
 	}
 
@@ -308,6 +339,8 @@ public class IrodsCorsFilter implements ContainerRequestFilter,
 				allowedOrigins.add(origin);
 			}
 		}
+
+		log.debug("allowed origins:{}", allowedOrigins);
 
 		this.allowedOrigins = allowedOrigins;
 
