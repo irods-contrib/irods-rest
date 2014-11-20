@@ -1,4 +1,4 @@
-package org.irods.jargon.rest.configuration;
+package org.irods.jargon.rest.auth;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -15,6 +15,7 @@ import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
+import org.irods.jargon.rest.configuration.RestConfiguration;
 import org.jboss.resteasy.spi.CorsHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

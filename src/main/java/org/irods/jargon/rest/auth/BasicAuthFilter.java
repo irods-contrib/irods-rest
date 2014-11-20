@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 @Named
 public class BasicAuthFilter implements Filter {
 
-	private Logger log = LoggerFactory.getLogger(this.getClass());
+	private final Logger log = LoggerFactory.getLogger(this.getClass());
 	@Inject
 	private RestConfiguration restConfiguration;
 	@Inject
@@ -102,28 +102,7 @@ public class BasicAuthFilter implements Filter {
 
 			log.info("authResponse:{}", authResponse);
 			log.info("success!");
-			/*
-			 * HttpServletRequestWrapper wrapper = new
-			 * HttpServletRequestWrapper(httpRequest) {
-			 * 
-			 * @Override public String getHeader(String name) {
-			 * log.info("getting header from:{}", name); final String value =
-			 * (String) super.getAttribute(name);
-			 * log.info("value form attrib is:{}", value); if (value != null) {
-			 * return value; } return super.getHeader(name); }
-			 * 
-			 * 
-			 * @SuppressWarnings("rawtypes")
-			 * 
-			 * @Override public Enumeration getHeaders(String name) {
-			 * log.info("getting headers from:{}", name); final String value =
-			 * (String) request.getAttribute(name); if (value != null) {
-			 * log.info("value from attrib is:{}", value); Set<String> mySet =
-			 * new HashSet<String>(); mySet.add(value); return
-			 * Collections.enumeration(mySet); } return super.getHeaders(name);
-			 * } }; wrapper.setAttribute(RestConstants.AUTH_RESULT_KEY,
-			 * irodsAccount.toURI(true).toString());
-			 */
+
 			chain.doFilter(httpRequest, httpResponse);
 			return;
 

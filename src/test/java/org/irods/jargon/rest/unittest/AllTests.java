@@ -1,5 +1,6 @@
 package org.irods.jargon.rest.unittest;
 
+import org.irods.jargon.rest.auth.IrodsCorsFilterTest;
 import org.irods.jargon.rest.commands.ServiceFunctionFactoryImplTest;
 import org.irods.jargon.rest.commands.collection.CollectionAclFunctionsImplTest;
 import org.irods.jargon.rest.commands.collection.CollectionServiceTest;
@@ -12,7 +13,6 @@ import org.irods.jargon.rest.commands.rule.RuleServiceTest;
 import org.irods.jargon.rest.commands.user.TemporaryPasswordServiceTest;
 import org.irods.jargon.rest.commands.user.UserGroupServiceTest;
 import org.irods.jargon.rest.commands.user.UserServiceTest;
-import org.irods.jargon.rest.configuration.IrodsCorsFilterTest;
 import org.irods.jargon.rest.environment.ServerEnvironmentServiceTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

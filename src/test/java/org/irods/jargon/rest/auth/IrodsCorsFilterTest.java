@@ -1,4 +1,4 @@
-package org.irods.jargon.rest.configuration;
+package org.irods.jargon.rest.auth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +11,8 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import junit.framework.Assert;
 
+import org.irods.jargon.rest.auth.IrodsCorsFilter;
+import org.irods.jargon.rest.configuration.RestConfiguration;
 import org.jboss.resteasy.spi.CorsHeaders;
 import org.junit.Test;
 import org.mockito.Mockito;
