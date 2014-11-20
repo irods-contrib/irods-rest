@@ -71,6 +71,17 @@ public class BasicAuthFilter implements Filter {
 		final HttpServletRequest httpRequest = (HttpServletRequest) request;
 		final HttpServletResponse httpResponse = (HttpServletResponse) response;
 
+		/*
+		 * If options request do not quthenticate
+		 */
+
+		if (isPreflight((HttpServletRequest) request)) {
+			log.debug("preflight, no auth");
+			chain.doFilter(httpRequest, httpResponse);
+			return;
+
+		}
+
 		String auth = httpRequest.getHeader("Authorization");
 
 		if (auth == null || auth.isEmpty()) {
@@ -173,6 +184,16 @@ public class BasicAuthFilter implements Filter {
 	public void setIrodsAccessObjectFactory(
 			final IRODSAccessObjectFactory irodsAccessObjectFactory) {
 		this.irodsAccessObjectFactory = irodsAccessObjectFactory;
+	}
+
+	/**
+	 * Checks if this is a X-domain pre-flight request.
+	 * 
+	 * @param request
+	 * @return
+	 */
+	private boolean isPreflight(HttpServletRequest request) {
+		return "OPTIONS".equals(request.getMethod());
 	}
 
 }

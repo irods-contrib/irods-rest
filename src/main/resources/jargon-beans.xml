@@ -40,7 +40,7 @@
 		<beans:property name="webInterfaceURL"
 			value="https://iren-web.renci.org:8443/idrop-web2" />
 		<beans:property name="allowCors" value="true" />
-		<beans:property name="corsAllowCredentials" value="false" />
+		<beans:property name="corsAllowCredentials" value="true" />
 		<beans:property name="corsOrigins">
 			<util:list id="myList" value-type="java.lang.String">
 				<beans:value>*</beans:value>
@@ -58,7 +58,6 @@
 			<util:list id="headersList" value-type="java.lang.String">
 				<beans:value>x-requested-with</beans:value>
 				<beans:value>x-requested-by</beans:value>
-				
 			</util:list>
 		</beans:property>
 

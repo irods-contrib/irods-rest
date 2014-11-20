@@ -336,12 +336,12 @@ public class IrodsCorsFilter implements ContainerRequestFilter,
 		} else {
 			log.debug("building up origin list");
 			for (String origin : restConfiguration.getCorsOrigins()) {
+				log.debug("adding origin:{}", origin);
 				allowedOrigins.add(origin);
 			}
 		}
 
 		log.debug("allowed origins:{}", allowedOrigins);
-
 		this.allowedOrigins = allowedOrigins;
 
 	}
