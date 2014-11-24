@@ -39,14 +39,14 @@ public class IrodsCorsFilter implements ContainerRequestFilter,
 	private String allowedHeaders;
 	private String exposedHeaders;
 	private int corsMaxAge = -1;
-	private Set<String> allowedOrigins = new HashSet<String>();
+	private Set<String> allowedOrigins;
 
 	/**
 	 * Put "*" if you want to accept all origins
 	 * 
 	 * @return
 	 */
-	public synchronized Set<String> getAllowedOrigins() {
+	public Set<String> getAllowedOrigins() {
 		return allowedOrigins;
 	}
 
@@ -55,11 +55,11 @@ public class IrodsCorsFilter implements ContainerRequestFilter,
 	 * 
 	 * @return
 	 */
-	public synchronized boolean isAllowCredentials() {
+	public boolean isAllowCredentials() {
 		return allowCredentials;
 	}
 
-	public synchronized void setAllowCredentials(boolean allowCredentials) {
+	public void setAllowCredentials(boolean allowCredentials) {
 		this.allowCredentials = allowCredentials;
 	}
 
@@ -68,7 +68,7 @@ public class IrodsCorsFilter implements ContainerRequestFilter,
 	 * 
 	 * @return
 	 */
-	public synchronized String getAllowedMethods() {
+	public String getAllowedMethods() {
 		return allowedMethods;
 	}
 
@@ -78,11 +78,11 @@ public class IrodsCorsFilter implements ContainerRequestFilter,
 	 * 
 	 * @param allowedMethods
 	 */
-	public synchronized void setAllowedMethods(String allowedMethods) {
+	public void setAllowedMethods(String allowedMethods) {
 		this.allowedMethods = allowedMethods;
 	}
 
-	public synchronized String getAllowedHeaders() {
+	public String getAllowedHeaders() {
 		return allowedHeaders;
 	}
 
@@ -92,19 +92,19 @@ public class IrodsCorsFilter implements ContainerRequestFilter,
 	 * 
 	 * @param allowedHeaders
 	 */
-	public synchronized void setAllowedHeaders(String allowedHeaders) {
+	public void setAllowedHeaders(String allowedHeaders) {
 		this.allowedHeaders = allowedHeaders;
 	}
 
-	public synchronized int getCorsMaxAge() {
+	public int getCorsMaxAge() {
 		return corsMaxAge;
 	}
 
-	public synchronized void setCorsMaxAge(int corsMaxAge) {
+	public void setCorsMaxAge(int corsMaxAge) {
 		this.corsMaxAge = corsMaxAge;
 	}
 
-	public synchronized String getExposedHeaders() {
+	public String getExposedHeaders() {
 		return exposedHeaders;
 	}
 
@@ -113,7 +113,7 @@ public class IrodsCorsFilter implements ContainerRequestFilter,
 	 * 
 	 * @param exposedHeaders
 	 */
-	public synchronized void setExposedHeaders(String exposedHeaders) {
+	public void setExposedHeaders(String exposedHeaders) {
 		this.exposedHeaders = exposedHeaders;
 	}
 
@@ -240,7 +240,13 @@ public class IrodsCorsFilter implements ContainerRequestFilter,
 		log.debug("checkOrigin()");
 
 		log.debug("origin:{}", origin);
-		log.debug("compared to:{}", allowedOrigins);
+
+		if (log.isDebugEnabled()) {
+			log.debug("dumping allowed origins...");
+			for (String allowed : allowedOrigins) {
+				log.debug("allowed:{}", allowed);
+			}
+		}
 
 		if (allowedOrigins.contains("*")) {
 			log.debug("all origins allowed");
@@ -253,12 +259,11 @@ public class IrodsCorsFilter implements ContainerRequestFilter,
 
 	}
 
-	public synchronized RestConfiguration getRestConfiguration() {
+	public RestConfiguration getRestConfiguration() {
 		return restConfiguration;
 	}
 
-	public synchronized void setRestConfiguration(
-			RestConfiguration restConfiguration) {
+	public void setRestConfiguration(RestConfiguration restConfiguration) {
 
 		log.info("rest configuration set:{}", restConfiguration);
 
@@ -296,7 +301,7 @@ public class IrodsCorsFilter implements ContainerRequestFilter,
 
 	}
 
-	private synchronized boolean isAllowCors() {
+	private boolean isAllowCors() {
 		log.debug("restConfiguration:{}", restConfiguration);
 
 		if (!restConfiguration.isAllowCors()) {
@@ -328,26 +333,26 @@ public class IrodsCorsFilter implements ContainerRequestFilter,
 		this.setAllowedMethods(sb.toString());
 	}
 
-	public void parseAllowedOriginsFromConfiguration() {
+	private void parseAllowedOriginsFromConfiguration() {
 
-		Set<String> allowedOrigins = new HashSet<String>();
+		Set<String> myOrigins = new HashSet<String>();
 		if (restConfiguration.getCorsOrigins().isEmpty()) {
 			log.debug("default to all origins");
-			allowedOrigins.add("*");
+			myOrigins.add("*");
 		} else {
 			log.debug("building up origin list");
 			for (String origin : restConfiguration.getCorsOrigins()) {
 				log.debug("adding origin:{}", origin);
-				allowedOrigins.add(origin);
+				myOrigins.add(origin.trim());
 			}
 		}
 
-		log.debug("allowed origins:{}", allowedOrigins);
-		this.allowedOrigins = allowedOrigins;
+		log.debug(">>>>>allowed origins:{}", myOrigins);
+		this.allowedOrigins = myOrigins;
 
 	}
 
-	public void parseAllowCredentialsFromConfiguration() {
+	private void parseAllowCredentialsFromConfiguration() {
 		this.allowCredentials = restConfiguration.isCorsAllowCredentials();
 	}
 

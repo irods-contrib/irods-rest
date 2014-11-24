@@ -80,7 +80,6 @@ public class RestAuthUtils {
 		String auth = basicAuthData.substring(index);
 
 		String decoded = new String(Base64.decodeBase64(auth));
-		log.info("*******decoded:{}", decoded);
 
 		log.info("index of end of basic prefix:{}", index);
 		if (decoded.isEmpty()) {
