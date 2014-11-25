@@ -35,7 +35,7 @@ public class IrodsCorsFilter implements ContainerRequestFilter,
 	private RestConfiguration restConfiguration;
 
 	private boolean allowCredentials = true;
-	private String allowedMethods;
+	private String allowedMethods = "GET, POST, DELETE, PUT";
 	private String allowedHeaders;
 	private String exposedHeaders;
 	private int corsMaxAge = -1;
@@ -248,7 +248,12 @@ public class IrodsCorsFilter implements ContainerRequestFilter,
 			}
 		}
 
-		if (allowedOrigins.contains("*")) {
+		/**
+		 * FIXME: remove with spring init fix
+		 */
+		if (allowedOrigins == null) {
+			log.debug("all origins allowed");
+		} else if (allowedOrigins.contains("*")) {
 			log.debug("all origins allowed");
 		} else if (allowedOrigins.contains(origin.trim())) {
 			log.debug("allowed origin matches saved origins");
