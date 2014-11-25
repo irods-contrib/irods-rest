@@ -248,12 +248,7 @@ public class IrodsCorsFilter implements ContainerRequestFilter,
 			}
 		}
 
-		/**
-		 * FIXME: remove with spring init fix
-		 */
-		if (allowedOrigins == null) {
-			log.debug("all origins allowed");
-		} else if (allowedOrigins.contains("*")) {
+		if (allowedOrigins.contains("*")) {
 			log.debug("all origins allowed");
 		} else if (allowedOrigins.contains(origin.trim())) {
 			log.debug("allowed origin matches saved origins");

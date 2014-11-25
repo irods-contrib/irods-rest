@@ -28,6 +28,10 @@
 		<beans:property name="restConfiguration" ref="restConfiguration" />
 	</beans:bean>
 	
+	<beans:bean id="irodsCorsFilter" class="org.irods.jargon.rest.auth.IrodsCorsFilter">
+	    <beans:property name="restConfiguration" ref="restConfiguration" />
+	</beans:bean>
+
 	<beans:bean id="restConfiguration"
 		class="org.irods.jargon.rest.configuration.RestConfiguration">
 		<beans:property name="irodsHost" value="consortium.local" />
