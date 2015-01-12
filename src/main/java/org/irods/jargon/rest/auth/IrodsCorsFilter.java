@@ -188,22 +188,36 @@ public class IrodsCorsFilter implements ContainerRequestFilter,
 
 		if (log.isDebugEnabled()) {
 			log.debug("************* all request headers ************");
-			Set<String> headerNames = requestContext.getHeaders().keySet();
 
-			for (String name : headerNames) {
-				log.debug("headerName:{}", name);
-				log.debug("headerValue:{}",
-						requestContext.getHeaders().get(name));
+			if (requestContext.getHeaders() != null) {
+
+				Set<String> headerNames = requestContext.getHeaders().keySet();
+
+				for (String name : headerNames) {
+					if (name != null) {
+						log.debug("headerName:{}", name);
+						log.debug("headerValue:{}", requestContext.getHeaders()
+								.get(name));
+					}
+				}
+
 			}
 
 			log.debug("************* all response headers ************");
-			headerNames = responseContext.getHeaders().keySet();
 
-			for (String name : headerNames) {
-				log.debug("headerName:{}", name);
-				log.debug("headerValue:{}",
-						requestContext.getHeaders().get(name));
+			if (responseContext.getHeaders() != null) {
+
+				Set<String> headerNames = responseContext.getHeaders().keySet();
+
+				for (String name : headerNames) {
+					if (name != null) {
+						log.debug("headerName:{}", name);
+						log.debug("headerValue:{}", responseContext
+								.getHeaders().get(name));
+					}
+				}
 			}
+
 		}
 
 	}
