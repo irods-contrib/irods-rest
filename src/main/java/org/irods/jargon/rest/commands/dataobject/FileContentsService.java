@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -38,6 +39,7 @@ import org.jboss.resteasy.annotations.providers.jaxb.json.Mapped;
 import org.jboss.resteasy.annotations.providers.jaxb.json.XmlNsMap;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+import org.jboss.resteasy.spi.CorsHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -186,7 +188,8 @@ public class FileContentsService extends AbstractIrodsService {
 	public void getFile(
 			@HeaderParam("Authorization") final String authorization,
 			@PathParam("path") final String path,
-			@Context final HttpServletResponse response) throws JargonException {
+			@Context final HttpServletResponse response,
+			@Context final HttpServletRequest request) throws JargonException {
 
 		log.info("getFile()");
 
@@ -225,12 +228,23 @@ public class FileContentsService extends AbstractIrodsService {
 					.getIRODSFileFactory(irodsAccount)
 					.instanceIRODSFileInputStream(irodsFile);
 
+			log.debug("************* all response headers ************");
+
 			int contentLength = (int) irodsFile.length();
 
 			response.setContentType("application/octet-stream");
 			response.setContentLength(contentLength);
 			response.setHeader("Content-disposition", "attachment; filename=\""
 					+ decodedPathString + "\"");
+
+			// test hack of origin for cors download
+
+			String origin = request.getHeader(CorsHeaders.ORIGIN);
+			if (origin != null) {
+				log.debug("adding an origin header for download per bug #11");
+				response.addHeader(CorsHeaders.ACCESS_CONTROL_ALLOW_ORIGIN,
+						origin);
+			}
 
 			OutputStream output;
 			try {

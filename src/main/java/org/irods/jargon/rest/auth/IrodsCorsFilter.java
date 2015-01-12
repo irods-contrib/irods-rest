@@ -149,7 +149,7 @@ public class IrodsCorsFilter implements ContainerRequestFilter,
 	public void filter(ContainerRequestContext requestContext,
 			ContainerResponseContext responseContext) throws IOException {
 
-		log.debug("filter(reqeustContext,responseContext");
+		log.debug("filter(requestContext,responseContext");
 
 		if (!isAllowCors()) {
 			log.debug("no CORS");
