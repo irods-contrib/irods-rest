@@ -34,13 +34,12 @@
 
 	<beans:bean id="restConfiguration"
 		class="org.irods.jargon.rest.configuration.RestConfiguration">
-		<beans:property name="irodsHost" value="enter a host here" />
+		<beans:property name="irodsHost" value="fedzone1-403.irods.org" />
 		<beans:property name="irodsPort" value="1247" />
-		<beans:property name="irodsZone" value="enter a zone here" />
+		<beans:property name="irodsZone" value="fedZone1" />
+		<beans:property name="utilizePackingStreams" value="true"/>
 		<beans:property name="authType" value="STANDARD" /> <!--  STANDARD,PAM -->
 		<beans:property name="defaultStorageResource" value="test1-resc" />
-		<beans:property name="privateCertAbsPath" value="c:/temp/test-certs/private.pem" />
-		<beans:property name="publicKeyAbsPath" value="c:/temp/test-certs/public.pem" />
 		<beans:property name="webInterfaceURL"
 			value="https://iren-web.renci.org:8443/idrop-web2" />
 		<beans:property name="allowCors" value="true" />

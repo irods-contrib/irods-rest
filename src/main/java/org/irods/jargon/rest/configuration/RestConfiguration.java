@@ -21,9 +21,13 @@ public class RestConfiguration {
 	private String irodsZone = "";
 	private String defaultStorageResource = "";
 	private String realm = "irods-rest";
-	private boolean smimeEncryptAdminFunctions = false;
-	private String privateCertAbsPath = "";
-	private String publicKeyAbsPath = "";
+
+	/**
+	 * Utilize the read ahead and write behind streams in jargon to optimize
+	 * transfers
+	 */
+	private boolean utilizePackingStreams = true;
+
 	/**
 	 * AuthScheme to use for accounts, based on {@link AuthScheme}
 	 */
@@ -130,52 +134,6 @@ public class RestConfiguration {
 		this.realm = realm;
 	}
 
-	/**
-	 * @return the smimeEncryptAdminFunctions
-	 */
-	public boolean isSmimeEncryptAdminFunctions() {
-		return smimeEncryptAdminFunctions;
-	}
-
-	/**
-	 * @param smimeEncryptAdminFunctions
-	 *            the smimeEncryptAdminFunctions to set
-	 */
-	public void setSmimeEncryptAdminFunctions(
-			final boolean smimeEncryptAdminFunctions) {
-		this.smimeEncryptAdminFunctions = smimeEncryptAdminFunctions;
-	}
-
-	/**
-	 * @return the privateCertAbsPath
-	 */
-	public String getPrivateCertAbsPath() {
-		return privateCertAbsPath;
-	}
-
-	/**
-	 * @param privateCertAbsPath
-	 *            the privateCertAbsPath to set
-	 */
-	public void setPrivateCertAbsPath(final String privateCertAbsPath) {
-		this.privateCertAbsPath = privateCertAbsPath;
-	}
-
-	/**
-	 * @return the publicKeyAbsPath
-	 */
-	public String getPublicKeyAbsPath() {
-		return publicKeyAbsPath;
-	}
-
-	/**
-	 * @param publicKeyAbsPath
-	 *            the publicKeyAbsPath to set
-	 */
-	public void setPublicKeyAbsPath(final String publicKeyAbsPath) {
-		this.publicKeyAbsPath = publicKeyAbsPath;
-	}
-
 	public String getWebInterfaceURL() {
 		return webInterfaceURL;
 	}
@@ -244,6 +202,11 @@ public class RestConfiguration {
 		this.corsAllowCredentials = corsAllowCredentials;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -271,19 +234,9 @@ public class RestConfiguration {
 			builder.append(realm);
 			builder.append(", ");
 		}
-		builder.append("smimeEncryptAdminFunctions=");
-		builder.append(smimeEncryptAdminFunctions);
+		builder.append("utilizePackingStreams=");
+		builder.append(utilizePackingStreams);
 		builder.append(", ");
-		if (privateCertAbsPath != null) {
-			builder.append("privateCertAbsPath=");
-			builder.append(privateCertAbsPath);
-			builder.append(", ");
-		}
-		if (publicKeyAbsPath != null) {
-			builder.append("publicKeyAbsPath=");
-			builder.append(publicKeyAbsPath);
-			builder.append(", ");
-		}
 		if (authType != null) {
 			builder.append("authType=");
 			builder.append(authType);
@@ -339,6 +292,21 @@ public class RestConfiguration {
 
 	public void setCorsAllowedHeaders(List<String> corsAllowedHeaders) {
 		this.corsAllowedHeaders = corsAllowedHeaders;
+	}
+
+	/**
+	 * @return the utilizePackingStreams
+	 */
+	public boolean isUtilizePackingStreams() {
+		return utilizePackingStreams;
+	}
+
+	/**
+	 * @param utilizePackingStreams
+	 *            the utilizePackingStreams to set
+	 */
+	public void setUtilizePackingStreams(boolean utilizePackingStreams) {
+		this.utilizePackingStreams = utilizePackingStreams;
 	}
 
 }
