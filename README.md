@@ -31,3 +31,7 @@ Add support for PAM authentication through customizable configuration
 #### add temp password for user #10
 
 New /user/userName/temppassword signatures available to obtain a temporary iRODS password, including in admin mode.
+
+#### use packing i/o for stream performance #14
+
+Added optional use of packing input and output streams for upload and download.  This uses a simple read-ahead and write-behind buffer approach to optimize iRODS buffer sizes.  The behavior may be controlled by adjusting the configuration property for 'utilizePackingStreams' in RestConfig.
