@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.irods</groupId>
 	<artifactId>irods-rest</artifactId>
-	<version>4.0.2.1-SNAPSHOT</version>
+	<version>4.0.2.3-RC1</version>
 	<packaging>war</packaging>
 	<name>irods-rest</name>
 	<description>REST API for iRODS based on Jargon</description>
@@ -503,6 +503,7 @@
 				<configuration>
 					<warSourceDirectory>src/main/webapp</warSourceDirectory>
 					<failOnMissingWebXml>true</failOnMissingWebXml>
+					<warName>irods-rest</warName>
 				</configuration>
 			</plugin>
 		</plugins>

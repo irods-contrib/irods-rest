@@ -35,7 +35,7 @@ public class IrodsCorsFilter implements ContainerRequestFilter,
 	private RestConfiguration restConfiguration;
 
 	private boolean allowCredentials = true;
-	private String allowedMethods;
+	private String allowedMethods = "GET, POST, DELETE, PUT";
 	private String allowedHeaders;
 	private String exposedHeaders;
 	private int corsMaxAge = -1;
@@ -149,7 +149,7 @@ public class IrodsCorsFilter implements ContainerRequestFilter,
 	public void filter(ContainerRequestContext requestContext,
 			ContainerResponseContext responseContext) throws IOException {
 
-		log.debug("filter(reqeustContext,responseContext");
+		log.debug("filter(requestContext,responseContext");
 
 		if (!isAllowCors()) {
 			log.debug("no CORS");
@@ -185,6 +185,41 @@ public class IrodsCorsFilter implements ContainerRequestFilter,
 			responseContext.getHeaders().putSingle(
 					CorsHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, exposedHeaders);
 		}
+
+		if (log.isDebugEnabled()) {
+			log.debug("************* all request headers ************");
+
+			if (requestContext.getHeaders() != null) {
+
+				Set<String> headerNames = requestContext.getHeaders().keySet();
+
+				for (String name : headerNames) {
+					if (name != null) {
+						log.debug("headerName:{}", name);
+						log.debug("headerValue:{}", requestContext.getHeaders()
+								.get(name));
+					}
+				}
+
+			}
+
+			log.debug("************* all response headers ************");
+
+			if (responseContext.getHeaders() != null) {
+
+				Set<String> headerNames = responseContext.getHeaders().keySet();
+
+				for (String name : headerNames) {
+					if (name != null) {
+						log.debug("headerName:{}", name);
+						log.debug("headerValue:{}", responseContext
+								.getHeaders().get(name));
+					}
+				}
+			}
+
+		}
+
 	}
 
 	protected void preflight(String origin,
