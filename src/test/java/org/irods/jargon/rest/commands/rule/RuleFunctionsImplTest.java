@@ -10,7 +10,6 @@ import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.core.pub.RuleProcessingAO.RuleProcessingType;
 import org.irods.jargon.rest.configuration.RestConfiguration;
-import org.irods.jargon.rest.domain.RuleExecResultOutputParameterWrapper;
 import org.irods.jargon.rest.domain.RuleExecResultWrapper;
 import org.irods.jargon.rest.domain.RuleParameterWrapper;
 import org.irods.jargon.testutils.TestingPropertiesHelper;
@@ -68,14 +67,6 @@ public class RuleFunctionsImplTest {
 		Assert.assertNotNull("null result", actualExecResultWrapper);
 		Assert.assertEquals("expected exec out and error out", 2,
 				actualExecResultWrapper.getOutputParameterResults().size());
-
-		RuleExecResultOutputParameterWrapper actual = actualExecResultWrapper
-				.getOutputParameterResults().get(0);
-
-		Assert.assertEquals("did not get rule exec out", "ruleExecOut",
-				actual.getParameterName());
-		Assert.assertFalse("did not get exec out data",
-				((String) actual.getResultObject()).isEmpty());
 
 	}
 }
