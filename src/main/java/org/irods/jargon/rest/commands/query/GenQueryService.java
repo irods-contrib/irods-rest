@@ -237,6 +237,7 @@ public class GenQueryService extends AbstractIrodsService {
 					col.setColumnValue(value);
 					col.setColumnName(selectColumn);
 					row.getColumnList().add(col);
+					++i;
 				}
 				responseData.getRows().add(row);
 
