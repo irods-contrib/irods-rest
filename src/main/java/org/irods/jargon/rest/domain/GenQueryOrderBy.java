@@ -54,7 +54,7 @@ public class GenQueryOrderBy {
 	 */
 	@Override
 	public String toString() {
-		return "OrderBy: column=" + column + " type=" + orderByType;
+		return "[OrderBy: column=" + column + " type=" + orderByType + "]";
 	}
 
 	/**
@@ -62,7 +62,7 @@ public class GenQueryOrderBy {
 	 *
 	 * @return the column
 	 */
-	@XmlElement(name = "column")
+	@XmlElement(name = "column", required = true)
 	public String getColumn() {
 		return column;
 	}
@@ -82,7 +82,7 @@ public class GenQueryOrderBy {
 	 *
 	 * @return the order by type
 	 */
-	@XmlElement(name = "order_condition")
+	@XmlElement(name = "order_condition", required = true)
 	public String getOrderByType() {
 		return orderByType;
 	}

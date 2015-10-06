@@ -32,7 +32,7 @@ public class GenQueryColumn {
 	 */
 	@Override
 	public String toString() {
-		return "column: name=" + columnName + " value=" + columnValue;
+		return "[column: name=" + columnName + " value=" + columnValue + "]";
 	}
 
 	/**

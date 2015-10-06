@@ -184,7 +184,7 @@ public class GenQueryService extends AbstractIrodsService {
 
 				builder.addConditionAsGenQueryField(
 						rodsGenQueryEnum,
-						QueryConditionOperators.valueOf(condition.getOperator()),
+						QueryConditionOperators.valueOf(condition.getOperator().toUpperCase()),
 						condition.getValue());
 			}
 

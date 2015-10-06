@@ -3,48 +3,21 @@
  */
 package org.irods.jargon.rest.commands.query;
 
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
-
 import junit.framework.Assert;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
+
 import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.irods.jargon.core.connection.IRODSAccount;
-import org.irods.jargon.core.protovalues.FilePermissionEnum;
-import org.irods.jargon.core.pub.CollectionAO;
 import org.irods.jargon.core.pub.DataTransferOperations;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.core.pub.IRODSFileSystem;
-import org.irods.jargon.core.pub.domain.AvuData;
-import org.irods.jargon.core.pub.domain.Collection;
-import org.irods.jargon.core.pub.domain.UserFilePermission;
-import org.irods.jargon.core.pub.io.IRODSFile;
-import org.irods.jargon.core.query.MetaDataAndDomainData;
 import org.irods.jargon.rest.auth.DefaultHttpClientAndContext;
 import org.irods.jargon.rest.auth.RestAuthUtils;
-import org.irods.jargon.rest.commands.collection.CollectionService;
-import org.irods.jargon.rest.domain.CollectionData;
-import org.irods.jargon.rest.domain.MetadataEntry;
-import org.irods.jargon.rest.domain.MetadataListing;
-import org.irods.jargon.rest.domain.MetadataOperation;
-import org.irods.jargon.rest.domain.MetadataOperationResultEntry;
-import org.irods.jargon.rest.domain.MetadataQueryResultEntry;
-import org.irods.jargon.rest.domain.PermissionListing;
-import org.irods.jargon.rest.utils.DataUtils;
 import org.irods.jargon.rest.utils.RestTestingProperties;
 import org.irods.jargon.testutils.IRODSTestSetupUtilities;
 import org.irods.jargon.testutils.TestingPropertiesHelper;
@@ -204,11 +177,10 @@ public class GenQueryServiceTest implements ApplicationContextAware {
 	@Test
 	public void testGetGenQuerySendXmlReceiveXml() throws Exception {
 	
-                String targetCollection = testingPropertiesHelper
-				.buildIRODSCollectionAbsolutePathFromTestProperties(
-						testingProperties, IRODS_TEST_SUBDIR_PATH);	
-                String targetResource = testingProperties.getProperty(TestingPropertiesHelper.IRODS_RESOURCE_KEY); 
-		
+		String targetCollection = testingPropertiesHelper
+				.buildIRODSCollectionAbsolutePathFromTestProperties(testingProperties, IRODS_TEST_SUBDIR_PATH);
+		String targetResource = testingProperties.getProperty(TestingPropertiesHelper.IRODS_RESOURCE_KEY);
+
 		String requestBodyXml = "<ns2:query xmlns:ns2=\"http://irods.org/irods-rest\">" 
 				+ "<select>RESC_NAME</select>"
 				+ "<select>COLL_NAME</select>"
@@ -239,22 +211,19 @@ public class GenQueryServiceTest implements ApplicationContextAware {
 				+ "<column name=\"DATA_SIZE\">40</column>"
 				+ "</row>"
 				+ "<row>"
-                                + "<column name=\"RESC_NAME\">" + targetResource + "</column>"
-                                + "<column name=\"COLL_NAME\">" + targetCollection + "</column>"
-                                + "<column name=\"DATA_NAME\">testfile2.dat</column>"
-                                + "<column name=\"DATA_SIZE\">30</column>"
+                + "<column name=\"RESC_NAME\">" + targetResource + "</column>"
+                + "<column name=\"COLL_NAME\">" + targetCollection + "</column>"
+                + "<column name=\"DATA_NAME\">testfile2.dat</column>"
+                + "<column name=\"DATA_SIZE\">30</column>"
 				+ "</row>"
 				+ "<row>"
-                               + "<column name=\"RESC_NAME\">" + targetResource + "</column>"
-                                + "<column name=\"COLL_NAME\">" + targetCollection + "</column>"
-                                + "<column name=\"DATA_NAME\">testfile1.dat</column>"
-                                + "<column name=\"DATA_SIZE\">20</column>"
+                + "<column name=\"RESC_NAME\">" + targetResource + "</column>"
+                + "<column name=\"COLL_NAME\">" + targetCollection + "</column>"
+                + "<column name=\"DATA_NAME\">testfile1.dat</column>"
+                + "<column name=\"DATA_SIZE\">20</column>"
 				+ "</row>"
 				+ "</ns2:results>";
 
-
-
-		
 		IRODSAccount irodsAccount = testingPropertiesHelper
 				.buildIRODSAccountFromTestProperties(testingProperties);
 
@@ -299,5 +268,811 @@ public class GenQueryServiceTest implements ApplicationContextAware {
 			clientAndContext.getHttpClient().getConnectionManager().shutdown();
 		}
 	}
+	
+	@Test
+	public void testGetGenQuerySendJsonReceiveJson() throws Exception {
+	
+		String targetCollection = testingPropertiesHelper
+				.buildIRODSCollectionAbsolutePathFromTestProperties(testingProperties, IRODS_TEST_SUBDIR_PATH);
+		String targetResource = testingProperties.getProperty(TestingPropertiesHelper.IRODS_RESOURCE_KEY);
+
+        String requestBodyJson = "{\"select\":"
+        		+ "[{\"value\":\"RESC_NAME\"},"
+        		+ "{\"value\":\"COLL_NAME\"},"
+        		+ "{\"value\":\"DATA_NAME\"},"
+        		+ "{\"value\":\"DATA_SIZE\"}],"
+        		+ "\"condition\":"
+        		+ "[{\"column\":\"COLL_NAME\",\"operator\":\"EQUAL\",\"value\":\"" + targetCollection + "\"},"
+        		+ "{\"column\":\"DATA_NAME\",\"operator\":\"LIKE\",\"value\":\"%.dat\"}],"
+        		+ "\"order_by\":"
+        		+ "[{\"column\":\"DATA_SIZE\",\"order_condition\":\"DESC\"}]"
+        		+ "}";
+       
+		String expectedResponseJson = "{\"row\":"
+				+ "[{\"column\":"
+				+ "[{\"name\":\"RESC_NAME\",\"value\":\"" + targetResource + "\"},"
+				+ "{\"name\":\"COLL_NAME\",\"value\":\"" + targetCollection + "\"},"
+				+ "{\"name\":\"DATA_NAME\",\"value\":\"testfile3.dat\"},"
+				+ "{\"name\":\"DATA_SIZE\",\"value\":\"40\"}]},"
+				+ "{\"column\":"
+				+ "[{\"name\":\"RESC_NAME\",\"value\":\"" + targetResource + "\"},"
+				+ "{\"name\":\"COLL_NAME\",\"value\":\"" + targetCollection + "\"},"
+				+ "{\"name\":\"DATA_NAME\",\"value\":\"testfile2.dat\"},"
+				+ "{\"name\":\"DATA_SIZE\",\"value\":\"30\"}]},"
+				+ "{\"column\":"
+				+ "[{\"name\":\"RESC_NAME\",\"value\":\"" + targetResource + "\"},"
+				+ "{\"name\":\"COLL_NAME\",\"value\":\"" + targetCollection + "\"},"
+				+ "{\"name\":\"DATA_NAME\",\"value\":\"testfile1.dat\"},"
+				+ "{\"name\":\"DATA_SIZE\",\"value\":\"20\"}]}]}";
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/genQuery");
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
+
+			HttpPost httppost = new HttpPost(sb.toString());
+			httppost.addHeader("Content-Type", "application/json");
+			httppost.addHeader("Accept", "application/json");
+			
+			HttpEntity requestEntity = new ByteArrayEntity(requestBodyJson.getBytes("UTF-8"));
+			httppost.setEntity(requestEntity);
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httppost, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			//Assert.assertTrue("Request : " + requestBodyJson, 1==0);
+			Assert.assertTrue("Response was not 200.  Send: " + requestBodyJson, 200 == response.getStatusLine().getStatusCode());
+			Assert.assertNotNull(entity);
+			
+			String entityData = EntityUtils.toString(entity);
+			EntityUtils.consume(entity);
+			System.out.println("JSON>>>");
+			System.out.println(entityData);
+			
+			Assert.assertTrue(
+					"Did not get expected xml stuff.  Sent: " + requestBodyJson + " Received: " + entityData 
+                                         + "Expected: " + expectedResponseJson,
+					entityData.indexOf(expectedResponseJson) > -1);
+
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+	}
+	
+	@Test
+	public void testGetGenQueryAggregateXml() throws Exception {
+	
+		String targetCollection = testingPropertiesHelper
+				.buildIRODSCollectionAbsolutePathFromTestProperties(testingProperties, IRODS_TEST_SUBDIR_PATH);
+
+		String requestBodyXml = "<ns2:query xmlns:ns2=\"http://irods.org/irods-rest\">" 
+				+ "<select aggregate_type=\"SUM\">DATA_SIZE</select>"
+				+ "<condition>"
+				+ "<column>COLL_NAME</column>"
+				+ "<operator>EQUAL</operator>"
+				+ "<value>" + targetCollection + "</value>"
+				+ "</condition>"
+				+ "<condition>"
+				+ "<column>DATA_NAME</column>"
+				+ "<operator>LIKE</operator>"
+				+ "<value>%.dat</value>"
+				+ "</condition>"
+				+ "</ns2:query>";
+		
+		String expectedResponseXml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+				+ "<ns2:results xmlns:ns2=\"http://irods.org/irods-rest\">"
+				+ "<row>"
+				+ "<column name=\"SUM(DATA_SIZE)\">90</column>"
+				+ "</row>"
+				+ "</ns2:results>";
+	
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/genQuery");
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
+
+			HttpPost httppost = new HttpPost(sb.toString());
+			httppost.addHeader("Content-Type", "application/xml");
+			httppost.addHeader("Accept", "application/xml");
+			
+			HttpEntity requestEntity = new ByteArrayEntity(requestBodyXml.getBytes("UTF-8"));
+			httppost.setEntity(requestEntity);
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httppost, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+			Assert.assertNotNull(entity);
+			
+			String entityData = EntityUtils.toString(entity);
+			EntityUtils.consume(entity);
+			System.out.println("XML>>>");
+			System.out.println(entityData);
+			
+			Assert.assertTrue(
+					"Did not get expected xml stuff.  Sent: " + requestBodyXml + " Received: " + entityData 
+                                         + "Expected: " + expectedResponseXml,
+					entityData.indexOf(expectedResponseXml) > -1);
+
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+	}
+	
+	@Test
+	public void testGetGenQueryAggregateJson() throws Exception {
+	
+		String targetCollection = testingPropertiesHelper
+				.buildIRODSCollectionAbsolutePathFromTestProperties(testingProperties, IRODS_TEST_SUBDIR_PATH);
+
+        String requestBodyJson = "{\"select\":"
+        		+ "[{\"value\":\"DATA_SIZE\",\"aggregate_type\":\"SUM\"}],"
+        		+ "\"condition\":"
+        		+ "[{\"column\":\"COLL_NAME\",\"operator\":\"EQUAL\",\"value\":\"" + targetCollection + "\"},"
+        		+ "{\"column\":\"DATA_NAME\",\"operator\":\"LIKE\",\"value\":\"%.dat\"}]"
+        		+ "}";
+       
+		String expectedResponseJson = "{\"row\":["
+				+ "{\"column\":[{\"name\":\"SUM(DATA_SIZE)\",\"value\":\"90\"}]}"
+				+ "]}";
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/genQuery");
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
+
+			HttpPost httppost = new HttpPost(sb.toString());
+			httppost.addHeader("Content-Type", "application/json");
+			httppost.addHeader("Accept", "application/json");
+			
+			HttpEntity requestEntity = new ByteArrayEntity(requestBodyJson.getBytes("UTF-8"));
+			httppost.setEntity(requestEntity);
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httppost, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			//Assert.assertTrue("Request : " + requestBodyJson, 1==0);
+			Assert.assertTrue("Response was not 200.  Send: " + requestBodyJson, 200 == response.getStatusLine().getStatusCode());
+			Assert.assertNotNull(entity);
+			
+			String entityData = EntityUtils.toString(entity);
+			EntityUtils.consume(entity);
+			System.out.println("JSON>>>");
+			System.out.println(entityData);
+			
+			Assert.assertTrue(
+					"Did not get expected xml stuff.  Sent: " + requestBodyJson + " Received: " + entityData 
+                                         + "Expected: " + expectedResponseJson,
+					entityData.indexOf(expectedResponseJson) > -1);
+
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+	}
+	
+	@Test
+	public void testGetGenQueryLimitRowsJson() throws Exception {
+	
+		String targetCollection = testingPropertiesHelper
+				.buildIRODSCollectionAbsolutePathFromTestProperties(testingProperties, IRODS_TEST_SUBDIR_PATH);
+		String targetResource = testingProperties.getProperty(TestingPropertiesHelper.IRODS_RESOURCE_KEY);
+
+        String requestBodyJson = "{\"count\":\"2\","
+        		+ "\"select\":"
+        		+ "[{\"value\":\"RESC_NAME\"},"
+        		+ "{\"value\":\"COLL_NAME\"},"
+        		+ "{\"value\":\"DATA_NAME\"},"
+        		+ "{\"value\":\"DATA_SIZE\"}],"
+        		+ "\"condition\":"
+        		+ "[{\"column\":\"COLL_NAME\",\"operator\":\"EQUAL\",\"value\":\"" + targetCollection + "\"},"
+        		+ "{\"column\":\"DATA_NAME\",\"operator\":\"LIKE\",\"value\":\"%.dat\"}],"
+        		+ "\"order_by\":"
+        		+ "[{\"column\":\"DATA_SIZE\",\"order_condition\":\"DESC\"}]"
+        		+ "}";
+       
+		String expectedResponseJson = "{\"row\":"
+				+ "[{\"column\":"
+				+ "[{\"name\":\"RESC_NAME\",\"value\":\"" + targetResource + "\"},"
+				+ "{\"name\":\"COLL_NAME\",\"value\":\"" + targetCollection + "\"},"
+				+ "{\"name\":\"DATA_NAME\",\"value\":\"testfile3.dat\"},"
+				+ "{\"name\":\"DATA_SIZE\",\"value\":\"40\"}]},"
+				+ "{\"column\":"
+				+ "[{\"name\":\"RESC_NAME\",\"value\":\"" + targetResource + "\"},"
+				+ "{\"name\":\"COLL_NAME\",\"value\":\"" + targetCollection + "\"},"
+				+ "{\"name\":\"DATA_NAME\",\"value\":\"testfile2.dat\"},"
+				+ "{\"name\":\"DATA_SIZE\",\"value\":\"30\"}]}"
+				+ "]}";
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/genQuery");
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
+
+			HttpPost httppost = new HttpPost(sb.toString());
+			httppost.addHeader("Content-Type", "application/json");
+			httppost.addHeader("Accept", "application/json");
+			
+			HttpEntity requestEntity = new ByteArrayEntity(requestBodyJson.getBytes("UTF-8"));
+			httppost.setEntity(requestEntity);
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httppost, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			//Assert.assertTrue("Request : " + requestBodyJson, 1==0);
+			Assert.assertTrue("Response was not 200.  Send: " + requestBodyJson, 200 == response.getStatusLine().getStatusCode());
+			Assert.assertNotNull(entity);
+			
+			String entityData = EntityUtils.toString(entity);
+			EntityUtils.consume(entity);
+			System.out.println("JSON>>>");
+			System.out.println(entityData);
+			
+			Assert.assertTrue(
+					"Did not get expected xml stuff.  Sent: " + requestBodyJson + " Received: " + entityData 
+                                         + "Expected: " + expectedResponseJson,
+					entityData.indexOf(expectedResponseJson) > -1);
+
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+	}
+	
+	@Test
+	public void testGetGenQueryLimitRowsXml() throws Exception {
+	
+		
+		String targetCollection = testingPropertiesHelper
+				.buildIRODSCollectionAbsolutePathFromTestProperties(testingProperties, IRODS_TEST_SUBDIR_PATH);
+		String targetResource = testingProperties.getProperty(TestingPropertiesHelper.IRODS_RESOURCE_KEY);
+
+		String requestBodyXml = "<ns2:query xmlns:ns2=\"http://irods.org/irods-rest\">" 
+				+ "<count>2</count>"
+				+ "<select>RESC_NAME</select>"
+				+ "<select>COLL_NAME</select>"
+				+ "<select>DATA_NAME</select>"
+				+ "<select>DATA_SIZE</select>"
+				+ "<condition>"
+				+ "<column>COLL_NAME</column>"
+				+ "<operator>EQUAL</operator>"
+				+ "<value>" + targetCollection + "</value>"
+				+ "</condition>"
+				+ "<condition>"
+				+ "<column>DATA_NAME</column>"
+				+ "<operator>LIKE</operator>"
+				+ "<value>%.dat</value>"
+				+ "</condition>"
+				+ "<order_by>"
+				+ "<column>DATA_SIZE</column>"
+				+ "<order_condition>DESC</order_condition>"
+				+ "</order_by>"
+				+ "</ns2:query>";
+		
+		String expectedResponseXml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+				+ "<ns2:results xmlns:ns2=\"http://irods.org/irods-rest\">"
+				+ "<row>"
+				+ "<column name=\"RESC_NAME\">" + targetResource + "</column>"
+				+ "<column name=\"COLL_NAME\">" + targetCollection + "</column>"
+				+ "<column name=\"DATA_NAME\">testfile3.dat</column>"
+				+ "<column name=\"DATA_SIZE\">40</column>"
+				+ "</row>"
+				+ "<row>"
+                + "<column name=\"RESC_NAME\">" + targetResource + "</column>"
+                + "<column name=\"COLL_NAME\">" + targetCollection + "</column>"
+                + "<column name=\"DATA_NAME\">testfile2.dat</column>"
+                + "<column name=\"DATA_SIZE\">30</column>"
+				+ "</row>"
+				+ "</ns2:results>";
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/genQuery");
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
+
+			HttpPost httppost = new HttpPost(sb.toString());
+			httppost.addHeader("Content-Type", "application/xml");
+			httppost.addHeader("Accept", "application/xml");
+			
+			HttpEntity requestEntity = new ByteArrayEntity(requestBodyXml.getBytes("UTF-8"));
+			httppost.setEntity(requestEntity);
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httppost, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+			Assert.assertNotNull(entity);
+			
+			String entityData = EntityUtils.toString(entity);
+			EntityUtils.consume(entity);
+			System.out.println("XML>>>");
+			System.out.println(entityData);
+			
+			Assert.assertTrue(
+					"Did not get expected xml stuff.  Sent: " + requestBodyXml + " Received: " + entityData 
+                                         + "Expected: " + expectedResponseXml,
+					entityData.indexOf(expectedResponseXml) > -1);
+
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+	}
+	
+	@Test
+	public void testGetGenQuerySelectZoneXml() throws Exception {
+	
+		String targetCollection = testingPropertiesHelper
+				.buildIRODSCollectionAbsolutePathFromTestProperties(testingProperties, IRODS_TEST_SUBDIR_PATH);
+		String targetResource = testingProperties.getProperty(TestingPropertiesHelper.IRODS_RESOURCE_KEY);
+		String targetZone = testingProperties.getProperty(TestingPropertiesHelper.IRODS_ZONE_KEY);
+
+		String requestBodyXml = "<ns2:query xmlns:ns2=\"http://irods.org/irods-rest\">" 
+				+ "<zone>" + targetZone + "</zone>"
+				+ "<select>RESC_NAME</select>"
+				+ "<select>COLL_NAME</select>"
+				+ "<select>DATA_NAME</select>"
+				+ "<select>DATA_SIZE</select>"
+				+ "<condition>"
+				+ "<column>COLL_NAME</column>"
+				+ "<operator>EQUAL</operator>"
+				+ "<value>" + targetCollection + "</value>"
+				+ "</condition>"
+				+ "<condition>"
+				+ "<column>DATA_NAME</column>"
+				+ "<operator>LIKE</operator>"
+				+ "<value>%.dat</value>"
+				+ "</condition>"
+				+ "<order_by>"
+				+ "<column>DATA_SIZE</column>"
+				+ "<order_condition>DESC</order_condition>"
+				+ "</order_by>"
+				+ "</ns2:query>";
+		
+		String expectedResponseXml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+				+ "<ns2:results xmlns:ns2=\"http://irods.org/irods-rest\">"
+				+ "<row>"
+				+ "<column name=\"RESC_NAME\">" + targetResource + "</column>"
+				+ "<column name=\"COLL_NAME\">" + targetCollection + "</column>"
+				+ "<column name=\"DATA_NAME\">testfile3.dat</column>"
+				+ "<column name=\"DATA_SIZE\">40</column>"
+				+ "</row>"
+				+ "<row>"
+                + "<column name=\"RESC_NAME\">" + targetResource + "</column>"
+                + "<column name=\"COLL_NAME\">" + targetCollection + "</column>"
+                + "<column name=\"DATA_NAME\">testfile2.dat</column>"
+                + "<column name=\"DATA_SIZE\">30</column>"
+				+ "</row>"
+				+ "<row>"
+                + "<column name=\"RESC_NAME\">" + targetResource + "</column>"
+                + "<column name=\"COLL_NAME\">" + targetCollection + "</column>"
+                + "<column name=\"DATA_NAME\">testfile1.dat</column>"
+                + "<column name=\"DATA_SIZE\">20</column>"
+				+ "</row>"
+				+ "</ns2:results>";
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/genQuery");
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
+
+			HttpPost httppost = new HttpPost(sb.toString());
+			httppost.addHeader("Content-Type", "application/xml");
+			httppost.addHeader("Accept", "application/xml");
+			
+			HttpEntity requestEntity = new ByteArrayEntity(requestBodyXml.getBytes("UTF-8"));
+			httppost.setEntity(requestEntity);
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httppost, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+			Assert.assertNotNull(entity);
+			
+			String entityData = EntityUtils.toString(entity);
+			EntityUtils.consume(entity);
+			System.out.println("XML>>>");
+			System.out.println(entityData);
+			
+			Assert.assertTrue(
+					"Did not get expected xml stuff.  Sent: " + requestBodyXml + " Received: " + entityData 
+                                         + "Expected: " + expectedResponseXml,
+					entityData.indexOf(expectedResponseXml) > -1);
+
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+	}
+	
+	@Test
+	public void testGetGenQuerySelectZoneJson() throws Exception {
+	
+		String targetCollection = testingPropertiesHelper
+				.buildIRODSCollectionAbsolutePathFromTestProperties(testingProperties, IRODS_TEST_SUBDIR_PATH);
+		String targetResource = testingProperties.getProperty(TestingPropertiesHelper.IRODS_RESOURCE_KEY);
+		String targetZone = testingProperties.getProperty(TestingPropertiesHelper.IRODS_ZONE_KEY);
+
+        String requestBodyJson = "{\"zone\":\"" + targetZone + "\","
+        		+ "\"select\":"
+        		+ "[{\"value\":\"RESC_NAME\"},"
+        		+ "{\"value\":\"COLL_NAME\"},"
+        		+ "{\"value\":\"DATA_NAME\"},"
+        		+ "{\"value\":\"DATA_SIZE\"}],"
+        		+ "\"condition\":"
+        		+ "[{\"column\":\"COLL_NAME\",\"operator\":\"EQUAL\",\"value\":\"" + targetCollection + "\"},"
+        		+ "{\"column\":\"DATA_NAME\",\"operator\":\"LIKE\",\"value\":\"%.dat\"}],"
+        		+ "\"order_by\":"
+        		+ "[{\"column\":\"DATA_SIZE\",\"order_condition\":\"DESC\"}]"
+        		+ "}";
+       
+		String expectedResponseJson = "{\"row\":"
+				+ "[{\"column\":"
+				+ "[{\"name\":\"RESC_NAME\",\"value\":\"" + targetResource + "\"},"
+				+ "{\"name\":\"COLL_NAME\",\"value\":\"" + targetCollection + "\"},"
+				+ "{\"name\":\"DATA_NAME\",\"value\":\"testfile3.dat\"},"
+				+ "{\"name\":\"DATA_SIZE\",\"value\":\"40\"}]},"
+				+ "{\"column\":"
+				+ "[{\"name\":\"RESC_NAME\",\"value\":\"" + targetResource + "\"},"
+				+ "{\"name\":\"COLL_NAME\",\"value\":\"" + targetCollection + "\"},"
+				+ "{\"name\":\"DATA_NAME\",\"value\":\"testfile2.dat\"},"
+				+ "{\"name\":\"DATA_SIZE\",\"value\":\"30\"}]},"
+				+ "{\"column\":"
+				+ "[{\"name\":\"RESC_NAME\",\"value\":\"" + targetResource + "\"},"
+				+ "{\"name\":\"COLL_NAME\",\"value\":\"" + targetCollection + "\"},"
+				+ "{\"name\":\"DATA_NAME\",\"value\":\"testfile1.dat\"},"
+				+ "{\"name\":\"DATA_SIZE\",\"value\":\"20\"}]}]}";
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/genQuery");
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
+
+			HttpPost httppost = new HttpPost(sb.toString());
+			httppost.addHeader("Content-Type", "application/json");
+			httppost.addHeader("Accept", "application/json");
+			
+			HttpEntity requestEntity = new ByteArrayEntity(requestBodyJson.getBytes("UTF-8"));
+			httppost.setEntity(requestEntity);
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httppost, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			//Assert.assertTrue("Request : " + requestBodyJson, 1==0);
+			Assert.assertTrue("Response was not 200.  Send: " + requestBodyJson, 200 == response.getStatusLine().getStatusCode());
+			Assert.assertNotNull(entity);
+			
+			String entityData = EntityUtils.toString(entity);
+			EntityUtils.consume(entity);
+			System.out.println("JSON>>>");
+			System.out.println(entityData);
+			
+			Assert.assertTrue(
+					"Did not get expected xml stuff.  Sent: " + requestBodyJson + " Received: " + entityData 
+                                         + "Expected: " + expectedResponseJson,
+					entityData.indexOf(expectedResponseJson) > -1);
+
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+	}
+	
+	@Test
+	public void testGetGenQueryCaseInsensitiveXml() throws Exception {
+	
+		String targetCollection = testingPropertiesHelper
+				.buildIRODSCollectionAbsolutePathFromTestProperties(testingProperties, IRODS_TEST_SUBDIR_PATH);
+
+		String requestBodyXml = "<ns2:query xmlns:ns2=\"http://irods.org/irods-rest\">" 
+				+ "<select aggregate_type=\"sum\">data_size</select>"
+				+ "<condition>"
+				+ "<column>coll_name</column>"
+				+ "<operator>equal</operator>"
+				+ "<value>" + targetCollection + "</value>"
+				+ "</condition>"
+				+ "<condition>"
+				+ "<column>data_name</column>"
+				+ "<operator>like</operator>"
+				+ "<value>%.dat</value>"
+				+ "</condition>"
+				+ "</ns2:query>";
+		
+		String expectedResponseXml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+				+ "<ns2:results xmlns:ns2=\"http://irods.org/irods-rest\">"
+				+ "<row>"
+				+ "<column name=\"SUM(DATA_SIZE)\">90</column>"
+				+ "</row>"
+				+ "</ns2:results>";
+	
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/genQuery");
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
+
+			HttpPost httppost = new HttpPost(sb.toString());
+			httppost.addHeader("Content-Type", "application/xml");
+			httppost.addHeader("Accept", "application/xml");
+			
+			HttpEntity requestEntity = new ByteArrayEntity(requestBodyXml.getBytes("UTF-8"));
+			httppost.setEntity(requestEntity);
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httppost, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+			Assert.assertNotNull(entity);
+			
+			String entityData = EntityUtils.toString(entity);
+			EntityUtils.consume(entity);
+			System.out.println("XML>>>");
+			System.out.println(entityData);
+			
+			Assert.assertTrue(
+					"Did not get expected xml stuff.  Sent: " + requestBodyXml + " Received: " + entityData 
+                                         + "Expected: " + expectedResponseXml,
+					entityData.indexOf(expectedResponseXml) > -1);
+
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+	}
+	
+	@Test
+	public void testGetGenQueryCaseInsensitiveJson() throws Exception {
+	
+		String targetCollection = testingPropertiesHelper
+				.buildIRODSCollectionAbsolutePathFromTestProperties(testingProperties, IRODS_TEST_SUBDIR_PATH);
+
+        String requestBodyJson = "{\"select\":"
+        		+ "[{\"value\":\"data_size\",\"aggregate_type\":\"sum\"}],"
+        		+ "\"condition\":"
+        		+ "[{\"column\":\"coll_name\",\"operator\":\"equal\",\"value\":\"" + targetCollection + "\"},"
+        		+ "{\"column\":\"data_name\",\"operator\":\"like\",\"value\":\"%.dat\"}]"
+        		+ "}";
+       
+		String expectedResponseJson = "{\"row\":["
+				+ "{\"column\":[{\"name\":\"SUM(DATA_SIZE)\",\"value\":\"90\"}]}"
+				+ "]}";
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/genQuery");
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
+
+			HttpPost httppost = new HttpPost(sb.toString());
+			httppost.addHeader("Content-Type", "application/json");
+			httppost.addHeader("Accept", "application/json");
+			
+			HttpEntity requestEntity = new ByteArrayEntity(requestBodyJson.getBytes("UTF-8"));
+			httppost.setEntity(requestEntity);
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httppost, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			//Assert.assertTrue("Request : " + requestBodyJson, 1==0);
+			Assert.assertTrue("Response was not 200.  Send: " + requestBodyJson, 200 == response.getStatusLine().getStatusCode());
+			Assert.assertNotNull(entity);
+			
+			String entityData = EntityUtils.toString(entity);
+			EntityUtils.consume(entity);
+			System.out.println("JSON>>>");
+			System.out.println(entityData);
+			
+			Assert.assertTrue(
+					"Did not get expected xml stuff.  Sent: " + requestBodyJson + " Received: " + entityData 
+                                         + "Expected: " + expectedResponseJson,
+					entityData.indexOf(expectedResponseJson) > -1);
+
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+	}
+	
+	
+	@Test
+	public void testGetGenQuerySelectOnlyXml() throws Exception {
+
+		String requestBodyXml = "<ns2:query xmlns:ns2=\"http://irods.org/irods-rest\">" 
+				+ "<select>data_size</select>"
+				+ "</ns2:query>";
+		
+	
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/genQuery");
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
+
+			HttpPost httppost = new HttpPost(sb.toString());
+			httppost.addHeader("Content-Type", "application/xml");
+			httppost.addHeader("Accept", "application/xml");
+			
+			HttpEntity requestEntity = new ByteArrayEntity(requestBodyXml.getBytes("UTF-8"));
+			httppost.setEntity(requestEntity);
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httppost, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+			Assert.assertNotNull(entity);
+			
+			String entityData = EntityUtils.toString(entity);
+			EntityUtils.consume(entity);
+			System.out.println("XML>>>");
+			System.out.println(entityData);
+			
+			// okay if we didn't get an exception
+
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+	}
+	
+	@Test
+	public void testGetGenQuerySelectOnlyJson() throws Exception {
+
+        String requestBodyJson = "{\"select\":"
+        		+ "[{\"value\":\"data_size\"}]}";
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/genQuery");
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
+
+			HttpPost httppost = new HttpPost(sb.toString());
+			httppost.addHeader("Content-Type", "application/json");
+			httppost.addHeader("Accept", "application/json");
+			
+			HttpEntity requestEntity = new ByteArrayEntity(requestBodyJson.getBytes("UTF-8"));
+			httppost.setEntity(requestEntity);
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httppost, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			//Assert.assertTrue("Request : " + requestBodyJson, 1==0);
+			Assert.assertTrue("Response was not 200.  Send: " + requestBodyJson, 200 == response.getStatusLine().getStatusCode());
+			Assert.assertNotNull(entity);
+			
+			String entityData = EntityUtils.toString(entity);
+			EntityUtils.consume(entity);
+			System.out.println("JSON>>>");
+			System.out.println(entityData);
+			
+			// okay if we didn't get an exception
+
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+	}
+
+
+	
 
 }

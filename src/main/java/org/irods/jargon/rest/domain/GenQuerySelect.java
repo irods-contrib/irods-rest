@@ -56,7 +56,7 @@ public class GenQuerySelect {
 	 *
 	 * @return the column
 	 */
-	@XmlValue
+	@XmlValue 
 	public String getColumn() {
 		return column;
 	}

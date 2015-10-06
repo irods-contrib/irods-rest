@@ -39,8 +39,8 @@ public class GenQueryCondition {
 	 */
 	@Override
 	public String toString() {
-		return "Condition: column=" + column + " operator=" + operator
-				+ " value=" + value;
+		return "[Condition: column=" + column + " operator=" + operator
+				+ " value=" + value + "]";
 	}
 
 	/**
@@ -48,7 +48,7 @@ public class GenQueryCondition {
 	 *
 	 * @return the column
 	 */
-	@XmlElement(name = "column")
+	@XmlElement(name = "column", required = true)
 	public String getColumn() {
 		return column;
 	}
@@ -68,7 +68,7 @@ public class GenQueryCondition {
 	 *
 	 * @return the value
 	 */
-	@XmlElement(name = "value")
+	@XmlElement(name = "value", required = true)
 	public String getValue() {
 		return value;
 	}
@@ -88,7 +88,7 @@ public class GenQueryCondition {
 	 *
 	 * @return the operator
 	 */
-	@XmlElement(name = "operator")
+	@XmlElement(name = "operator", required = true)
 	public String getOperator() {
 		return operator;
 	}
