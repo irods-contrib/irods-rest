@@ -13,8 +13,9 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jargon.version>4.0.2.4-RC1</jargon.version>
 		<resteasy.version>3.0.12.Final</resteasy.version>
-		<spring.core.version>4.2.2.RELEASE</spring.core.version>
-		<spring.security.version>4.2.2.RELEASE</spring.security.version>
+		<spring.core.version>3.1.0.RELEASE</spring.core.version>
+		<spring.security.version>3.1.0.RELEASE</spring.security.version>
+		<java.version>1.8</java.version>
 	</properties>
 	<issueManagement>
 		<system>GitHub</system>
@@ -42,20 +43,11 @@
 		</developer>
 	</developers>
 	<repositories>
-	<!-- 	<repository>
-			<id>ibiblio.repository</id>
-			<name>ibiblio.repository</name>
-			<url>http://mirrors.ibiblio.org/pub/mirrors/maven2</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>never</updatePolicy>
-				<checksumPolicy>fail</checksumPolicy>
-			</snapshots>
-		</repository> -->
-			<repository>
+		<!-- <repository> <id>ibiblio.repository</id> <name>ibiblio.repository</name> 
+			<url>http://mirrors.ibiblio.org/pub/mirrors/maven2</url> <releases> <enabled>true</enabled> 
+			</releases> <snapshots> <enabled>true</enabled> <updatePolicy>never</updatePolicy> 
+			<checksumPolicy>fail</checksumPolicy> </snapshots> </repository> -->
+		<repository>
 			<id>dice.repository snaps</id>
 			<name>dice.repository.snapshots</name>
 			<url>https://raw.github.com/DICE-UNC/DICE-Maven/master/snapshots</url>
@@ -95,9 +87,9 @@
 			</snapshots>
 		</repository>
 	</repositories>
-	<distributionManagement>
-		
-	</distributionManagement>
+	<distributionManagement />
+
+
 	<reporting>
 		<plugins>
 			<plugin>
@@ -267,7 +259,12 @@
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpmime</artifactId>
-				<version>4.2.1</version>
+				<version>4.5.1</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpclient</artifactId>
+				<version>4.5.1</version>
 			</dependency>
 
 		</dependencies>
@@ -391,10 +388,14 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-beans</artifactId>
 		</dependency>
-			<dependency>
-				<groupId>org.apache.httpcomponents</groupId>
-				<artifactId>httpmime</artifactId>
-			</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpmime</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -498,8 +499,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.0</version>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
 				</configuration>
 			</plugin>
 			<plugin>

@@ -21,11 +21,13 @@ import javax.xml.bind.annotation.XmlElement;
  * @author jjames
  */
 public class GenQueryRow {
-	
+
 	/** The column list. */
 	private ArrayList<GenQueryColumn> columnList = new ArrayList<GenQueryColumn>();
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
@@ -53,12 +55,11 @@ public class GenQueryRow {
 	/**
 	 * Sets the column list.
 	 *
-	 * @param columnList the new column list
+	 * @param columnList
+	 *            the new column list
 	 */
 	public void setColumnList(ArrayList<GenQueryColumn> columnList) {
 		this.columnList = columnList;
 	}
-	
-
 
 }
