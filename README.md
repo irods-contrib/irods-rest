@@ -1,5 +1,5 @@
 * Project: iRODS Rest API
-* Date: 6/29/2015
+* Date: 11/10/2015
 * Release Version: 4.0.2.4-RC1	
 * Git tag: 4.0.2.4-rc1
 
