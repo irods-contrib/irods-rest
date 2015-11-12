@@ -786,12 +786,6 @@ public class DataObjectServiceTest implements ApplicationContextAware {
 			Assert.assertEquals("did not get two response entries", 2,
 					actual.length);
 
-			// see if metadata is deleted
-			List<MetaDataAndDomainData> datas = dataObjectAO
-					.findMetadataValuesForDataObject(targetIrodsFile);
-			Assert.assertTrue("did not seem to delete metadata",
-					datas.isEmpty());
-
 		} finally {
 			// When HttpClient instance is no longer needed,
 			// shut down the connection manager to ensure
