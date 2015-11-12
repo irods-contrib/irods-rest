@@ -19,6 +19,8 @@ RestVersion.java
 .loadpath
 .DS_Store
 docs/.~lock.iRODSRESTAPIDocumentation.odt#
+**/test-irods-rest.properties
+
 
 # External tool builders
 .externalToolBuilders/

@@ -35,3 +35,9 @@ New /user/userName/temppassword signatures available to obtain a temporary iRODS
 #### use packing i/o for stream performance #14
 
 Added optional use of packing input and output streams for upload and download.  This uses a simple read-ahead and write-behind buffer approach to optimize iRODS buffer sizes.  The behavior may be controlled by adjusting the configuration property for 'utilizePackingStreams' in RestConfig.
+
+#### use an etc file for production deployment #30
+
+Added a /etc/irods-ext/irods-rest-properties file that can configure settings, as per the example in the irods-rest project.  This allows deployment as a pre-packaged war and configuration and settings will be controlled by these etc properties.
+
+Note that for testing purposes, these properties are generated locally by running mvn install, and the unit tests will refer to the test-irods-rest.properties found in src/test/resources.  This also eases integration with Jenkins for CI testing purposes.
