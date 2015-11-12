@@ -114,9 +114,28 @@ public class RestAuthUtils {
 			throw new IrodsRestException("unknown or unsupported auth scheme");
 		}
 
+		log.info("see if auth scheme is overrideen by the provided credentials");
+		/*
+		 * Ids can be prepended with STANDARD: or PAM:
+		 */
+
+		String userId = credentials[0];
+		if (userId.startsWith(AuthScheme.STANDARD.toString())) {
+			log.info("authScheme override to Standard");
+			authScheme = AuthScheme.STANDARD;
+			userId = userId
+					.substring(AuthScheme.STANDARD.toString().length() + 1);
+		} else if (userId.startsWith(AuthScheme.PAM.toString())) {
+			log.info("authScheme override to PAM");
+			authScheme = AuthScheme.PAM;
+			userId = userId.substring(AuthScheme.PAM.toString().length() + 1);
+		}
+
+		log.debug("userId:{}", userId);
+
 		return IRODSAccount.instance(restConfiguration.getIrodsHost(),
-				restConfiguration.getIrodsPort(), credentials[0],
-				credentials[1], "", restConfiguration.getIrodsZone(),
+				restConfiguration.getIrodsPort(), userId, credentials[1], "",
+				restConfiguration.getIrodsZone(),
 				restConfiguration.getDefaultStorageResource(), authScheme);
 
 	}

@@ -1,6 +1,7 @@
 package org.irods.jargon.rest.unittest;
 
 import org.irods.jargon.rest.auth.IrodsCorsFilterTest;
+import org.irods.jargon.rest.auth.PamAuthTest;
 import org.irods.jargon.rest.commands.ServiceFunctionFactoryImplTest;
 import org.irods.jargon.rest.commands.collection.CollectionAclFunctionsImplTest;
 import org.irods.jargon.rest.commands.collection.CollectionServiceTest;
@@ -27,7 +28,7 @@ import org.junit.runners.Suite.SuiteClasses;
 		DataObjectAclFunctionsImplTest.class,
 		DataObjectAvuFunctionsImplTest.class, RuleFunctionsImplTest.class,
 		RuleServiceTest.class, IrodsCorsFilterTest.class,
-		TemporaryPasswordServiceTest.class })
+		TemporaryPasswordServiceTest.class, PamAuthTest.class })
 public class AllTests {
 
 }
