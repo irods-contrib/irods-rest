@@ -8,7 +8,7 @@
 	http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
 	<!-- Import basic SpringMVC Resteasy integration -->
-	<!-- <context:property-placeholder  location="file:///etc/irods-ext/irods-rest.properties" /> -->
+	<context:property-placeholder  location="file:///etc/irods-ext/irods-rest.properties" /> 
 	<beans:import resource="classpath:jargon-beans.xml" />
 
 	
