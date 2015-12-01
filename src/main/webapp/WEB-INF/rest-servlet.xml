@@ -11,8 +11,6 @@
 	<context:property-placeholder  location="file:///etc/irods-ext/irods-rest.properties" /> 
 	<beans:import resource="classpath:jargon-beans.xml" />
 
-	
-
 	<context:component-scan base-package="org.irods.jargon.rest" />
 
 </beans:beans>

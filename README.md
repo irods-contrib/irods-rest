@@ -1,20 +1,20 @@
-* Project: iRODS Rest API
-* Date: 11/10/2015
-* Release Version: 4.0.2.4-RC1	
-* Git tag: 4.0.2.4-RC1
+# Project: iRODS Rest API
+## Date: 
+## Release Version: 4.0.2.5-SNAPSHOT
+## Git tag: 
 
 https://github.com/DICE-UNC/irods-rest
 
-iRODS Rest API based on Jargon 4.0.2.4, certified against iRODS 3.0+ as well as iRODS Consortium 4.1.x releases up to 4.1.7.  See included docs folder for comprehensive user documentation and install instructions
+iRODS Rest API based on Jargon 4.0.2.5, certified against iRODS 3.0+ as well as iRODS Consortium 4.1.x releases up to 4.1.7.  See included docs folder for comprehensive user documentation and install instructions
 
 See https://github.com/DICE-UNC/irods-rest/issues for support and known issues
 
 
 ### Requirements
 
-* Depends on Java 1.7+
+* Depends on Java 1.8+
 * Built using Apache Maven2, see POM for dependencies
-
+	
 
 ### Bug Fixes
 
