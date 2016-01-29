@@ -5,6 +5,8 @@ package org.irods.jargon.rest.commands.query;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 
 import javax.inject.Named;
 import javax.ws.rs.Consumes;
@@ -36,6 +38,7 @@ import org.irods.jargon.rest.domain.GenQueryRequestData;
 import org.irods.jargon.rest.domain.GenQueryResponseData;
 import org.irods.jargon.rest.domain.GenQueryRow;
 import org.irods.jargon.rest.domain.GenQuerySelect;
+import org.irods.jargon.rest.domain.GenQueryConditionValueList;
 import org.jboss.resteasy.annotations.providers.jaxb.json.Mapped;
 import org.jboss.resteasy.annotations.providers.jaxb.json.XmlNsMap;
 import org.slf4j.Logger;
@@ -181,11 +184,34 @@ public class GenQueryService extends AbstractIrodsService {
 				// look up the Jargon enum for the condition field
 				RodsGenQueryEnum rodsGenQueryEnum = translateQueryColumnToEnum(condition
 						.getColumn());
+				
+				// Must treat "in" clause Differently from others.
+				if (condition.getOperator().equalsIgnoreCase("IN")) {
+					
+					if (condition.getValueList() == null || condition.getValueList().getValues() == null || condition.getValueList().getValues().size() == 0) {
+						throw new IllegalArgumentException("Condition (IN) must have a value_list.");
+					} else if (condition.getValue() != null) {
+						throw new IllegalArgumentException("Condition (IN) should have a value_list and not a simple value.");
+					}
 
-				builder.addConditionAsGenQueryField(
-						rodsGenQueryEnum,
-						QueryConditionOperators.valueOf(condition.getOperator().toUpperCase()),
-						condition.getValue());
+                    ArrayList<String> valueList = condition.getValueList().getValues();
+
+					builder.addConditionAsMultiValueCondition(
+							rodsGenQueryEnum,
+							QueryConditionOperators.valueOf(condition.getOperator().toUpperCase()),
+							valueList);
+				} else {
+					if (condition.getValue() == null) {
+						throw new IllegalArgumentException("Condition " + condition.getOperator().toUpperCase() + "  must have a value");
+					} else if (condition.getValueList() != null) {
+						throw new IllegalArgumentException("Condition " + condition.getOperator().toUpperCase() + " should not have a value_list.");
+					}
+					
+					builder.addConditionAsGenQueryField(
+							rodsGenQueryEnum,
+							QueryConditionOperators.valueOf(condition.getOperator().toUpperCase()),
+							condition.getValue());
+				}
 			}
 
 			// Update the query builder for the order by fields.

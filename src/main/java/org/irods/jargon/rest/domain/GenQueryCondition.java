@@ -1,5 +1,8 @@
 package org.irods.jargon.rest.domain;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlElement;
 
 /**
@@ -28,9 +31,12 @@ public class GenQueryCondition {
 
 	/** The operator. */
 	private String operator = "";
+	
+	/** Single values */
+	private String value = null;
 
-	/** The value. */
-	private String value = "";
+	/** List of values for "IN" clause. */
+	private GenQueryConditionValueList valueList = null;
 
 	/*
 	 * (non-Javadoc)
@@ -40,7 +46,7 @@ public class GenQueryCondition {
 	@Override
 	public String toString() {
 		return "[Condition: column=" + column + " operator=" + operator
-				+ " value=" + value + "]";
+				+ " value=" + valueList + "]";
 	}
 
 	/**
@@ -68,7 +74,7 @@ public class GenQueryCondition {
 	 *
 	 * @return the value
 	 */
-	@XmlElement(name = "value", required = true)
+	@XmlElement(name = "value", required = false)
 	public String getValue() {
 		return value;
 	}
@@ -81,6 +87,15 @@ public class GenQueryCondition {
 	 */
 	public void setValue(String value) {
 		this.value = value;
+	}
+
+	@XmlElement(name = "value_list", required = false)
+	public GenQueryConditionValueList getValueList() {
+		return valueList;
+	}
+
+	public void setValueList(GenQueryConditionValueList v) {
+		this.valueList = v;
 	}
 
 	/**
