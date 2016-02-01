@@ -139,6 +139,18 @@ public class RestAuthUtils {
 				restConfiguration.getDefaultStorageResource(), authScheme);
 
 	}
+	
+	/**
+     * Create an <code>IRODSAccount</code> suitable for anonymous access.
+     *
+     * @param restConfiguration
+     * @return <code>IRODSAccount</code> suitable for anonymous access
+     * @throws JargonException
+     */
+    public static IRODSAccount instanceForAnonymous(final RestConfiguration restConfiguration) throws JargonException {
+    	
+    	return IRODSAccount.instance(restConfiguration.getIrodsHost(), restConfiguration.getIrodsPort(), IRODSAccount.PUBLIC_USERNAME, "", "", restConfiguration.getIrodsZone(), restConfiguration.getDefaultStorageResource());
+    }
 
 	/**
 	 * Return boilerplate http client for testing that uses basic auth

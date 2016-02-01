@@ -21,6 +21,7 @@ import org.irods.jargon.core.connection.auth.AuthResponse;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.rest.configuration.RestConfiguration;
+import org.irods.jargon.ticket.TicketClientSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,13 +67,13 @@ public class BasicAuthFilter implements Filter {
 			final ServletResponse response, final FilterChain chain)
 			throws IOException, ServletException {
 
-		log.info("doFilter()");
+		log.info("JUSTIN: BasicAuthFilter.doFilter()");
 
 		final HttpServletRequest httpRequest = (HttpServletRequest) request;
 		final HttpServletResponse httpResponse = (HttpServletResponse) response;
 
 		/*
-		 * If options request do not quthenticate
+		 * If options request do not authenticate
 		 */
 
 		if (isPreflight((HttpServletRequest) request)) {
@@ -83,25 +84,45 @@ public class BasicAuthFilter implements Filter {
 		}
 
 		String auth = httpRequest.getHeader("Authorization");
-
-		if (auth == null || auth.isEmpty()) {
-			log.error("auth null or empty");
-			sendAuthError(httpResponse);
-			return;
-		}
-
+		String ticketString = httpRequest.getParameter("ticket");
 		AuthResponse authResponse = null;
+		IRODSAccount irodsAccount; 
+		
 		try {
-			IRODSAccount irodsAccount = RestAuthUtils
-					.getIRODSAccountFromBasicAuthValues(auth, restConfiguration);
+			
+			if (auth == null || auth.isEmpty()) {
 
+				// if not auth is provided there must be a ticket
+				if (ticketString == null || ticketString.isEmpty()) {
+					log.error("auth null or empty");
+					sendAuthError(httpResponse);
+					return;
+				}
+				
+				// ticket provided, use anonymous account
+				irodsAccount = RestAuthUtils.instanceForAnonymous(restConfiguration);
+			} else {
+			    irodsAccount = RestAuthUtils
+					.getIRODSAccountFromBasicAuthValues(auth, restConfiguration);
+			}
+			
 			log.info("irods account for auth:{}", irodsAccount);
 
 			authResponse = irodsAccessObjectFactory
 					.authenticateIRODSAccount(irodsAccount);
-
 			log.info("authResponse:{}", authResponse);
 			log.info("success!");
+
+			if (ticketString != null && !ticketString.isEmpty()) {
+				
+				log.info("JUSTIN:  Ticket in URL");
+
+				// use TicketClientSupport
+				TicketClientSupport ticketClientSupport = new TicketClientSupport(
+						irodsAccessObjectFactory, irodsAccount);
+				ticketClientSupport.initializeSessionWithTicket(ticketString);
+			
+			} 
 
 			chain.doFilter(httpRequest, httpResponse);
 			return;
