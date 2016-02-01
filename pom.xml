@@ -15,7 +15,7 @@
 		<resteasy.version>3.0.12.Final</resteasy.version>
 		<spring.core.version>3.1.0.RELEASE</spring.core.version>
 		<spring.security.version>3.1.0.RELEASE</spring.security.version>
-		<java.version>1.8</java.version>
+		<java.version>1.7</java.version>
 	</properties>
 	<issueManagement>
 		<system>GitHub</system>
@@ -180,6 +180,11 @@
 				<version>${jargon.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>org.irods.jargon</groupId>
+				<artifactId>jargon-ticket</artifactId>
+				<version>${jargon.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
 				<version>4.8.2</version>
@@ -325,6 +330,10 @@
 		<dependency>
 			<groupId>org.irods.jargon</groupId>
 			<artifactId>jargon-core</artifactId>
+		</dependency>
+				<dependency>
+			<groupId>org.irods.jargon</groupId>
+			<artifactId>jargon-ticket</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
