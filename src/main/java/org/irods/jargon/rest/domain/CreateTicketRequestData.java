@@ -32,7 +32,7 @@ public class CreateTicketRequestData {
 	/**
 	 * @return the mode
 	 */
-	@XmlElement(name = "mode")
+	@XmlElement(name = "mode", required=true)
 	public String getMode() {
 		return mode;
 	}
@@ -47,7 +47,7 @@ public class CreateTicketRequestData {
 	/**
 	 * @return the objectPath
 	 */
-	@XmlElement(name = "object_path")
+	@XmlElement(name = "object_path", required=true)
 	public String getObjectPath() {
 		return objectPath;
 	}
