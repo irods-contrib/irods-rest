@@ -6,16 +6,26 @@ package org.irods.jargon.rest.domain;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+
+
 /**
- * Value object to hold return value from a GenQuery call.  The request
- * includes an optional count parameter, and optional zone hint, a list 
- * of select fields, a list of conditionals, and a list of order by clauses.
+ * <pre>
+ * Value object to hold request ticket information.  
+ * 
+ * The XML representation of this request follows.
+ * 
+ * {@code
+ * <ticket> 
+ *   <ticket_string>META_DATA_ATTR_NAME</ticket_string> 
+ * </ticket>
+ * }
+ * </pre>
  * 
  * @author jjames
  * 
  */
 @XmlRootElement(name = "ticket")
-public class CreateTicketResponseData {
+public class DeleteTicketRequestData {
 
 	
 	/** The object. */
@@ -27,7 +37,7 @@ public class CreateTicketResponseData {
 	 *
 	 * @return the ticket string
 	 */
-	@XmlElement(name = "ticket_string")
+	@XmlElement(name = "ticket_string", required=true)
 	public String getTicketString() {
 		return ticketString;
 	}

@@ -3,16 +3,14 @@
  */
 package org.irods.jargon.rest.domain;
 
-import java.util.ArrayList;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 
 
 /**
- * Value object to hold return value from a GenQuery call.  The request
- * includes an optional count parameter, and optional zone hint, a list 
- * of select fields, a list of conditionals, and a list of order by clauses.
+ * <pre>
+ * Value object to hold request data for ticket creation.  The 
  * 
  * @author jjames
  * 
@@ -65,7 +63,7 @@ public class CreateTicketRequestData {
 	 *
 	 * @return the ticket string
 	 */
-	@XmlElement(name = "string", required=false)
+	@XmlElement(name = "ticket_string", required=false)
 	public String getTicketString() {
 		return ticketString;
 	}
