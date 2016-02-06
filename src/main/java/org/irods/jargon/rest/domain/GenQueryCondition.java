@@ -34,6 +34,22 @@ public class GenQueryCondition {
 
 	/** List of values for "IN" clause. */
 	private GenQueryConditionValueList valueList = null;
+	
+	public GenQueryCondition() {
+		
+	}
+	
+	public GenQueryCondition(String col, String op, String val) {
+		column = col;
+		operator = op;
+		value = val;
+	}
+	
+	public GenQueryCondition(String col, String op, GenQueryConditionValueList valList) {
+		column = col;
+		operator = op;
+		valueList = valList;
+	}
 
 	/*
 	 * (non-Javadoc)
