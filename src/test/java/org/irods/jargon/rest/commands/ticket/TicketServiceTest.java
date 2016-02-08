@@ -13,6 +13,7 @@ import junit.framework.Assert;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.ByteArrayEntity;
@@ -45,8 +46,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -134,13 +133,13 @@ public class TicketServiceTest  implements ApplicationContextAware {
 		restrictionTypeValueMap.put("add_host", "localhost");
 		restrictionTypeValueMap.put("remove_host", "localhost");
 		restrictionTypeValueMap.put("add_group",
-				testingProperties.getProperty("jargon.test.user.group"));
+				testingProperties.getProperty(TestingPropertiesHelper.IRODS_USER_GROUP_KEY));
 		restrictionTypeValueMap.put("remove_group",
-				testingProperties.getProperty("jargon.test.user.group"));
+				testingProperties.getProperty(TestingPropertiesHelper.IRODS_USER_GROUP_KEY));
 		restrictionTypeValueMap.put("add_user",
-				testingProperties.getProperty("test.irods.user"));
+				testingProperties.getProperty(TestingPropertiesHelper.IRODS_USER_KEY));
 		restrictionTypeValueMap.put("remove_user",
-				testingProperties.getProperty("test.irods.user"));
+				testingProperties.getProperty(TestingPropertiesHelper.IRODS_USER_KEY));
 		restrictionTypeValueMap.put("byte_write_limit", "100");
 		restrictionTypeValueMap.put("file_write_limit", "200");
 		restrictionTypeValueMap.put("uses_limit", "25");
@@ -404,7 +403,7 @@ public class TicketServiceTest  implements ApplicationContextAware {
 			
 			String entityData = EntityUtils.toString(entity);
 			EntityUtils.consume(entity);
-			System.out.println("XML>>>");
+			System.out.println("JSON>>>");
 			System.out.println(entityData);
 			
 			int index1 = entityData.indexOf(expectedResponse_1);
@@ -489,7 +488,7 @@ public class TicketServiceTest  implements ApplicationContextAware {
 			
 			String entityData = EntityUtils.toString(entity);
 			EntityUtils.consume(entity);
-			System.out.println("XML>>>");
+			System.out.println("JSON>>>");
 			System.out.println(entityData);
 			
 			int index1 = entityData.indexOf(expectedResponse_1);
@@ -590,7 +589,7 @@ public class TicketServiceTest  implements ApplicationContextAware {
 					index1 > -1);
 			
 			// check that the ticket actually exists
-			Ticket t = ticketService.getTicketForSpecifiedTicketString(ticketString);
+			ticketService.getTicketForSpecifiedTicketString(ticketString);
 
 		} finally {
 			// When HttpClient instance is no longer needed,
@@ -644,7 +643,7 @@ public class TicketServiceTest  implements ApplicationContextAware {
 			
 			String entityData = EntityUtils.toString(entity);
 			EntityUtils.consume(entity);
-			System.out.println("XML>>>");
+			System.out.println("JSON>>>");
 			System.out.println(entityData);
 			
 			int index1 = entityData.indexOf(expectedResponse);
@@ -655,7 +654,7 @@ public class TicketServiceTest  implements ApplicationContextAware {
 					index1 > -1);
 			
 			// check that the ticket actually exists
-			Ticket t = ticketService.getTicketForSpecifiedTicketString(ticketString);
+			ticketService.getTicketForSpecifiedTicketString(ticketString);
 
 		} finally {
 			// When HttpClient instance is no longer needed,
@@ -699,7 +698,7 @@ public class TicketServiceTest  implements ApplicationContextAware {
 			Assert.assertEquals(204, response.getStatusLine().getStatusCode());
 			
 			// test that the ticket has been deleted - should throw DataNotFoundException
-			Ticket t = ticketService.getTicketForSpecifiedTicketString(ticketString);
+			ticketService.getTicketForSpecifiedTicketString(ticketString);
 
 		} finally {
 			// When HttpClient instance is no longer needed,
@@ -710,7 +709,7 @@ public class TicketServiceTest  implements ApplicationContextAware {
 	}
 	
 	@Test
-	public void updateTicket() throws Exception {
+	public void updateTicketXml() throws Exception {
 	
 		// create a ticket that we will update
 		String ticketString = new TicketRandomString(15).nextString();
@@ -817,5 +816,298 @@ public class TicketServiceTest  implements ApplicationContextAware {
 		}
 	}
 	
+	@Test
+	public void updateTicketJson() throws Exception {
+	
+		// create a ticket that we will update
+		String ticketString = new TicketRandomString(15).nextString();
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
+				.getIRODSAccessObjectFactory();
+		IRODSFile file = accessObjectFactory.getIRODSFileFactory(irodsAccount).instanceIRODSFile(targetIrodsFile);
+		ticketService.createTicket(TicketCreateModeEnum.READ, file, ticketString);
+
+		DefaultHttpClientAndContext clientAndContext = null;
+		try {
+			
+			for (String key : restrictionTypeValueMap.keySet()) {
+				
+				System.out.println("This ran!!!");
+				
+				String restrictionType = key;
+				String restrictionValue = restrictionTypeValueMap.get(key);
+				
+				System.out.println("****** restrictionType=" + restrictionType + " restrictionValue=" + restrictionValue + " *******");
+		
+				
+				String requestBody = "{\"restriction_type\":\"" + restrictionType + "\","
+						+ "\"restriction_value\":\"" + restrictionValue + "\"}";
+
+				// Send REST request to update the ticket
+				StringBuilder sb = new StringBuilder();
+				sb.append("http://localhost:");
+				sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+						testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+				sb.append("/ticket/");
+				sb.append(ticketString);
+
+				clientAndContext = RestAuthUtils
+						.httpClientSetup(irodsAccount, testingProperties);
+
+				HttpPut httpput = new HttpPut(sb.toString());
+				httpput.addHeader("Content-Type", "application/json");
+			
+				HttpEntity requestEntity = new ByteArrayEntity(requestBody.getBytes("UTF-8"));
+				httpput.setEntity(requestEntity);
+
+				HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpput, clientAndContext.getHttpContext());
+				Assert.assertEquals(204, response.getStatusLine().getStatusCode());
+			
+				// check that the request did what we expected
+				Ticket t = ticketService.getTicketForSpecifiedTicketString(ticketString);
+	
+				List<String> tempList;
+				switch (restrictionType) {
+				case "add_host":
+					tempList = ticketService.listAllHostRestrictionsForSpecifiedTicket(t.getTicketString(), 0);
+					Assert.assertTrue("Add host expected size of 1 but got size of " + tempList.size(), tempList.size() == 1);
+					break;
+				case "remove_host":
+					tempList = ticketService.listAllHostRestrictionsForSpecifiedTicket(t.getTicketString(), 0);
+					Assert.assertTrue("Remove host expected size of 0 but got size of " + tempList.size(), tempList.size() == 0);
+					break;
+				case "add_group":
+					tempList = ticketService.listAllGroupRestrictionsForSpecifiedTicket(t.getTicketString(), 0);
+					Assert.assertTrue("Add group expected size of 1 but got size of " + tempList.size(), tempList.size() == 1);
+					Assert.assertTrue("Did not get the expected group for ticket.  " + tempList.get(0), restrictionValue.equalsIgnoreCase(tempList.get(0)));
+					break;
+				case "remove_group":
+					tempList = ticketService.listAllGroupRestrictionsForSpecifiedTicket(t.getTicketString(), 0);
+					Assert.assertTrue("Remove group expected size of 0 but got size of " + tempList.size(), tempList.size() == 0);
+					break;
+				case "add_user":
+					tempList = ticketService.listAllUserRestrictionsForSpecifiedTicket(t.getTicketString(), 0);
+					Assert.assertTrue("Add user expected size of 1 but got size of " + tempList.size(), tempList.size() == 1);
+					Assert.assertTrue("Did not get the expected user for ticket.  " + tempList.get(0), restrictionValue.equalsIgnoreCase(tempList.get(0)));
+					break;
+				case "remove_user":
+					tempList = ticketService.listAllUserRestrictionsForSpecifiedTicket(t.getTicketString(), 0);
+					Assert.assertTrue("Remove user expected size of 0 but got size of " + tempList.size(), tempList.size() == 0);
+					break;
+				case "byte_write_limit":
+					Assert.assertTrue("Did not get the expected write byte limit for ticket.  " + t.getWriteByteLimit(),  t.getWriteByteLimit() == Long.parseLong(restrictionValue));
+					break;
+				case "file_write_limit":
+					Assert.assertTrue("Did not get the expected write file limit for ticket.  " + t.getWriteFileLimit(), t.getWriteFileLimit() == Long.parseLong(restrictionValue));
+					break;
+				case "uses_limit":
+					Assert.assertTrue("Did not get the expected uses limit for ticket.  " + t.getUsesLimit(), t.getUsesLimit() == Long.parseLong(restrictionValue));
+					break;
+				case "expiration":		
+					Assert.assertTrue("Did not get the expected expiration data.", t.getExpireTime().equals(EXPIRATION_DATE_FORMAT.parse(restrictionValue)));
+					break;
+
+				}
+			}
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			if (clientAndContext != null)
+				clientAndContext.getHttpClient().getConnectionManager().shutdown();
+			
+			// clean up - delete the ticket
+			ticketService.deleteTicket(ticketString);
+		}
+	}
+	
+	@Test
+	public void listTicketXml() throws Exception {
+	
+		// create a ticket
+		String ticketString = new TicketRandomString(15).nextString();
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
+				.getIRODSAccessObjectFactory();
+		IRODSFile file = accessObjectFactory.getIRODSFileFactory(irodsAccount).instanceIRODSFile(targetIrodsFile);
+		ticketService.createTicket(TicketCreateModeEnum.READ, file, ticketString);
+		
+		String ticketId = ticketService.getTicketForSpecifiedTicketString(ticketString).getTicketId();
+		
+		ticketService.addTicketHostRestriction(ticketString, "localhost");
+		ticketService.addTicketUserRestriction(ticketString, testingProperties.getProperty(TestingPropertiesHelper.IRODS_USER_KEY));
+		ticketService.addTicketGroupRestriction(ticketString, testingProperties.getProperty(TestingPropertiesHelper.IRODS_USER_GROUP_KEY));
+		ticketService.setTicketByteWriteLimit(ticketString, 1000);
+		ticketService.setTicketFileWriteLimit(ticketString, 10);
+		ticketService.setTicketUsesLimit(ticketString, 20);
+		Date expirationTime = new Date(new Date().getTime() + 365 * 24 * 60 * 60 * 1000L);
+		ticketService.setTicketExpiration(ticketString, expirationTime);
+		
+		String expectedResponse1 = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+				+ "<ns2:ticket xmlns:ns2=\"http://irods.org/irods-rest\">"
+				+ "<ticket_id>" + ticketId + "</ticket_id>"
+				+ "<ticket_string>" + ticketString + "</ticket_string>"
+				+ "<ticket_type>read</ticket_type>"
+				+ "<object_type>data_object</object_type>"
+				+ "<owner_name>" + testingProperties.getProperty(TestingPropertiesHelper.IRODS_USER_KEY) + "</owner_name>"
+				+ "<owner_zone>" + testingProperties.getProperty(TestingPropertiesHelper.IRODS_ZONE_KEY) + "</owner_zone>"
+				+ "<uses_count>0</uses_count>"
+				+ "<uses_limit>20</uses_limit>"
+				+ "<write_file_count>0</write_file_count>"
+				+ "<write_file_limit>10</write_file_limit>"
+				+ "<write_byte_count>0</write_byte_count>"
+				+ "<write_byte_limit>1000</write_byte_limit>"
+				+ "<expire_time>" + EXPIRATION_DATE_FORMAT.format(expirationTime) + "</expire_time>"
+				+ "<irods_path>" + targetIrodsFile + "</irods_path>"
+				+ "<host_restrictions>";
+		String expectedResponse2 = "</host_restrictions>"
+				+ "<user_restrictions>" + testingProperties.getProperty(TestingPropertiesHelper.IRODS_USER_KEY) + "</user_restrictions>"
+				+ "<group_restrictions>" + testingProperties.getProperty(TestingPropertiesHelper.IRODS_USER_GROUP_KEY) + "</group_restrictions>"
+				+ "</ns2:ticket>";
+		
+
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/ticket/");
+		sb.append(ticketString);
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
+
+			HttpGet httpget = new HttpGet(sb.toString());
+			httpget.addHeader("Accept", "application/xml");
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpget, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+			Assert.assertNotNull(entity);
+			
+			String entityData = EntityUtils.toString(entity);
+			EntityUtils.consume(entity);
+			System.out.println("XML>>>");
+			System.out.println(entityData);
+			
+			// The host can be translated to IP so just look for the part before and after host restrictions.
+			int index1 = entityData.indexOf(expectedResponse1);
+			int index2 = entityData.indexOf(expectedResponse1);
+			
+			Assert.assertTrue(
+					"Did not get expected xml stuff.  Received: " + entityData 
+                                         + "Expected: " + expectedResponse1,
+					index1 > -1);
+			Assert.assertTrue(
+					"Did not get expected xml stuff.  Received: " + entityData 
+                                         + "Expected: " + expectedResponse2,
+					index2 > -1);
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+			
+			// clean up - delete the ticket
+			ticketService.deleteTicket(ticketString);
+		}
+	}
+	
+	@Test
+	public void listTicketJson() throws Exception {
+	
+		// create a ticket 
+		String ticketString = new TicketRandomString(15).nextString();
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
+				.getIRODSAccessObjectFactory();
+		IRODSFile file = accessObjectFactory.getIRODSFileFactory(irodsAccount).instanceIRODSFile(targetIrodsFile);
+		ticketService.createTicket(TicketCreateModeEnum.READ, file, ticketString);
+		
+		String ticketId = ticketService.getTicketForSpecifiedTicketString(ticketString).getTicketId();
+		
+		ticketService.addTicketHostRestriction(ticketString, "localhost");
+		ticketService.addTicketUserRestriction(ticketString, testingProperties.getProperty(TestingPropertiesHelper.IRODS_USER_KEY));
+		ticketService.addTicketGroupRestriction(ticketString, testingProperties.getProperty(TestingPropertiesHelper.IRODS_USER_GROUP_KEY));
+		ticketService.setTicketByteWriteLimit(ticketString, 1000);
+		ticketService.setTicketFileWriteLimit(ticketString, 10);
+		ticketService.setTicketUsesLimit(ticketString, 20);
+		Date expirationTime = new Date(new Date().getTime() + 365 * 24 * 60 * 60 * 1000L);
+		ticketService.setTicketExpiration(ticketString, expirationTime);
+		
+		String expectedResponse1 = "{\"ticket_id\":\"" + ticketId + "\","
+				+ "\"ticket_string\":\"" + ticketString + "\","
+				+ "\"ticket_type\":\"read\","
+				+ "\"object_type\":\"data_object\","
+				+ "\"owner_name\":\"" + testingProperties.getProperty(TestingPropertiesHelper.IRODS_USER_KEY) + "\","
+				+ "\"owner_zone\":\"" + testingProperties.getProperty(TestingPropertiesHelper.IRODS_ZONE_KEY) + "\","
+				+ "\"uses_count\":0,"
+				+ "\"uses_limit\":20,"
+				+ "\"write_file_count\":0,"
+				+ "\"write_file_limit\":10,"
+				+ "\"write_byte_count\":0,"
+				+ "\"write_byte_limit\":1000,"
+				+ "\"expire_time\":\"" + EXPIRATION_DATE_FORMAT.format(expirationTime) + "\","
+				+ "\"irods_path\":\"" + targetIrodsFile + "\","
+				+ "\"host_restrictions\"";
+		String expectedResponse2 = "\"]"
+				+ "\"user_restrictions\":[\"" + testingProperties.getProperty(TestingPropertiesHelper.IRODS_USER_KEY) + "\"],"
+				+ "\"group_restrictions\":[\"" + testingProperties.getProperty(TestingPropertiesHelper.IRODS_USER_GROUP_KEY) + "\"]}";
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/ticket/");
+		sb.append(ticketString);
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
+
+			HttpGet httpget = new HttpGet(sb.toString());
+			httpget.addHeader("Accept", "application/json");
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpget, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+			Assert.assertNotNull(entity);
+			
+			String entityData = EntityUtils.toString(entity);
+			EntityUtils.consume(entity);
+			System.out.println("JSON>>>");
+			System.out.println(entityData);
+			
+			// The host can be translated to IP so just look for the part before and after host restrictions.
+			int index1 = entityData.indexOf(expectedResponse1);
+			int index2 = entityData.indexOf(expectedResponse1);
+			
+			Assert.assertTrue(
+					"Did not get expected xml stuff.  Received: " + entityData 
+                                         + "Expected: " + expectedResponse1,
+					index1 > -1);
+			Assert.assertTrue(
+					"Did not get expected xml stuff.  Received: " + entityData 
+                                         + "Expected: " + expectedResponse2,
+					index2 > -1);
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+			
+			// clean up - delete the ticket
+			ticketService.deleteTicket(ticketString);
+		}
+	}
 
 }

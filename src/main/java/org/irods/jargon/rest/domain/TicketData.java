@@ -10,6 +10,7 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 import org.irods.jargon.rest.commands.ticket.TicketService;
 import org.irods.jargon.ticket.Ticket;
@@ -32,7 +33,7 @@ import org.irods.jargon.ticket.packinstr.TicketCreateModeEnum;
  *      <owner_name>rods</owner_name>
  *      <owner_zone>tempZone</owner_zone> 
  *      <ticket_id>12493</ticket_id> 
- *      <string>abcdefghijklmno</string>
+ *      <ticket_string>abcdefghijklmno</ticket_string>
  *      <ticket_type>write</ticket_type>
  *      <uses_count>0</uses_count>
  *      <uses_limit>19</uses_limit>
@@ -48,6 +49,11 @@ import org.irods.jargon.ticket.packinstr.TicketCreateModeEnum;
  * 
  */
 @XmlRootElement(name = "ticket")
+@XmlType(propOrder = { "ticketId", "ticketString", "type",
+		"objectType", "ownerName", "ownerZone", "usesCount", "usesLimit",
+		"writeFileCount", "writeFileLimit", "writeByteCount",
+		"writeByteLimit", "expireTime", "irodsAbsolutePath", "hostRestrictions",
+		"userRestrictions", "groupRestrictions" })
 public class TicketData {
 
 	private Ticket ticket;
@@ -216,7 +222,7 @@ public class TicketData {
 	/**
 	 * @return the writeByteLimit
 	 */
-	@XmlElement(name = "byte_limit")
+	@XmlElement(name = "write_byte_limit")
 	public long getWriteByteLimit() {
 		return ticket.getWriteByteLimit();
 	}

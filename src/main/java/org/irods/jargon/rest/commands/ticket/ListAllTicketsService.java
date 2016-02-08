@@ -3,7 +3,6 @@
  */
 package org.irods.jargon.rest.commands.ticket;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +49,7 @@ public class ListAllTicketsService extends AbstractIrodsService {
 			@HeaderParam("Authorization") final String authorization) throws JargonException,
 			GenQueryBuilderException, JargonQueryException {
 
-		log.info("updateTicket()");
+		System.out.println("List All Tickets Ran!!!");
 		if (authorization == null || authorization.isEmpty()) {
 			throw new IllegalArgumentException("null or empty authorization");
 		}
