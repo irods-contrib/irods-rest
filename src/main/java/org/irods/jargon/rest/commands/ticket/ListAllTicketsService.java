@@ -13,6 +13,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import org.irods.jargon.core.connection.IRODSAccount;
+import org.irods.jargon.core.exception.DataNotFoundException;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.core.pub.IRODSFileSystem;
@@ -26,8 +27,6 @@ import org.irods.jargon.ticket.TicketAdminService;
 import org.irods.jargon.ticket.TicketServiceFactoryImpl;
 import org.jboss.resteasy.annotations.providers.jaxb.json.Mapped;
 import org.jboss.resteasy.annotations.providers.jaxb.json.XmlNsMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The Class ListAllTicketsService.
@@ -37,9 +36,6 @@ import org.slf4j.LoggerFactory;
 @Named
 @Path("/listAllTickets")
 public class ListAllTicketsService extends AbstractIrodsService {
-	
-	/** The log. */
-	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
 	
 	@GET
@@ -82,10 +78,14 @@ public class ListAllTicketsService extends AbstractIrodsService {
 								currentTicket.getTicketString(), 0));
 				
 				// Because of a Jargon issue 172, the irodsAbsolutePath is not being set.  Do another query for this.
-				currentTicket.setIrodsAbsolutePath(ticketService
-						.getTicketForSpecifiedTicketString(
-								currentTicket.getTicketString())
-						.getIrodsAbsolutePath());
+				try {
+					currentTicket.setIrodsAbsolutePath(ticketService
+							.getTicketForSpecifiedTicketString(
+									currentTicket.getTicketString())
+							.getIrodsAbsolutePath());
+				} catch (DataNotFoundException e) {
+					//  The ticket is no longer associated with a data object.  Just keep the path empty.
+				}
 				
 				ticketDataList.add(currentTicket);
 			}

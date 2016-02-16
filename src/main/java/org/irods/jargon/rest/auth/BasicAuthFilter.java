@@ -4,6 +4,11 @@
 package org.irods.jargon.rest.auth;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -14,6 +19,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
 import org.irods.jargon.core.connection.IRODSAccount;
@@ -65,12 +71,12 @@ public class BasicAuthFilter implements Filter {
 	@Override
 	public void doFilter(final ServletRequest request,
 			final ServletResponse response, final FilterChain chain)
-			throws IOException, ServletException {
+			throws IOException, ServletException {	
 
-		log.info("JUSTIN: BasicAuthFilter.doFilter()");
-
-		final HttpServletRequest httpRequest = (HttpServletRequest) request;
+		HttpServletRequest httpRequest = (HttpServletRequest) request;
 		final HttpServletResponse httpResponse = (HttpServletResponse) response;
+		
+		log.info("BasicAuthFilter.doFilter()");
 
 		/*
 		 * If options request do not authenticate
@@ -100,7 +106,15 @@ public class BasicAuthFilter implements Filter {
 				}
 				
 				// ticket provided, use anonymous account
+				log.info("setting authorization to anonymous");
 				irodsAccount = RestAuthUtils.instanceForAnonymous(restConfiguration);
+				
+				HeaderMapRequestWrapper headerMapRequest = new HeaderMapRequestWrapper(httpRequest);
+				headerMapRequest.addHeader("Authorization", RestAuthUtils.basicAuthTokenFromIRODSAccount(irodsAccount));
+				httpRequest = headerMapRequest;
+				
+			    
+
 			} else {
 			    irodsAccount = RestAuthUtils
 					.getIRODSAccountFromBasicAuthValues(auth, restConfiguration);
@@ -114,8 +128,6 @@ public class BasicAuthFilter implements Filter {
 			log.info("success!");
 
 			if (ticketString != null && !ticketString.isEmpty()) {
-				
-				log.info("JUSTIN:  Ticket in URL");
 
 				// use TicketClientSupport
 				TicketClientSupport ticketClientSupport = new TicketClientSupport(
@@ -194,6 +206,46 @@ public class BasicAuthFilter implements Filter {
 	 */
 	private boolean isPreflight(HttpServletRequest request) {
 		return "OPTIONS".equals(request.getMethod());
+	}
+	
+	public class HeaderMapRequestWrapper extends HttpServletRequestWrapper {
+
+		private Map<String, String> headerMap = new HashMap<String, String>();
+
+		public HeaderMapRequestWrapper(HttpServletRequest request) {
+			super(request);
+		}
+		
+        public void addHeader(String name, String value) {
+            headerMap.put(name, value);
+        }
+
+		@Override
+		public String getHeader(String name) {
+			String headerValue = super.getHeader(name);
+			if (headerMap.containsKey(name)) {
+				headerValue = headerMap.get(name);
+			}
+			return headerValue;
+		}
+
+		@Override
+		public Enumeration<String> getHeaderNames() {
+			List<String> names = Collections.list(super.getHeaderNames());
+			for (String name : headerMap.keySet()) {
+				names.add(name);
+			}
+			return Collections.enumeration(names);
+		}
+
+		@Override
+		public Enumeration<String> getHeaders(String name) {
+			List<String> values = Collections.list(super.getHeaders(name));
+			if (headerMap.containsKey(name)) {
+				values.add(headerMap.get(name));
+			}
+			return Collections.enumeration(values);
+		}
 	}
 
 }
