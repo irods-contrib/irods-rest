@@ -5,21 +5,17 @@ package org.irods.jargon.rest.commands.dataobject;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Properties;
 
 import junit.framework.Assert;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
@@ -66,7 +62,15 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 
 /**
- * @author Mike Conway - DICE (www.irods.org)
+ * @author Justin James - Renci (www.irods.org)
+ * 
+ *         The tests in this package require the use of an external REST
+ *         deployment running on the local host.  The test.external.rest.port
+ *         should point to this external REST deployment port.
+ *         
+ *         The reason this does not use the imbedded TJWS used elsewhere is 
+ *         due to the fact that TJWS does not execute filters when run in 
+ *         embedded mode.  Filters are required for ticket use.
  * 
  */
 
@@ -75,9 +79,7 @@ import org.springframework.test.context.support.DirtiesContextTestExecutionListe
 		"classpath:rest-servlet.xml" })
 @TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
 		DirtiesContextTestExecutionListener.class })
-public class FileContentsServiceTest implements ApplicationContextAware {
-
-	private static TJWSEmbeddedJaxrsServer server;
+public class FileContentsServiceTicketsTest implements ApplicationContextAware {
 
 	private static ApplicationContext applicationContext;
 
@@ -108,46 +110,16 @@ public class FileContentsServiceTest implements ApplicationContextAware {
 		irodsFileSystem = IRODSFileSystem.instance();
 	}
 
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-		if (server != null) {
-			server.stop();
-		}
-		irodsFileSystem.closeAndEatExceptions();
-	}
-
 	@Before
 	public void setUp() throws Exception {
 
-		if (server != null) {
-			return;
-		}
-
-		int port = testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY);
-		server = new TJWSEmbeddedJaxrsServer();
-		server.setPort(port);
-
-		ResteasyDeployment deployment = server.getDeployment();
-
-		server.start();
-		Dispatcher dispatcher = deployment.getDispatcher();
-		SpringBeanProcessor processor = new SpringBeanProcessor(dispatcher,
-				deployment.getRegistry(), deployment.getProviderFactory());
-		((ConfigurableApplicationContext) applicationContext)
-				.addBeanFactoryPostProcessor(processor);
-
-		SpringResourceFactory noDefaults = new SpringResourceFactory(
-				"fileContentsService", applicationContext,
-				FileContentsService.class);
-		dispatcher.getRegistry().addResourceFactory(noDefaults);
-
 	}
 
+	
 	@Test
-	public void testUploadDataObjectData() throws Exception {
+	public void testUploadDataObjectDataWithTicket() throws Exception {
 		// generate a local scratch file
-		String testFileName = "testUploadDataObjectData.dat";
+		String testFileName = "testUploadDataObjectDataWithTicket.dat";
 		String absPath = scratchFileUtils
 				.createAndReturnAbsoluteScratchPath(IRODS_TEST_SUBDIR_PATH);
 		String localFileName = FileGenerator
@@ -159,26 +131,45 @@ public class FileContentsServiceTest implements ApplicationContextAware {
 				.buildIRODSCollectionAbsolutePathFromTestProperties(
 						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
 								+ testFileName);
+		
+		// put a ticket on the collection with write access using the main account.
+		IRODSAccount irodsAccount = testingPropertiesHelper.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem.getIRODSAccessObjectFactory();
+		IRODSFile targetIrodsCollection = accessObjectFactory.getIRODSFileFactory(
+				irodsAccount).instanceIRODSFile(testingPropertiesHelper
+						.buildIRODSCollectionAbsolutePathFromTestProperties(
+								testingProperties, IRODS_TEST_SUBDIR_PATH));
+		TicketServiceFactory ticketServiceFactory = new TicketServiceFactoryImpl(accessObjectFactory);
+		TicketAdminService ticketService = ticketServiceFactory.instanceTicketAdminService(irodsAccount);
+		String ticketString = new TicketRandomString(15).nextString();
+		ticketService.createTicket(TicketCreateModeEnum.WRITE, targetIrodsCollection, ticketString);
 
-		IRODSAccount irodsAccount = testingPropertiesHelper
-				.buildIRODSAccountFromTestProperties(testingProperties);
-
-		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
-				.getIRODSAccessObjectFactory();
+		// Use another account to upload the file
+		IRODSAccount secondaryIrodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromSecondaryTestProperties(testingProperties);
 
 		StringBuilder sb = new StringBuilder();
-		sb.append("http://localhost:");
+		sb.append("http://" + irodsAccount.getUserName() + ":" + irodsAccount.getPassword() + "@localhost:");
 		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
-		sb.append("/fileContents/");
-		sb.append(DataUtils.encodeIrodsAbsolutePath(targetIrodsFile,
-				accessObjectFactory.getJargonProperties().getEncoding()));
-
+				testingProperties, RestTestingProperties.EXTERNAL_REST_PORT_PROPERTY));
+		sb.append("/irods-rest/rest/fileContents");
+		sb.append(targetIrodsFile);
+		sb.append("?ticket=");
+		sb.append(ticketString);
+		
+		System.out.println("REQUEST : " + sb.toString());
+		
 		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
-				.httpClientSetup(irodsAccount, testingProperties);
+				.httpClientSetup(secondaryIrodsAccount, testingProperties);
+
 		try {
 
 			HttpPost httpPost = new HttpPost(sb.toString());
+		    
+		    HttpParams parameters = new BasicHttpParams();
+		    parameters.setParameter("ticket", ticketString);
+		    httpPost.setParams(parameters);
+
 			httpPost.addHeader("accept", "application/json");
 			// httpPost.addHeader("Content-type", "multipart/form-data");
 			FileBody fileEntity = new FileBody(localFile,
@@ -186,9 +177,12 @@ public class FileContentsServiceTest implements ApplicationContextAware {
 			MultipartEntity reqEntity = new MultipartEntity(
 					HttpMultipartMode.BROWSER_COMPATIBLE);
 			reqEntity.addPart("uploadFile", fileEntity);
+	
 			httpPost.setEntity(reqEntity);
+
 			HttpResponse response = clientAndContext.getHttpClient().execute(
 					httpPost, clientAndContext.getHttpContext());
+
 			HttpEntity entity = response.getEntity();
 			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
 			Assert.assertNotNull(entity);
@@ -212,21 +206,22 @@ public class FileContentsServiceTest implements ApplicationContextAware {
 			// shut down the connection manager to ensure
 			// immediate deallocation of all system resources
 			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+			ticketService.deleteTicket(ticketString);
 		}
 	}
 
 	@Test
-	public void testDownloadDataObjectData() throws Exception {
+	public void testDownloadDataObjectDataWithTicket() throws Exception {
 		// generate a local scratch file
 		long length = 100 * 1024;
-		String testFileName = "testDownloadDataObjectData.dat";
+		String testFileName = "testDownloadDataObjectDataWithTicket.dat";
 		String absPath = scratchFileUtils
 				.createAndReturnAbsoluteScratchPath(IRODS_TEST_SUBDIR_PATH);
 		String localFileName = FileGenerator
 				.generateFileOfFixedLengthGivenName(absPath, testFileName,
 						length);
 
-		String targetIrodsFile = testingPropertiesHelper
+		String targetIrodsFilePath = testingPropertiesHelper
 				.buildIRODSCollectionAbsolutePathFromTestProperties(
 						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
 								+ testFileName);
@@ -239,15 +234,29 @@ public class FileContentsServiceTest implements ApplicationContextAware {
 
 		DataTransferOperations dto = accessObjectFactory
 				.getDataTransferOperations(irodsAccount);
-		dto.putOperation(localFileName, targetIrodsFile, "", null, null);
+		dto.putOperation(localFileName, targetIrodsFilePath, "", null, null);
+		
+		IRODSFile targetIrodsFile = accessObjectFactory.getIRODSFileFactory(
+				irodsAccount).instanceIRODSFile(targetIrodsFilePath);
+		
+		TicketServiceFactory ticketServiceFactory = new TicketServiceFactoryImpl(accessObjectFactory);
+		TicketAdminService ticketService = ticketServiceFactory.instanceTicketAdminService(irodsAccount);
+		String ticketString = new TicketRandomString(15).nextString();
+	
+		ticketService.createTicket(TicketCreateModeEnum.READ, targetIrodsFile, ticketString);
+		
+		// Use another account to upload the file
+		IRODSAccount secondaryIrodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromSecondaryTestProperties(testingProperties);
 
 		StringBuilder sb = new StringBuilder();
-		sb.append("http://localhost:");
+		sb.append("http://" + secondaryIrodsAccount.getUserName() + ":" + secondaryIrodsAccount.getPassword() + "@localhost:");
 		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
-		sb.append("/fileContents/");
-		sb.append(DataUtils.encodeIrodsAbsolutePath(targetIrodsFile,
-				accessObjectFactory.getJargonProperties().getEncoding()));
+				testingProperties, RestTestingProperties.EXTERNAL_REST_PORT_PROPERTY));
+		sb.append("/irods-rest/rest/fileContents");
+		sb.append(targetIrodsFilePath);
+		sb.append("?ticket=");
+		sb.append(ticketString);
 
 		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
 				.httpClientSetup(irodsAccount, testingProperties);
@@ -277,15 +286,23 @@ public class FileContentsServiceTest implements ApplicationContextAware {
 			// shut down the connection manager to ensure
 			// immediate deallocation of all system resources
 			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+			ticketService.deleteTicket(ticketString);
 		}
 	}
-
+	
+	
 	@Test
-	public void testDownloadDataObjectDataNotExists() throws Exception {
+	public void testAnonymousDownloadDataObjectDataWithTicket() throws Exception {
+		// generate a local scratch file
+		long length = 200 * 1024;
+		String testFileName = "testAnonymousDownloadDataObjectDataWithTicket.dat";
+		String absPath = scratchFileUtils
+				.createAndReturnAbsoluteScratchPath(IRODS_TEST_SUBDIR_PATH);
+		String localFileName = FileGenerator
+				.generateFileOfFixedLengthGivenName(absPath, testFileName,
+						length);
 
-		String testFileName = "testDownloadDataObjectDataNotExists.dat";
-
-		String targetIrodsFile = testingPropertiesHelper
+		String targetIrodsFilePath = testingPropertiesHelper
 				.buildIRODSCollectionAbsolutePathFromTestProperties(
 						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
 								+ testFileName);
@@ -296,13 +313,28 @@ public class FileContentsServiceTest implements ApplicationContextAware {
 		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
 				.getIRODSAccessObjectFactory();
 
+		DataTransferOperations dto = accessObjectFactory
+				.getDataTransferOperations(irodsAccount);
+		dto.putOperation(localFileName, targetIrodsFilePath, "", null, null);
+		
+		IRODSFile targetIrodsFile = accessObjectFactory.getIRODSFileFactory(
+				irodsAccount).instanceIRODSFile(targetIrodsFilePath);
+		
+		TicketServiceFactory ticketServiceFactory = new TicketServiceFactoryImpl(accessObjectFactory);
+		TicketAdminService ticketService = ticketServiceFactory.instanceTicketAdminService(irodsAccount);
+		String ticketString = new TicketRandomString(15).nextString();
+	
+		ticketService.createTicket(TicketCreateModeEnum.READ, targetIrodsFile, ticketString);
+
+
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
 		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
-		sb.append("/fileContents/");
-		sb.append(DataUtils.encodeIrodsAbsolutePath(targetIrodsFile,
-				accessObjectFactory.getJargonProperties().getEncoding()));
+				testingProperties, RestTestingProperties.EXTERNAL_REST_PORT_PROPERTY));
+		sb.append("/irods-rest/rest/fileContents");
+		sb.append(targetIrodsFilePath);
+		sb.append("?ticket=");
+		sb.append(ticketString);
 
 		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
 				.httpClientSetup(irodsAccount, testingProperties);
@@ -314,14 +346,27 @@ public class FileContentsServiceTest implements ApplicationContextAware {
 			HttpResponse response = clientAndContext.getHttpClient().execute(
 					httpGet, clientAndContext.getHttpContext());
 
-			Assert.assertEquals(404, response.getStatusLine().getStatusCode());
+			HttpEntity entity = response.getEntity();
+			long len = 0;
+			InputStream inputStream = null;
+
+			if (entity != null) {
+				len = entity.getContentLength();
+				inputStream = entity.getContent();
+				// write the file to whether you want it.
+			}
+			Assert.assertEquals("invalid content length returned", length, len);
+
+			Assert.assertNotNull("null input stream returned", inputStream);
 
 		} finally {
 			// When HttpClient instance is no longer needed,
 			// shut down the connection manager to ensure
 			// immediate deallocation of all system resources
 			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+			ticketService.deleteTicket(ticketString);
 		}
 	}
+
 
 }

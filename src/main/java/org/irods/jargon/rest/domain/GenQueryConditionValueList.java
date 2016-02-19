@@ -2,11 +2,10 @@ package org.irods.jargon.rest.domain;
 
 import javax.xml.bind.annotation.XmlElement;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 
- * The following is a sample XML representation:
+ * Object to hold a list of GenQuery condition values.
  * 
  * @author jjames
  */

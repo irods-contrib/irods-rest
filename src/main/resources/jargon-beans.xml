@@ -31,18 +31,18 @@
 	<beans:bean id="irodsCorsFilter" class="org.irods.jargon.rest.auth.IrodsCorsFilter">
 	    <beans:property name="restConfiguration" ref="restConfiguration" />
 	</beans:bean>
-
+	
 	<beans:bean id="restConfiguration"
 		class="org.irods.jargon.rest.configuration.RestConfiguration">
 		<beans:property name="irodsHost" value="${irods.host}" />
 		<beans:property name="irodsPort" value="${irods.port}" />
 		<beans:property name="irodsZone" value="${irods.zone}" />
 		<beans:property name="utilizePackingStreams" value="${utilize.packing.streams}"/>
-		<beans:property name="authType" value="${auth.type}" /> <!--  STANDARD,PAM -->
-		<beans:property name="defaultStorageResource" value="${default.storage.resource}" />
+		<beans:property name="authType" value="STANDARD" /> <!--  STANDARD,PAM -->
+		<beans:property name="defaultStorageResource" value="demoResc" />
 		<beans:property name="webInterfaceURL"
 			value="${web.interface.url}" />
-		<beans:property name="allowCors" value="${cors.allow}" />
+		<beans:property name="allowCors" value="true" />
 		<beans:property name="corsAllowCredentials" value="true" />
 		<beans:property name="corsOrigins">
 			<util:list id="myList" value-type="java.lang.String">
@@ -66,7 +66,10 @@
 
 	</beans:bean>
 	
-	<beans:bean id="springFilter" class="org.irods.jargon.rest.auth.BasicAuthFilter" />
+	<beans:bean id="springFilter" class="org.irods.jargon.rest.auth.BasicAuthFilter">
+         <beans:property name="irodsAccessObjectFactory" ref="irodsAccessObjectFactory" />
+         <beans:property name="restConfiguration" ref="restConfiguration" />
+    </beans:bean>
 
 
 </beans:beans>

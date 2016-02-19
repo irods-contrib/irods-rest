@@ -5,7 +5,6 @@ package org.irods.jargon.rest.commands.query;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.List;
 import java.util.ArrayList;
 
 import javax.inject.Named;
@@ -38,7 +37,6 @@ import org.irods.jargon.rest.domain.GenQueryRequestData;
 import org.irods.jargon.rest.domain.GenQueryResponseData;
 import org.irods.jargon.rest.domain.GenQueryRow;
 import org.irods.jargon.rest.domain.GenQuerySelect;
-import org.irods.jargon.rest.domain.GenQueryConditionValueList;
 import org.jboss.resteasy.annotations.providers.jaxb.json.Mapped;
 import org.jboss.resteasy.annotations.providers.jaxb.json.XmlNsMap;
 import org.slf4j.Logger;
@@ -202,7 +200,7 @@ public class GenQueryService extends AbstractIrodsService {
 							valueList);
 				} else {
 					if (condition.getValue() == null) {
-						throw new IllegalArgumentException("Condition " + condition.getOperator().toUpperCase() + "  must have a value");
+						throw new IllegalArgumentException("Condition " + condition.getOperator().toUpperCase() + " must have a value");
 					} else if (condition.getValueList() != null) {
 						throw new IllegalArgumentException("Condition " + condition.getOperator().toUpperCase() + " should not have a value_list.");
 					}
@@ -271,7 +269,7 @@ public class GenQueryService extends AbstractIrodsService {
 
 			return responseData;
 		} finally {
-			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
+			//getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
 		}
 	}
 
