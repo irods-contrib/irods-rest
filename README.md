@@ -1,11 +1,13 @@
 # Project: iRODS Rest API
 ## Date: 
-## Release Version: 4.0.2.5-SNAPSHOT
-## Git tag: 
+## Release Version: 4.0.2.5-RC1
+## Git tag: 4.0.2.5-RC1
+
+Release candidate for REST API including Ticket support
 
 https://github.com/DICE-UNC/irods-rest
 
-iRODS Rest API based on Jargon 4.0.2.5, certified against iRODS 3.0+ as well as iRODS Consortium 4.1.x releases up to 4.1.7.  See included docs folder for comprehensive user documentation and install instructions
+iRODS Rest API based on Jargon 4.0.2.4, certified against iRODS 3.0+ as well as iRODS Consortium 4.1.x releases up to 4.1.7.  See included docs folder for comprehensive user documentation and install instructions
 
 See https://github.com/DICE-UNC/irods-rest/issues for support and known issues
 
@@ -15,10 +17,7 @@ See https://github.com/DICE-UNC/irods-rest/issues for support and known issues
 * Depends on Java 1.8+
 * Built using Apache Maven2, see POM for dependencies
 	
-
-### Bug Fixes
-
-### Features
+### Changes
 
 #### #2 CORS header support
 
@@ -48,4 +47,8 @@ Added unit test for PAM auth, added a capability to override rest api configs an
 in basic auth to force standard iRODS auth or PAM auth behavior.
 
 See the docs/ section for installation and configuration instructions, as well as notes on using PAM and Standard iRODS Auth.
+
+#### add ticket support #9
+
+REST API now supports the use of iRODS tickets, allowing anonymous, token based access to iRODS REST resources
 
