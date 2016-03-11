@@ -1178,10 +1178,10 @@ public class GenQueryServiceTest implements ApplicationContextAware {
        
 		String expectedResponseJson = "{\"row\":"
 				+ "[{\"column\":[{\"name\":\"COLL_NAME\","
-				+ "\"value\":\"/tempZone/home/rods/dir/GenQueryTestDirectory\"},"
+				+ "\"value\":\"" + targetCollection + "\"},"
 				+ "{\"name\":\"DATA_NAME\",\"value\":\"testfile1.dat\"}]},"
 				+ "{\"column\":[{\"name\":\"COLL_NAME\","
-				+ "\"value\":\"/tempZone/home/rods/dir/GenQueryTestDirectory\"},{"
+				+ "\"value\":\"" + targetCollection + "\"},{"
 				+ "\"name\":\"DATA_NAME\",\"value\":\"testfile2.dat\"}]}]}";
 
 		IRODSAccount irodsAccount = testingPropertiesHelper
