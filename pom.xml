@@ -4,17 +4,18 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.irods</groupId>
 	<artifactId>irods-rest</artifactId>
-	<version>4.0.2.1-SNAPSHOT</version>
+	<version>4.0.2.5-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<name>irods-rest</name>
 	<description>REST API for iRODS based on Jargon</description>
 	<url>https://github.com/DICE-UNC/irods-rest</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<jargon.version>4.0.2-RELEASE</jargon.version>
-		<resteasy.version>3.0.6.Final</resteasy.version>
+		<jargon.version>4.0.2.5-RELEASE</jargon.version>
+		<resteasy.version>3.0.12.Final</resteasy.version>
 		<spring.core.version>3.1.0.RELEASE</spring.core.version>
 		<spring.security.version>3.1.0.RELEASE</spring.security.version>
+		<java.version>1.7</java.version>
 	</properties>
 	<issueManagement>
 		<system>GitHub</system>
@@ -42,20 +43,11 @@
 		</developer>
 	</developers>
 	<repositories>
+		<!-- <repository> <id>ibiblio.repository</id> <name>ibiblio.repository</name> 
+			<url>http://mirrors.ibiblio.org/pub/mirrors/maven2</url> <releases> <enabled>true</enabled> 
+			</releases> <snapshots> <enabled>true</enabled> <updatePolicy>never</updatePolicy> 
+			<checksumPolicy>fail</checksumPolicy> </snapshots> </repository> -->
 		<repository>
-			<id>ibiblio.repository</id>
-			<name>ibiblio.repository</name>
-			<url>http://mirrors.ibiblio.org/pub/mirrors/maven2</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>never</updatePolicy>
-				<checksumPolicy>fail</checksumPolicy>
-			</snapshots>
-		</repository>
-			<repository>
 			<id>dice.repository snaps</id>
 			<name>dice.repository.snapshots</name>
 			<url>https://raw.github.com/DICE-UNC/DICE-Maven/master/snapshots</url>
@@ -95,9 +87,9 @@
 			</snapshots>
 		</repository>
 	</repositories>
-	<distributionManagement>
-		
-	</distributionManagement>
+	<distributionManagement />
+
+
 	<reporting>
 		<plugins>
 			<plugin>
@@ -188,6 +180,11 @@
 				<version>${jargon.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>org.irods.jargon</groupId>
+				<artifactId>jargon-ticket</artifactId>
+				<version>${jargon.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
 				<version>4.8.2</version>
@@ -250,6 +247,11 @@
 				<version>${resteasy.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>org.jboss.resteasy</groupId>
+				<artifactId>resteasy-jsapi</artifactId>
+				<version>${resteasy.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>javax.servlet</groupId>
 				<artifactId>servlet-api</artifactId>
 				<version>2.5</version>
@@ -262,7 +264,12 @@
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpmime</artifactId>
-				<version>4.2.1</version>
+				<version>4.5.1</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpclient</artifactId>
+				<version>4.5.1</version>
 			</dependency>
 
 		</dependencies>
@@ -323,6 +330,10 @@
 		<dependency>
 			<groupId>org.irods.jargon</groupId>
 			<artifactId>jargon-core</artifactId>
+		</dependency>
+				<dependency>
+			<groupId>org.irods.jargon</groupId>
+			<artifactId>jargon-ticket</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -386,10 +397,14 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-beans</artifactId>
 		</dependency>
-			<dependency>
-				<groupId>org.apache.httpcomponents</groupId>
-				<artifactId>httpmime</artifactId>
-			</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpmime</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -480,6 +495,32 @@
 									test.option.gsi.user=${test.option.gsi.user}
 									test.option.gsi.file=${test.option.gsi.file}
 									test.rest.port=${test.rest.port}
+                                    test.external.rest.port=${test.external.rest.port}
+								</echo>
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>1</id>
+						<phase>validate</phase>
+						<configuration>
+							<tasks>
+								<delete file="${basedir}/src/test/resources/test-irods-rest.properties" />
+								<touch file="${basedir}/src/test/resources/test-irods-rest.properties"
+									mkdirs="true" />
+								<echo file="${basedir}/src/test/resources/test-irods-rest.properties"
+									append="true">
+									irods.host=${jargon.test.irods.host}
+									irods.port=${jargon.test.irods.port}
+									irods.zone=${jargon.test.irods.zone}
+									utilize.packing.streams=true
+									auth.type=STANDARD
+									default.storage.resource=
+									web.interface.url=
+									cors.allow=true
 								</echo>
 							</tasks>
 						</configuration>
@@ -493,16 +534,17 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.0</version>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
 				</configuration>
 			</plugin>
 			<plugin>
 				<artifactId>maven-war-plugin</artifactId>
-				<version>2.3</version>
+				<version>2.5</version>
 				<configuration>
 					<warSourceDirectory>src/main/webapp</warSourceDirectory>
 					<failOnMissingWebXml>true</failOnMissingWebXml>
+					<warName>irods-rest</warName>
 				</configuration>
 			</plugin>
 		</plugins>

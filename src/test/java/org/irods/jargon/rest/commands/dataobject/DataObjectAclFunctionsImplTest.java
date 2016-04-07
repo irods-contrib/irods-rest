@@ -7,7 +7,7 @@ import junit.framework.Assert;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.FileNotFoundException;
 import org.irods.jargon.core.protovalues.FilePermissionEnum;
-import org.irods.jargon.core.pub.DataObjectAOImpl;
+import org.irods.jargon.core.pub.DataObjectAO;
 import org.irods.jargon.core.pub.DataTransferOperations;
 import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.core.pub.domain.UserFilePermission;
@@ -99,7 +99,7 @@ public class DataObjectAclFunctionsImplTest {
 
 		IRODSAccount irodsAccount = testingPropertiesHelper
 				.buildIRODSAccountFromTestProperties(testingProperties);
-		DataObjectAOImpl dataObjectAO = (DataObjectAOImpl) irodsFileSystem
+		DataObjectAO dataObjectAO = (DataObjectAO) irodsFileSystem
 				.getIRODSAccessObjectFactory().getDataObjectAO(irodsAccount);
 
 		DataTransferOperations dto = irodsFileSystem
@@ -145,7 +145,7 @@ public class DataObjectAclFunctionsImplTest {
 				.buildIRODSAccountFromTestProperties(testingProperties);
 		IRODSAccount secondaryAccount = testingPropertiesHelper
 				.buildIRODSAccountFromSecondaryTestProperties(testingProperties);
-		DataObjectAOImpl dataObjectAO = (DataObjectAOImpl) irodsFileSystem
+		DataObjectAO dataObjectAO = (DataObjectAO) irodsFileSystem
 				.getIRODSAccessObjectFactory().getDataObjectAO(irodsAccount);
 
 		DataTransferOperations dto = irodsFileSystem
@@ -190,7 +190,7 @@ public class DataObjectAclFunctionsImplTest {
 				.buildIRODSAccountFromTestProperties(testingProperties);
 		IRODSAccount secondaryAccount = testingPropertiesHelper
 				.buildIRODSAccountFromSecondaryTestProperties(testingProperties);
-		DataObjectAOImpl dataObjectAO = (DataObjectAOImpl) irodsFileSystem
+		DataObjectAO dataObjectAO = (DataObjectAO) irodsFileSystem
 				.getIRODSAccessObjectFactory().getDataObjectAO(irodsAccount);
 
 		DataTransferOperations dto = irodsFileSystem

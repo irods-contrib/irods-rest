@@ -3,6 +3,7 @@
  */
 package org.irods.jargon.rest.commands.dataobject;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -30,7 +32,10 @@ import org.irods.jargon.core.pub.DataObjectAO;
 import org.irods.jargon.core.pub.Stream2StreamAO;
 import org.irods.jargon.core.pub.domain.DataObject;
 import org.irods.jargon.core.pub.io.IRODSFile;
+import org.irods.jargon.core.pub.io.IRODSFileInputStream;
 import org.irods.jargon.core.pub.io.IRODSFileOutputStream;
+import org.irods.jargon.core.pub.io.PackingIrodsInputStream;
+import org.irods.jargon.core.pub.io.PackingIrodsOutputStream;
 import org.irods.jargon.rest.commands.AbstractIrodsService;
 import org.irods.jargon.rest.domain.DataObjectData;
 import org.irods.jargon.rest.utils.DataUtils;
@@ -38,6 +43,7 @@ import org.jboss.resteasy.annotations.providers.jaxb.json.Mapped;
 import org.jboss.resteasy.annotations.providers.jaxb.json.XmlNsMap;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+import org.jboss.resteasy.spi.CorsHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -138,17 +144,29 @@ public class FileContentsService extends AbstractIrodsService {
 			DataObjectAO dataObjectAO = getIrodsAccessObjectFactory()
 					.getDataObjectAO(irodsAccount);
 			log.info("creating target output stream to irods..");
-			IRODSFileOutputStream outputStream = getIrodsAccessObjectFactory()
+			OutputStream outputStream = getIrodsAccessObjectFactory()
 					.getIRODSFileFactory(irodsAccount)
 					.instanceIRODSFileOutputStream(dataFile);
-
-			log.info("getting input stream for file...");
 			// convert the uploaded file to inputstream
-			InputStream inputStream = inputPart
-					.getBody(InputStream.class, null);
-			log.info("started stream copy...");
-			stream2StreamAO.streamToStreamCopyUsingStandardIO(inputStream,
-					outputStream);
+			InputStream inputStream = new BufferedInputStream(
+					inputPart.getBody(InputStream.class, null));
+
+			if (this.getRestConfiguration().isUtilizePackingStreams()) {
+				log.info("using packing streams scheme");
+				outputStream = new PackingIrodsOutputStream(
+						(IRODSFileOutputStream) outputStream);
+				stream2StreamAO.streamToStreamCopyUsingStandardIO(inputStream,
+						outputStream); // will flush and close
+
+			} else {
+				log.info("using standard streams scheme");
+				log.info("getting input stream for file...");
+
+				log.info("started stream copy...");
+				stream2StreamAO.streamToStreamCopyUsingStandardIO(inputStream,
+						outputStream);
+			}
+
 			log.info("stream copy completed...look up resulting iRODS data object to prepare response");
 			DataObject dataObject = dataObjectAO
 					.findByAbsolutePath(decodedPathString);
@@ -186,7 +204,8 @@ public class FileContentsService extends AbstractIrodsService {
 	public void getFile(
 			@HeaderParam("Authorization") final String authorization,
 			@PathParam("path") final String path,
-			@Context final HttpServletResponse response) throws JargonException {
+			@Context final HttpServletResponse response,
+			@Context final HttpServletRequest request) throws JargonException {
 
 		log.info("getFile()");
 
@@ -225,12 +244,29 @@ public class FileContentsService extends AbstractIrodsService {
 					.getIRODSFileFactory(irodsAccount)
 					.instanceIRODSFileInputStream(irodsFile);
 
+			if (this.getRestConfiguration().isUtilizePackingStreams()) {
+				log.info("utilize packing stream for iRODS input");
+				input = new PackingIrodsInputStream(
+						(IRODSFileInputStream) input);
+			}
+
+			log.debug("************* all response headers ************");
+
 			int contentLength = (int) irodsFile.length();
 
 			response.setContentType("application/octet-stream");
 			response.setContentLength(contentLength);
 			response.setHeader("Content-disposition", "attachment; filename=\""
 					+ decodedPathString + "\"");
+
+			// test hack of origin for cors download
+
+			String origin = request.getHeader(CorsHeaders.ORIGIN);
+			if (origin != null) {
+				log.debug("adding an origin header for download per bug #11");
+				response.addHeader(CorsHeaders.ACCESS_CONTROL_ALLOW_ORIGIN,
+						origin);
+			}
 
 			OutputStream output;
 			try {

@@ -5,12 +5,14 @@ package org.irods.jargon.rest.commands.user;
 
 import javax.inject.Named;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.DuplicateDataException;
@@ -46,8 +48,9 @@ public class UserService extends AbstractIrodsService {
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
 	public UserData getUser(
 			@HeaderParam("Authorization") final String authorization,
-			@PathParam("userName") final String userName)
+			@PathParam("userName") final String userName, @QueryParam("admin") @DefaultValue("false") final boolean isAdmin)
 			throws JargonException {
+		
 		log.info("getUser()");
 
 		if (authorization == null || authorization.isEmpty()) {
@@ -61,6 +64,8 @@ public class UserService extends AbstractIrodsService {
 		if (getIrodsAccessObjectFactory() == null) {
 			throw new IllegalArgumentException("null irodsAccessObjectFactory");
 		}
+		
+		log.info("as admin?:{}", isAdmin);
 
 		try {
 			IRODSAccount irodsAccount = RestAuthUtils

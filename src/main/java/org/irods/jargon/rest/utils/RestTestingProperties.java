@@ -11,5 +11,6 @@ package org.irods.jargon.rest.utils;
  */
 public class RestTestingProperties {
 	public static final String REST_PORT_PROPERTY = "test.rest.port";
+	public static final String EXTERNAL_REST_PORT_PROPERTY = "test.external.rest.port";
 
 }

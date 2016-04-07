@@ -6,6 +6,7 @@
 bin/**
 tmp/**
 tmp/**/*
+.pmd
 *.tmp
 *.bak
 *.swp
@@ -17,6 +18,10 @@ RestVersion.java
 .settings/
 .loadpath
 .DS_Store
+docs/.~lock.iRODSRESTAPIDocumentation.odt#
+**/test-irods-rest.properties
+
+
 # External tool builders
 .externalToolBuilders/
 
@@ -31,3 +36,4 @@ RestVersion.java
 
 #Version file
 src/**/RestVersion.java
+/build

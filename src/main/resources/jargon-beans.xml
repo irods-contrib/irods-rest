@@ -2,10 +2,10 @@
 <beans:beans xmlns="http://www.springframework.org/schema/security"
 	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:sec="http://www.springframework.org/schema/security"
+	xmlns:sec="http://www.springframework.org/schema/security" xmlns:util="http://www.springframework.org/schema/util"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
                         http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd http://www.springframework.org/schema/context 
-	http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+	http://www.springframework.org/schema/context/spring-context-3.1.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
 
 	<beans:bean id="irodsConnectionManager"
 		class="org.irods.jargon.core.connection.IRODSSimpleProtocolManager"
@@ -21,66 +21,55 @@
 		class="org.irods.jargon.core.pub.IRODSAccessObjectFactoryImpl">
 		<beans:constructor-arg ref="irodsSession" />
 	</beans:bean>
-	
-	<beans:bean id="serviceFunctionFactory" class="org.irods.jargon.rest.commands.ServiceFunctionFactoryImpl">
-		<beans:property name="irodsAccessObjectFactory" ref="irodsAccessObjectFactory"/>
-		<beans:property name="restConfiguration" ref="restConfiguration"/>
-	</beans:bean>
 
+	<beans:bean id="serviceFunctionFactory"
+		class="org.irods.jargon.rest.commands.ServiceFunctionFactoryImpl">
+		<beans:property name="irodsAccessObjectFactory" ref="irodsAccessObjectFactory" />
+		<beans:property name="restConfiguration" ref="restConfiguration" />
+	</beans:bean>
+	
+	<beans:bean id="irodsCorsFilter" class="org.irods.jargon.rest.auth.IrodsCorsFilter">
+	    <beans:property name="restConfiguration" ref="restConfiguration" />
+	</beans:bean>
+	
 	<beans:bean id="restConfiguration"
 		class="org.irods.jargon.rest.configuration.RestConfiguration">
-		<beans:property name="irodsHost" value="consortium.local" />
-		<beans:property name="irodsPort" value="1247" />
-		<beans:property name="irodsZone" value="test1" />
-		<beans:property name="defaultStorageResource" value="test1-resc" />
-		<beans:property name="privateCertAbsPath" value="c:/temp/test-certs/private.pem" />
-		<beans:property name="publicKeyAbsPath" value="c:/temp/test-certs/public.pem" />
+		<beans:property name="irodsHost" value="${irods.host}" />
+		<beans:property name="irodsPort" value="${irods.port}" />
+		<beans:property name="irodsZone" value="${irods.zone}" />
+		<beans:property name="utilizePackingStreams" value="${utilize.packing.streams}"/>
+		<beans:property name="authType" value="${auth.type}" /> <!--  STANDARD,PAM -->
+		<beans:property name="defaultStorageResource" value="${default.storage.resource}" />
 		<beans:property name="webInterfaceURL"
-			value="https://iren-web.renci.org:8443/idrop-web2" />
+			value="${web.interface.url}" />
+		<beans:property name="allowCors" value="true" />
+		<beans:property name="corsAllowCredentials" value="${cors.allow}" />
+		<beans:property name="corsOrigins">
+			<util:list id="myList" value-type="java.lang.String">
+				<beans:value>*</beans:value>
+			</util:list>
+		</beans:property>
+		<beans:property name="corsMethods">
+			<util:list id="methodsList" value-type="java.lang.String">
+				<beans:value>GET</beans:value>
+				<beans:value>POST</beans:value>
+				<beans:value>DELETE</beans:value>
+				<beans:value>PUT</beans:value>
+			</util:list>
+		</beans:property>
+		<beans:property name="corsAllowedHeaders">
+			<util:list id="headersList" value-type="java.lang.String">
+				<beans:value>x-requested-with</beans:value>
+				<beans:value>x-requested-by</beans:value>
+			</util:list>
+		</beans:property>
+
 	</beans:bean>
-	<!-- <beans:bean id="restConfiguration" class="org.irods.jargon.rest.configuration.RestConfiguration"> 
-		<beans:property name="irodsHost" value="geni-gimi.renci.org" /> <beans:property 
-		name="irodsPort" value="1247" /> <beans:property name="irodsZone" value="geniRenci" 
-		/> <beans:property name="defaultStorageResource" value="demoResc" /> <beans:property 
-		name="webInterfaceURL" value="https://geni-gimi.renci.org:8443/idrop-web2" 
-		/> </beans:bean> -->
-	<!-- test <beans:bean id="restConfiguration" class="org.irods.jargon.rest.configuration.RestConfiguration"> 
-		<beans:property name="irodsHost" value="155.99.144.100" /> <beans:property 
-		name="irodsPort" value="1247" /> <beans:property name="irodsZone" value="tempZone" 
-		/> <beans:property name="defaultStorageResource" value="demoResc" /> <beans:property 
-		name="privateCertAbsPath" value="c:/temp/test-certs/private.pem"/> <beans:property 
-		name="publicKeyAbsPath" value="c:/temp/test-certs/public.pem"/> <beans:property 
-		name="webInterfaceURL" value = "https://iren-web.renci.org:8443/idrop-web2" 
-		/> </beans:bean> <beans:bean id="restConfiguration" class="org.irods.jargon.rest.configuration.RestConfiguration"> 
-		<beans:property name="irodsHost" value="localhost" /> <beans:property name="irodsPort" 
-		value="1247" /> <beans:property name="irodsZone" value="test1" /> <beans:property 
-		name="defaultStorageResource" value="test1-resc" /> <beans:property name="privateCertAbsPath" 
-		value="c:/temp/test-certs/private.pem"/> <beans:property name="publicKeyAbsPath" 
-		value="c:/temp/test-certs/public.pem"/> <beans:property name="webInterfaceURL" 
-		value = "https://iren-web.renci.org:8443/idrop-web2" /> </beans:bean> -->
-
-
-	<!-- <beans:bean id="restConfiguration" class="org.irods.jargon.rest.configuration.RestConfiguration"> 
-		<beans:property name="irodsHost" value="geni-gimi.renci.org" /> <beans:property 
-		name="irodsPort" value="1247" /> <beans:property name="irodsZone" value="geniRenci" 
-		/> <beans:property name="defaultStorageResource" value="demoResc" /> <beans:property 
-		name="webInterfaceURL" value="https://geni-gimi.renci.org:8443/idrop-web2" 
-		/> </beans:bean> -->
-	<!-- <beans:bean id="restConfiguration" class="org.irods.jargon.rest.configuration.RestConfiguration"> 
-		<beans:property name="irodsHost" value="fedZone1" /> <beans:property name="irodsPort" 
-		value="1247" /> <beans:property name="irodsZone" value="fedZone1" /> <beans:property 
-		name="defaultStorageResource" value="test1-resc" /> <beans:property name="privateCertAbsPath" 
-		value="c:/temp/test-certs/private.pem"/> <beans:property name="publicKeyAbsPath" 
-		value="c:/temp/test-certs/public.pem"/> <beans:property name="webInterfaceURL" 
-		value = "https://iren-web.renci.org:8443/idrop-web2" /> </beans:bean> -->
-	<!-- <beans:bean id="restConfiguration" class="org.irods.jargon.rest.configuration.RestConfiguration"> 
-		<beans:property name="irodsHost" value="152.54.14.9" /> <beans:property name="irodsPort" 
-		value="1247" /> <beans:property name="irodsZone" value="tempZone" /> <beans:property 
-		name="defaultStorageResource" value="demoResc" /> <beans:property name="privateCertAbsPath" 
-		value="c:/temp/test-certs/private.pem"/> <beans:property name="publicKeyAbsPath" 
-		value="c:/temp/test-certs/public.pem"/> <beans:property name="webInterfaceURL" 
-		value = "https://iren-web.renci.org:8443/idrop-web2" /> </beans:bean> -->
-	<beans:bean id="springFilter" class="org.irods.jargon.rest.auth.BasicAuthFilter" />
+	
+	<beans:bean id="springFilter" class="org.irods.jargon.rest.auth.BasicAuthFilter">
+         <beans:property name="irodsAccessObjectFactory" ref="irodsAccessObjectFactory" />
+         <beans:property name="restConfiguration" ref="restConfiguration" />
+    </beans:bean>
 
 
 </beans:beans>
