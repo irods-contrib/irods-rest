@@ -18,13 +18,14 @@ RestVersion.java
 .settings/
 .loadpath
 .DS_Store
+*.*~
 docs/.~lock.iRODSRESTAPIDocumentation.odt#
 **/test-irods-rest.properties
-
-
+node_modules
+.idea
 # External tool builders
 .externalToolBuilders/
-
+**/.idea/*
 # Locally stored "Eclipse launch configurations"
 *.launch
 
