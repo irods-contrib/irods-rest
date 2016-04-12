@@ -15,6 +15,8 @@ frisby.globalSetup({
 });
 
 var testCollForCreate = "/RESTtestCreateCollAsLoggedInUser";
+var ticketFolder =  testProps.userHome(testProps.zone, testProps.user1) + testCollForCreate;
+var ticketString1 = "RESTtest-ticket1";
 
 frisby.create('test get environment as logged in user').get(testProps.urlPrefix("server")).auth(testProps.user1, testProps.password1).expectStatus(200).toss();
 
@@ -31,6 +33,17 @@ frisby.create('test get info on collection that doesnt exist get a 404').get(tes
     .toss();
 
 
+frisby.create("delete a ticket on your collection").delete(testProps.urlPrefix("ticket/" + ticketString1)).auth(testProps.user1, testProps.password1).expectStatus(204)
+    .toss();
 
+
+
+frisby.create("add a ticket on your collection").post(testProps.urlPrefix("ticket"), {
+        mode: 'read',
+        object_path: ticketFolder,
+        ticket_string: ticketString1
+    }, {json: true},{ headers: { 'Content-Type': 'json' }}).auth(testProps.user1, testProps.password1).expectStatus(200).inspectRequest().inspectBody()
+    .expectHeaderContains('Content-Type', 'json').inspectJSON()
+    .toss();
 
 
