@@ -6,6 +6,8 @@
     "url": "http://github.com/vlucas/frisby"
   },
   "dependencies": {
-    "frisby": "*"
+    "frisby": "*",
+    "form-data": "*",
+    "fs": "*"
   }
 }

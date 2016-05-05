@@ -6,6 +6,10 @@
 var frisby = require('frisby');
 var testProps = require('./testing_props.js');
 
+var fs = require('fs');
+var path = require('path');
+var FormData = require('form-data');
+
 // Global setup for all tests
 frisby.globalSetup({
   request: {
@@ -36,14 +40,30 @@ frisby.create('test get info on collection that doesnt exist get a 404').get(tes
 frisby.create("delete a ticket on your collection").delete(testProps.urlPrefix("ticket/" + ticketString1)).auth(testProps.user1, testProps.password1).expectStatus(204)
     .toss();
 
-
-
-frisby.create("add a ticket on your collection").post(testProps.urlPrefix("ticket"), {
+frisby.create("add a ticket on your collection").post(testProps.urlPrefix("ticket"), {createTicketRequestData:{
         mode: 'read',
         object_path: ticketFolder,
-        ticket_string: ticketString1
-    }, {json: true},{ headers: { 'Content-Type': 'json' }}).auth(testProps.user1, testProps.password1).expectStatus(200).inspectRequest().inspectBody()
-    .expectHeaderContains('Content-Type', 'json').inspectJSON()
+        ticket_string: ticketString1}
+    }, {json: true},{ headers: { "Content-Type": "application/json"}}).auth(testProps.user1, testProps.password1).expectStatus(200).inspectRequest().inspectBody()
+    .expectHeaderContains('Content-Type', 'application/json').inspectJSON()
     .toss();
 
+var form = new FormData();
 
+form.append('uploadFile',fs.createReadStream(testProps.testfile1Path()), {
+    knownLength: fs.statSync(testProps.testfile1Path()).size         // we need to set the knownLength so we can call  form.getLengthSync()
+});
+
+var uploadFileName = "upload1.txt";
+/*
+frisby.create('file upload with ticket, anonymous')
+    .post(testProps.urlPrefix("fileContents" + ticketFolder + "/" + uploadFileName + "?ticket=" + ticketString1), form, {
+        json: false,
+        headers: {
+            'content-type': 'multipart/form-data; boundary=' + form.getBoundary(),
+            'content-length': form.getLengthSync(),
+        }
+    })
+    .expectStatus(200)
+    .inspectJSON()
+    .toss();*/

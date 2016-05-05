@@ -21,7 +21,8 @@ public class RestConfiguration {
 	private String irodsZone = "";
 	private String defaultStorageResource = "";
 	private String realm = "irods-rest";
-
+	public static final String NS = "http://irods.org/irods-rest";
+	public static final String JSON_NAME = "irods-rest";
 	/**
 	 * Utilize the read ahead and write behind streams in jargon to optimize
 	 * transfers

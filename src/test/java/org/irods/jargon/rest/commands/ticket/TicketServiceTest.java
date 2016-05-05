@@ -192,11 +192,11 @@ public class TicketServiceTest implements ApplicationContextAware {
 	@Test
 	public void testCreateReadTicketDefaultStringXml() throws Exception {
 
-		String requestBody = "<ns2:ticket xmlns:ns2=\"http://irods.org/irods-rest\">"
+		String requestBody = "<ns2:createTicketRequestData xmlns:ns2=\"http://irods.org/irods-rest\">"
 				+ "<mode>read</mode>"
 				+ "<object_path>"
 				+ targetIrodsFile
-				+ "</object_path>" + "</ns2:ticket>";
+				+ "</object_path>" + "</ns2:createTicketRequestData>";
 
 		String expectedResponse_1 = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
 				+ "<ns2:ticket xmlns:ns2=\"http://irods.org/irods-rest\">"
@@ -284,11 +284,11 @@ public class TicketServiceTest implements ApplicationContextAware {
 	@Test
 	public void testCreateWriteTicketDefaultStringXml() throws Exception {
 
-		String requestBody = "<ns2:ticket xmlns:ns2=\"http://irods.org/irods-rest\">"
+		String requestBody = "<ns2:createTicketRequestData xmlns:ns2=\"http://irods.org/irods-rest\">"
 				+ "<mode>write</mode>"
 				+ "<object_path>"
 				+ targetIrodsFile
-				+ "</object_path>" + "</ns2:ticket>";
+				+ "</object_path>" + "</ns2:createTicketRequestData>";
 
 		String expectedResponse_1 = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
 				+ "<ns2:ticket xmlns:ns2=\"http://irods.org/irods-rest\">"
@@ -555,14 +555,14 @@ public class TicketServiceTest implements ApplicationContextAware {
 
 		String ticketString = new TicketRandomString(15).nextString();
 
-		String requestBody = "<ns2:ticket xmlns:ns2=\"http://irods.org/irods-rest\">"
+		String requestBody = "<ns2:createTicketRequestData xmlns:ns2=\"http://irods.org/irods-rest\">"
 				+ "<mode>read</mode>"
 				+ "<object_path>"
 				+ targetIrodsFile
 				+ "</object_path>"
 				+ "<ticket_string>"
 				+ ticketString
-				+ "</ticket_string>" + "</ns2:ticket>";
+				+ "</ticket_string>" + "</ns2:createTicketRequestData>";
 
 		String expectedResponse = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
 				+ "<ns2:ticket xmlns:ns2=\"http://irods.org/irods-rest\">"

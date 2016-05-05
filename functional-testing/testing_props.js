@@ -3,6 +3,9 @@
  * Created by mconway on 4/8/16.
  */
 
+var fs = require('fs');
+var path = require('path');
+var FormData = require('form-data');
 
 exports.host = "localhost";
 exports.port = "8080";
@@ -26,6 +29,14 @@ exports.urlPrefix = function(resource)  {
     return exports.protocol + exports.host + ":" + exports.port + exports.context +"/" + resource;
 
 };
+
+/**
+ * Get the path to the file1 test file
+ * @returns {*}
+ */
+exports.testfile1Path = function() {
+  return path.resolve(__dirname, './sample-data/file1.txt');
+}
 
 /**
  * Get the user home path

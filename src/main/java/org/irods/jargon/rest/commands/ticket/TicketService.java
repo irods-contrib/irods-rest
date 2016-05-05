@@ -18,6 +18,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.JargonException;
@@ -27,10 +28,11 @@ import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.core.query.GenQueryBuilderException;
 import org.irods.jargon.core.query.JargonQueryException;
 import org.irods.jargon.rest.commands.AbstractIrodsService;
+import org.irods.jargon.rest.configuration.RestConfiguration;
 import org.irods.jargon.rest.domain.CreateTicketRequestData;
 import org.irods.jargon.rest.domain.CreateTicketResponseData;
-import org.irods.jargon.rest.domain.TicketData;
 import org.irods.jargon.rest.domain.ModifyTicketRequestData;
+import org.irods.jargon.rest.domain.TicketData;
 import org.irods.jargon.ticket.Ticket;
 import org.irods.jargon.ticket.TicketAdminService;
 import org.irods.jargon.ticket.TicketServiceFactoryImpl;
@@ -48,21 +50,22 @@ import org.slf4j.LoggerFactory;
 @Named
 @Path("/ticket")
 public class TicketService extends AbstractIrodsService {
-	
-	public static final SimpleDateFormat EXPIRATION_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
+	public static final SimpleDateFormat EXPIRATION_DATE_FORMAT = new SimpleDateFormat(
+			"yyyy-MM-dd HH:mm:ss");
 
 	/** The log. */
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
 	@POST
-	@Consumes({ "application/xml", "application/json" })
-	@Produces({ "application/xml", "application/json" })
-	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	@Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = RestConfiguration.NS, jsonName = RestConfiguration.JSON_NAME) })
 	public CreateTicketResponseData createTicket(
 			@HeaderParam("Authorization") final String authorization,
-			final CreateTicketRequestData requestData) throws JargonException,
-			GenQueryBuilderException, JargonQueryException {
+			@Mapped(namespaceMap = { @XmlNsMap(namespace = RestConfiguration.NS, jsonName = RestConfiguration.JSON_NAME) }) final CreateTicketRequestData requestData)
+			throws JargonException, GenQueryBuilderException,
+			JargonQueryException {
 
 		log.info("createTicket()");
 		if (authorization == null || authorization.isEmpty()) {
@@ -75,31 +78,36 @@ public class TicketService extends AbstractIrodsService {
 			IRODSFileSystem irodsFileSystem = IRODSFileSystem.instance();
 			IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
 					.getIRODSAccessObjectFactory();
-			
-			TicketServiceFactoryImpl ticketServiceFactory = new TicketServiceFactoryImpl(accessObjectFactory);
-			TicketAdminService ticketService = ticketServiceFactory.instanceTicketAdminService(irodsAccount);
-			
+
+			TicketServiceFactoryImpl ticketServiceFactory = new TicketServiceFactoryImpl(
+					accessObjectFactory);
+			TicketAdminService ticketService = ticketServiceFactory
+					.instanceTicketAdminService(irodsAccount);
+
 			log.info("objectPath={}", requestData.getObjectPath());
-			
-			IRODSFile file = accessObjectFactory.getIRODSFileFactory(irodsAccount).instanceIRODSFile(
-							requestData.getObjectPath());
-			
+
+			IRODSFile file = accessObjectFactory.getIRODSFileFactory(
+					irodsAccount)
+					.instanceIRODSFile(requestData.getObjectPath());
+
 			String ticketString = requestData.getTicketString();
-			
-			String responseTicketString = ticketService.createTicket(TicketCreateModeEnum.findTypeByString(requestData.getMode().toLowerCase()), file, ticketString);
+
+			String responseTicketString = ticketService.createTicket(
+					TicketCreateModeEnum.findTypeByString(requestData.getMode()
+							.toLowerCase()), file, ticketString);
 
 			CreateTicketResponseData responseData = new CreateTicketResponseData();
 			responseData.setTicketString(responseTicketString);
 			return responseData;
-			
+
 		} finally {
 			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
 		}
 	}
-	
+
 	@DELETE
 	@Path("{ticket:.*}")
-	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = RestConfiguration.NS, jsonName = "irods-rest") })
 	public void deleteTicket(
 			@HeaderParam("Authorization") final String authorization,
 			@PathParam("ticket") final String ticketId) throws JargonException,
@@ -115,19 +123,21 @@ public class TicketService extends AbstractIrodsService {
 			IRODSFileSystem irodsFileSystem = IRODSFileSystem.instance();
 			IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
 					.getIRODSAccessObjectFactory();
-			TicketServiceFactoryImpl ticketServiceFactory = new TicketServiceFactoryImpl(accessObjectFactory);
-			TicketAdminService ticketService = ticketServiceFactory.instanceTicketAdminService(irodsAccount);
-			ticketService.deleteTicket(ticketId);			
+			TicketServiceFactoryImpl ticketServiceFactory = new TicketServiceFactoryImpl(
+					accessObjectFactory);
+			TicketAdminService ticketService = ticketServiceFactory
+					.instanceTicketAdminService(irodsAccount);
+			ticketService.deleteTicket(ticketId);
 		} finally {
 			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
 		}
 	}
-	
+
 	@PUT
 	@Path("{ticket:.*}")
 	@Consumes({ "application/xml", "application/json" })
 	@Produces({ "application/xml", "application/json" })
-	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = RestConfiguration.NS, jsonName = "irods-rest") })
 	public void updateTicket(
 			@HeaderParam("Authorization") final String authorization,
 			@PathParam("ticket") final String ticketString,
@@ -144,69 +154,84 @@ public class TicketService extends AbstractIrodsService {
 			IRODSFileSystem irodsFileSystem = IRODSFileSystem.instance();
 			IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
 					.getIRODSAccessObjectFactory();
-			TicketServiceFactoryImpl ticketServiceFactory = new TicketServiceFactoryImpl(accessObjectFactory);
-			TicketAdminService ticketService = ticketServiceFactory.instanceTicketAdminService(irodsAccount);
-			
+			TicketServiceFactoryImpl ticketServiceFactory = new TicketServiceFactoryImpl(
+					accessObjectFactory);
+			TicketAdminService ticketService = ticketServiceFactory
+					.instanceTicketAdminService(irodsAccount);
+
 			String restrictionType = requestData.getRestrictionType();
 			String restrictionValue = requestData.getRestrictionValue();
-			
+
 			switch (restrictionType.toLowerCase()) {
 			case "add_host":
-				ticketService.addTicketHostRestriction(ticketString, restrictionValue);
+				ticketService.addTicketHostRestriction(ticketString,
+						restrictionValue);
 				break;
 			case "remove_host":
-				ticketService.removeTicketHostRestriction(ticketString, restrictionValue);
+				ticketService.removeTicketHostRestriction(ticketString,
+						restrictionValue);
 				break;
 			case "add_group":
-				ticketService.addTicketGroupRestriction(ticketString, restrictionValue);
+				ticketService.addTicketGroupRestriction(ticketString,
+						restrictionValue);
 				break;
 			case "remove_group":
-				ticketService.removeTicketGroupRestriction(ticketString, restrictionValue);
+				ticketService.removeTicketGroupRestriction(ticketString,
+						restrictionValue);
 				break;
 			case "add_user":
-				ticketService.addTicketUserRestriction(ticketString, restrictionValue);
+				ticketService.addTicketUserRestriction(ticketString,
+						restrictionValue);
 				break;
 			case "remove_user":
-				ticketService.removeTicketUserRestriction(ticketString, restrictionValue);
+				ticketService.removeTicketUserRestriction(ticketString,
+						restrictionValue);
 				break;
 			case "byte_write_limit":
 				long byteWriteLimit = Long.parseLong(restrictionValue);
-				ticketService.setTicketByteWriteLimit(ticketString, byteWriteLimit);
+				ticketService.setTicketByteWriteLimit(ticketString,
+						byteWriteLimit);
 				break;
 			case "file_write_limit":
 				int fileWriteLimit = Integer.parseInt(restrictionValue);
-				ticketService.setTicketFileWriteLimit(ticketString, fileWriteLimit);
+				ticketService.setTicketFileWriteLimit(ticketString,
+						fileWriteLimit);
 				break;
 			case "uses_limit":
 				int usesLimit = Integer.parseInt(restrictionValue);
 				ticketService.setTicketUsesLimit(ticketString, usesLimit);
 				break;
 			case "expiration":
-				Date expirationTime = EXPIRATION_DATE_FORMAT.parse(restrictionValue);
+				Date expirationTime = EXPIRATION_DATE_FORMAT
+						.parse(restrictionValue);
 				ticketService.setTicketExpiration(ticketString, expirationTime);
 				break;
 			default:
 				break;
 			}
-			
+
 		} catch (NumberFormatException nfe) {
-			throw new JargonException("Cannot convert restrictionValue to integer or long", nfe);
+			throw new JargonException(
+					"Cannot convert restrictionValue to integer or long", nfe);
 		} catch (ParseException pe) {
-			throw new JargonException("RestrictionValue is not a valid date in the format yyyy-MM-dd HH:mm:ss", pe);
+			throw new JargonException(
+					"RestrictionValue is not a valid date in the format yyyy-MM-dd HH:mm:ss",
+					pe);
 		} finally {
 			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
 		}
 	}
-	
+
 	@GET
 	@Path("{ticket:.*}")
 	@Consumes({ "application/xml", "application/json" })
 	@Produces({ "application/xml", "application/json" })
-	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = RestConfiguration.NS, jsonName = "irods-rest") })
 	public TicketData listTicket(
 			@HeaderParam("Authorization") final String authorization,
-			@PathParam("ticket") final String ticketString) throws JargonException,
-			GenQueryBuilderException, JargonQueryException {
+			@PathParam("ticket") final String ticketString)
+			throws JargonException, GenQueryBuilderException,
+			JargonQueryException {
 
 		log.info("updateTicket()");
 		if (authorization == null || authorization.isEmpty()) {
@@ -218,13 +243,16 @@ public class TicketService extends AbstractIrodsService {
 			IRODSFileSystem irodsFileSystem = IRODSFileSystem.instance();
 			IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
 					.getIRODSAccessObjectFactory();
-			TicketServiceFactoryImpl ticketServiceFactory = new TicketServiceFactoryImpl(accessObjectFactory);
-			TicketAdminService ticketService = ticketServiceFactory.instanceTicketAdminService(irodsAccount);
-			
-			Ticket ticketInfo = ticketService.getTicketForSpecifiedTicketString(ticketString);
-						
+			TicketServiceFactoryImpl ticketServiceFactory = new TicketServiceFactoryImpl(
+					accessObjectFactory);
+			TicketAdminService ticketService = ticketServiceFactory
+					.instanceTicketAdminService(irodsAccount);
+
+			Ticket ticketInfo = ticketService
+					.getTicketForSpecifiedTicketString(ticketString);
+
 			TicketData responseData = new TicketData(ticketInfo);
-			
+
 			// retrieve and set the user, group and host restrictions
 			responseData.setGroupRestrictions((ArrayList<String>) ticketService
 					.listAllGroupRestrictionsForSpecifiedTicket(
@@ -235,16 +263,15 @@ public class TicketService extends AbstractIrodsService {
 			responseData.setHostRestrictions((ArrayList<String>) ticketService
 					.listAllHostRestrictionsForSpecifiedTicket(
 							responseData.getTicketString(), 0));
-			
+
 			return responseData;
-			
+
 		} catch (NumberFormatException nfe) {
-			throw new JargonException("Cannot convert restrictionValue to integer or long", nfe);
+			throw new JargonException(
+					"Cannot convert restrictionValue to integer or long", nfe);
 		} finally {
 			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
 		}
 	}
-
-
 
 }

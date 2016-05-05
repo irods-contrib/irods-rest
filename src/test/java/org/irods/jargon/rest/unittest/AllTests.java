@@ -9,7 +9,6 @@ import org.irods.jargon.rest.commands.dataobject.DataObjectAclFunctionsImplTest;
 import org.irods.jargon.rest.commands.dataobject.DataObjectAvuFunctionsImplTest;
 import org.irods.jargon.rest.commands.dataobject.DataObjectServiceTest;
 import org.irods.jargon.rest.commands.dataobject.FileContentsServiceTest;
-import org.irods.jargon.rest.commands.dataobject.FileContentsServiceTicketsTest;
 import org.irods.jargon.rest.commands.query.GenQueryServiceTest;
 import org.irods.jargon.rest.commands.rule.RuleFunctionsImplTest;
 import org.irods.jargon.rest.commands.rule.RuleServiceTest;
@@ -24,10 +23,14 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({ UserGroupServiceTest.class, UserServiceTest.class,
-		ServerEnvironmentServiceTest.class, CollectionServiceTest.class,
-		DataObjectServiceTest.class, FileContentsServiceTest.class,
-		FileContentsServiceTicketsTest.class,
+@SuiteClasses({
+		UserGroupServiceTest.class,
+		UserServiceTest.class,
+		ServerEnvironmentServiceTest.class,
+		CollectionServiceTest.class,
+		DataObjectServiceTest.class,
+		FileContentsServiceTest.class,
+		// FileContentsServiceTicketsTest.class,
 		ServiceFunctionFactoryImplTest.class,
 		CollectionAclFunctionsImplTest.class,
 		DataObjectAclFunctionsImplTest.class,

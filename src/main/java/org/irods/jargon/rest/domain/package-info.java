@@ -3,5 +3,8 @@
  * @author Mike Conway - DICE (www.irods.org)
  *
  */
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://irods.org/irods-rest")
+@javax.xml.bind.annotation.XmlSchema(namespace = org.irods.jargon.rest.configuration.RestConfiguration.NS, elementFormDefault = XmlNsForm.UNSET)
 package org.irods.jargon.rest.domain;
+
+import javax.xml.bind.annotation.XmlNsForm;
+
