@@ -71,11 +71,11 @@ public class BasicAuthFilter implements Filter {
 	@Override
 	public void doFilter(final ServletRequest request,
 			final ServletResponse response, final FilterChain chain)
-			throws IOException, ServletException {	
+			throws IOException, ServletException {
 
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
 		final HttpServletResponse httpResponse = (HttpServletResponse) response;
-		
+
 		log.info("BasicAuthFilter.doFilter()");
 
 		/*
@@ -92,10 +92,10 @@ public class BasicAuthFilter implements Filter {
 		String auth = httpRequest.getHeader("Authorization");
 		String ticketString = httpRequest.getParameter("ticket");
 		AuthResponse authResponse = null;
-		IRODSAccount irodsAccount; 
-		
+		IRODSAccount irodsAccount;
+
 		try {
-			
+
 			if (auth == null || auth.isEmpty()) {
 
 				// if not auth is provided there must be a ticket
@@ -104,22 +104,26 @@ public class BasicAuthFilter implements Filter {
 					sendAuthError(httpResponse);
 					return;
 				}
-				
+
 				// ticket provided, use anonymous account
 				log.info("setting authorization to anonymous");
-				irodsAccount = RestAuthUtils.instanceForAnonymous(restConfiguration);
-				
-				HeaderMapRequestWrapper headerMapRequest = new HeaderMapRequestWrapper(httpRequest);
-				headerMapRequest.addHeader("Authorization", RestAuthUtils.basicAuthTokenFromIRODSAccount(irodsAccount));
+				irodsAccount = RestAuthUtils
+						.instanceForAnonymous(restConfiguration);
+
+				HeaderMapRequestWrapper headerMapRequest = new HeaderMapRequestWrapper(
+						httpRequest);
+				headerMapRequest.addHeader("Authorization", RestAuthUtils
+						.basicAuthTokenFromIRODSAccount(irodsAccount));
 				httpRequest = headerMapRequest;
-				
-			    
 
 			} else {
-			    irodsAccount = RestAuthUtils
-					.getIRODSAccountFromBasicAuthValues(auth, restConfiguration);
+				irodsAccount = RestAuthUtils
+						.getIRODSAccountFromBasicAuthValues(auth,
+								restConfiguration);
+				log.info("defaut storage resource in irods account:{}",
+						irodsAccount.getDefaultStorageResource());
 			}
-			
+
 			log.info("irods account for auth:{}", irodsAccount);
 
 			authResponse = irodsAccessObjectFactory
@@ -133,8 +137,8 @@ public class BasicAuthFilter implements Filter {
 				TicketClientSupport ticketClientSupport = new TicketClientSupport(
 						irodsAccessObjectFactory, irodsAccount);
 				ticketClientSupport.initializeSessionWithTicket(ticketString);
-			
-			} 
+
+			}
 
 			chain.doFilter(httpRequest, httpResponse);
 			return;
@@ -207,7 +211,7 @@ public class BasicAuthFilter implements Filter {
 	private boolean isPreflight(HttpServletRequest request) {
 		return "OPTIONS".equals(request.getMethod());
 	}
-	
+
 	public class HeaderMapRequestWrapper extends HttpServletRequestWrapper {
 
 		private Map<String, String> headerMap = new HashMap<String, String>();
@@ -215,10 +219,10 @@ public class BasicAuthFilter implements Filter {
 		public HeaderMapRequestWrapper(HttpServletRequest request) {
 			super(request);
 		}
-		
-        public void addHeader(String name, String value) {
-            headerMap.put(name, value);
-        }
+
+		public void addHeader(String name, String value) {
+			headerMap.put(name, value);
+		}
 
 		@Override
 		public String getHeader(String name) {
