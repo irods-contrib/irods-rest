@@ -5,18 +5,21 @@ package org.irods.jargon.rest.domain;
 
 import java.util.Date;
 
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.irods.jargon.core.connection.IRODSServerProperties.IcatEnabled;
-import org.jboss.resteasy.annotations.providers.jaxb.json.BadgerFish;
+import org.irods.jargon.rest.configuration.RestConfiguration;
+import org.jboss.resteasy.annotations.providers.jaxb.json.Mapped;
+import org.jboss.resteasy.annotations.providers.jaxb.json.XmlNsMap;
 
 /**
  * Information about the server for representation as XML or JSON
  * 
  * @author Mike Conway - DICE (www.irods.org)
  */
-@XmlRootElement(name = "serverInfo")
-@BadgerFish
+@XmlRootElement(name = "serverInfo", namespace = RestConfiguration.NS)
+@Mapped(namespaceMap = { @XmlNsMap(namespace = RestConfiguration.NS, jsonName = RestConfiguration.JSON_NAME) })
 public class ServerInfo {
 
 	private Date initializeDate = new Date();
@@ -30,6 +33,7 @@ public class ServerInfo {
 	 */
 	private long currentServerTime = 0;
 
+	@XmlElement
 	public Date getInitializeDate() {
 		return initializeDate;
 	}
@@ -38,6 +42,7 @@ public class ServerInfo {
 		this.initializeDate = initializeDate;
 	}
 
+	@XmlElement
 	public IcatEnabled getIcatEnabled() {
 		return icatEnabled;
 	}
@@ -46,6 +51,7 @@ public class ServerInfo {
 		this.icatEnabled = icatEnabled;
 	}
 
+	@XmlElement
 	public int getServerBootTime() {
 		return serverBootTime;
 	}
@@ -54,6 +60,7 @@ public class ServerInfo {
 		this.serverBootTime = serverBootTime;
 	}
 
+	@XmlElement
 	public String getRelVersion() {
 		return relVersion;
 	}
@@ -62,6 +69,7 @@ public class ServerInfo {
 		this.relVersion = relVersion;
 	}
 
+	@XmlElement
 	public String getApiVersion() {
 		return apiVersion;
 	}
@@ -70,6 +78,7 @@ public class ServerInfo {
 		this.apiVersion = apiVersion;
 	}
 
+	@XmlElement
 	public String getRodsZone() {
 		return rodsZone;
 	}
@@ -78,6 +87,7 @@ public class ServerInfo {
 		this.rodsZone = rodsZone;
 	}
 
+	@XmlElement
 	public long getCurrentServerTime() {
 		return currentServerTime;
 	}

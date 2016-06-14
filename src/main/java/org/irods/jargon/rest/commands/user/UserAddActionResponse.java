@@ -6,15 +6,12 @@ package org.irods.jargon.rest.commands.user;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.jboss.resteasy.annotations.providers.jaxb.json.BadgerFish;
-
 /**
  * Represents a response to the add user command
  * 
  * @author Mike Conway - DICE (www.irods.org)
  */
 @XmlRootElement(name = "userAddActionResponse")
-@BadgerFish
 public class UserAddActionResponse {
 
 	public enum UserAddActionResponseCode {

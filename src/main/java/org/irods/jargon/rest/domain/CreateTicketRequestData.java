@@ -5,9 +5,10 @@ package org.irods.jargon.rest.domain;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 
 import org.irods.jargon.rest.configuration.RestConfiguration;
+import org.jboss.resteasy.annotations.providers.jaxb.json.Mapped;
+import org.jboss.resteasy.annotations.providers.jaxb.json.XmlNsMap;
 
 /**
  * Value object to hold request data for ticket creation. The
@@ -15,8 +16,8 @@ import org.irods.jargon.rest.configuration.RestConfiguration;
  * @author jjames
  * 
  */
-@XmlType(name = "createTicketRequestData", namespace = RestConfiguration.NS)
 @XmlRootElement(name = "createTicketRequestData", namespace = RestConfiguration.NS)
+@Mapped(namespaceMap = { @XmlNsMap(namespace = RestConfiguration.NS, jsonName = RestConfiguration.JSON_NAME) })
 public class CreateTicketRequestData {
 
 	/** The mode. */
@@ -35,7 +36,7 @@ public class CreateTicketRequestData {
 	/**
 	 * @return the mode
 	 */
-	@XmlElement(name = "mode", required = true, namespace = RestConfiguration.NS)
+	@XmlElement(name = "mode", required = true)
 	public String getMode() {
 		return mode;
 	}
@@ -51,7 +52,7 @@ public class CreateTicketRequestData {
 	/**
 	 * @return the objectPath
 	 */
-	@XmlElement(name = "object_path", required = true, namespace = RestConfiguration.NS)
+	@XmlElement(name = "object_path", required = true)
 	public String getObjectPath() {
 		return objectPath;
 	}
@@ -69,7 +70,7 @@ public class CreateTicketRequestData {
 	 *
 	 * @return the ticket string
 	 */
-	@XmlElement(name = "ticket_string", required = false, namespace = RestConfiguration.NS)
+	@XmlElement(name = "ticket_string", required = false)
 	public String getTicketString() {
 		return ticketString;
 	}

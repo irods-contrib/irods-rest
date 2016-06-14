@@ -63,6 +63,7 @@ form.append('uploadFile',fs.createReadStream(testProps.testfile1Path()), {
 
 var uploadFileName = "upload1.txt";
 
+/*
 frisby.create('file upload with ticket, anonymous')
     .post(testProps.urlPrefix("fileContents" + ticketFolder + "/" + uploadFileName + "?ticket=" + ticketString1), form, {
         json: false,
@@ -74,3 +75,5 @@ frisby.create('file upload with ticket, anonymous')
     .expectStatus(200)
     .inspectJSON()
     .toss();
+
+    */

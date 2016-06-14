@@ -13,7 +13,6 @@ import org.irods.jargon.core.protovalues.UserTypeEnum;
 import org.irods.jargon.core.pub.domain.User;
 import org.irods.jargon.rest.configuration.RestConfiguration;
 import org.irods.jargon.rest.utils.ConfigurationUtils;
-import org.jboss.resteasy.annotations.providers.jaxb.json.BadgerFish;
 
 /**
  * Value object wrapping a jargon <code>User</code> object for representation as
@@ -22,7 +21,6 @@ import org.jboss.resteasy.annotations.providers.jaxb.json.BadgerFish;
  * @author Mike Conway - DICE (www.irods.org)
  */
 @XmlRootElement(name = "user")
-@BadgerFish
 public class UserData {
 
 	private String name = "";
