@@ -11,6 +11,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.commons.io.FileUtils;
 import org.irods.jargon.core.pub.domain.ObjStat.SpecColType;
+import org.irods.jargon.rest.configuration.RestConfiguration;
+import org.jboss.resteasy.annotations.providers.jaxb.json.Mapped;
+import org.jboss.resteasy.annotations.providers.jaxb.json.XmlNsMap;
 
 /**
  * Value object to hold system metadata and information about a data object
@@ -19,7 +22,8 @@ import org.irods.jargon.core.pub.domain.ObjStat.SpecColType;
  * @author Mike Conway - DICE (www.irods.org)
  * 
  */
-@XmlRootElement(name = "dataObject")
+@XmlRootElement(name = "dataObject", namespace = RestConfiguration.NS)
+@Mapped(namespaceMap = { @XmlNsMap(namespace = RestConfiguration.NS, jsonName = RestConfiguration.JSON_NAME) })
 public class DataObjectData {
 
 	private int id = 0;
