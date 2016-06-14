@@ -17,6 +17,7 @@ import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.core.pub.UserAO;
 import org.irods.jargon.rest.auth.RestAuthUtils;
 import org.irods.jargon.rest.commands.AbstractIrodsService;
+import org.irods.jargon.rest.configuration.RestConfiguration;
 import org.irods.jargon.rest.exception.InvalidRequestDataException;
 import org.irods.jargon.rest.exception.IrodsRestException;
 import org.jboss.resteasy.annotations.providers.jaxb.json.Mapped;
@@ -58,7 +59,7 @@ public class TemporaryPasswordService extends AbstractIrodsService {
 	@PUT
 	@Path("/{userName}/temppassword")
 	@Consumes("application/json")
-	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = RestConfiguration.NS, jsonName = RestConfiguration.JSON_NAME) })
 	public TemporaryPasswordResponse obtainTemporaryPasswordForUser(
 			@HeaderParam("Authorization") final String authorization,
 			@PathParam("userName") final String userName,

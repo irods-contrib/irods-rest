@@ -13,6 +13,7 @@ import javax.ws.rs.Produces;
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.rest.commands.AbstractIrodsService;
+import org.irods.jargon.rest.configuration.RestConfiguration;
 import org.irods.jargon.rest.domain.RuleExecResultWrapper;
 import org.irods.jargon.rest.domain.RuleWrapper;
 import org.jboss.resteasy.annotations.providers.jaxb.json.Mapped;
@@ -50,7 +51,7 @@ public class RuleService extends AbstractIrodsService {
 	@POST
 	@Consumes({ "application/xml", "application/json" })
 	@Produces({ "application/xml", "application/json" })
-	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = RestConfiguration.NS, jsonName = RestConfiguration.JSON_NAME) })
 	public RuleExecResultWrapper executeRule(
 			@HeaderParam("Authorization") final String authorization,
 			final RuleWrapper ruleWrapper) throws JargonException {

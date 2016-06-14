@@ -37,6 +37,7 @@ import org.irods.jargon.core.pub.io.IRODSFileOutputStream;
 import org.irods.jargon.core.pub.io.PackingIrodsInputStream;
 import org.irods.jargon.core.pub.io.PackingIrodsOutputStream;
 import org.irods.jargon.rest.commands.AbstractIrodsService;
+import org.irods.jargon.rest.configuration.RestConfiguration;
 import org.irods.jargon.rest.domain.DataObjectData;
 import org.irods.jargon.rest.utils.DataUtils;
 import org.jboss.resteasy.annotations.providers.jaxb.json.Mapped;
@@ -91,7 +92,7 @@ public class FileContentsService extends AbstractIrodsService {
 	@Path("{path:.*}")
 	@Consumes("multipart/form-data")
 	@Produces({ "application/xml", "application/json" })
-	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = RestConfiguration.NS, jsonName = RestConfiguration.JSON_NAME) })
 	public DataObjectData uploadFile(
 			@HeaderParam("Authorization") final String authorization,
 			@PathParam("path") final String path,

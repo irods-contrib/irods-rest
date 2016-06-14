@@ -3,9 +3,9 @@
  */
 package org.irods.jargon.rest.commands.query;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.ArrayList;
 
 import javax.inject.Named;
 import javax.ws.rs.Consumes;
@@ -20,6 +20,7 @@ import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.core.pub.IRODSGenQueryExecutor;
 import org.irods.jargon.core.query.GenQueryBuilderException;
+import org.irods.jargon.core.query.GenQueryField.SelectFieldTypes;
 import org.irods.jargon.core.query.GenQueryOrderByField.OrderByType;
 import org.irods.jargon.core.query.IRODSGenQueryBuilder;
 import org.irods.jargon.core.query.IRODSGenQueryFromBuilder;
@@ -28,8 +29,8 @@ import org.irods.jargon.core.query.IRODSQueryResultSetInterface;
 import org.irods.jargon.core.query.JargonQueryException;
 import org.irods.jargon.core.query.QueryConditionOperators;
 import org.irods.jargon.core.query.RodsGenQueryEnum;
-import org.irods.jargon.core.query.GenQueryField.SelectFieldTypes;
 import org.irods.jargon.rest.commands.AbstractIrodsService;
+import org.irods.jargon.rest.configuration.RestConfiguration;
 import org.irods.jargon.rest.domain.GenQueryColumn;
 import org.irods.jargon.rest.domain.GenQueryCondition;
 import org.irods.jargon.rest.domain.GenQueryOrderBy;
@@ -106,22 +107,22 @@ public class GenQueryService extends AbstractIrodsService {
 	 * Response:
 	 * 
 	 * <pre>
-	 * {@code 
-	 * <?xml version="1.0" encoding="UTF-8" standalone="yes"?> 
-	 * <ns2:resultsxmlns:ns2="http://irods.org/irods-rest"> 
-	 *   <row> 
-	 *     <column name="RESC_NAME">demoResc</column> 
-	 *     <column name="COLL_NAME">/tempZone/home/rods</column> 
-	 *     <column name="DATA_NAME">CAMB001.hdf5</column> 
-	 *   </row> 
-	 *   <row> 
-	 *     <column name="RESC_NAME">demoResc</column> 
-	 *     <column name="COLL_NAME">/tempZone/home/rods</column> 
-	 *     <column name="DATA_NAME">CAMB001.snapshot.hdf5</column> 
-	 *   </row> 
-	 * </ns2:results>
-	 *}
-	 *</pre>
+	 *  {@code 
+	 *  <?xml version="1.0" encoding="UTF-8" standalone="yes"?> 
+	 *  <ns2:resultsxmlns:ns2="http://irods.org/irods-rest"> 
+	 *    <row> 
+	 *      <column name="RESC_NAME">demoResc</column> 
+	 *      <column name="COLL_NAME">/tempZone/home/rods</column> 
+	 *      <column name="DATA_NAME">CAMB001.hdf5</column> 
+	 *    </row> 
+	 *    <row> 
+	 *      <column name="RESC_NAME">demoResc</column> 
+	 *      <column name="COLL_NAME">/tempZone/home/rods</column> 
+	 *      <column name="DATA_NAME">CAMB001.snapshot.hdf5</column> 
+	 *    </row> 
+	 *  </ns2:results>
+	 * }
+	 * </pre>
 	 *
 	 * @param authorization
 	 * @param requestData
@@ -133,7 +134,7 @@ public class GenQueryService extends AbstractIrodsService {
 	@POST
 	@Consumes({ "application/xml", "application/json" })
 	@Produces({ "application/xml", "application/json" })
-	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = RestConfiguration.NS, jsonName = RestConfiguration.JSON_NAME) })
 	public GenQueryResponseData getGenQueryData(
 			@HeaderParam("Authorization") final String authorization,
 			final GenQueryRequestData requestData) throws JargonException,
@@ -182,33 +183,41 @@ public class GenQueryService extends AbstractIrodsService {
 				// look up the Jargon enum for the condition field
 				RodsGenQueryEnum rodsGenQueryEnum = translateQueryColumnToEnum(condition
 						.getColumn());
-				
+
 				// Must treat "in" clause Differently from others.
 				if (condition.getOperator().equalsIgnoreCase("IN")) {
-					
-					if (condition.getValueList() == null || condition.getValueList().getValues() == null || condition.getValueList().getValues().size() == 0) {
-						throw new IllegalArgumentException("Condition (IN) must have a value_list.");
+
+					if (condition.getValueList() == null
+							|| condition.getValueList().getValues() == null
+							|| condition.getValueList().getValues().size() == 0) {
+						throw new IllegalArgumentException(
+								"Condition (IN) must have a value_list.");
 					} else if (condition.getValue() != null) {
-						throw new IllegalArgumentException("Condition (IN) should have a value_list and not a simple value.");
+						throw new IllegalArgumentException(
+								"Condition (IN) should have a value_list and not a simple value.");
 					}
 
-                    ArrayList<String> valueList = condition.getValueList().getValues();
+					ArrayList<String> valueList = condition.getValueList()
+							.getValues();
 
-					builder.addConditionAsMultiValueCondition(
-							rodsGenQueryEnum,
-							QueryConditionOperators.valueOf(condition.getOperator().toUpperCase()),
-							valueList);
+					builder.addConditionAsMultiValueCondition(rodsGenQueryEnum,
+							QueryConditionOperators.valueOf(condition
+									.getOperator().toUpperCase()), valueList);
 				} else {
 					if (condition.getValue() == null) {
-						throw new IllegalArgumentException("Condition " + condition.getOperator().toUpperCase() + " must have a value");
+						throw new IllegalArgumentException("Condition "
+								+ condition.getOperator().toUpperCase()
+								+ " must have a value");
 					} else if (condition.getValueList() != null) {
-						throw new IllegalArgumentException("Condition " + condition.getOperator().toUpperCase() + " should not have a value_list.");
+						throw new IllegalArgumentException("Condition "
+								+ condition.getOperator().toUpperCase()
+								+ " should not have a value_list.");
 					}
-					
-					builder.addConditionAsGenQueryField(
-							rodsGenQueryEnum,
-							QueryConditionOperators.valueOf(condition.getOperator().toUpperCase()),
-							condition.getValue());
+
+					builder.addConditionAsGenQueryField(rodsGenQueryEnum,
+							QueryConditionOperators.valueOf(condition
+									.getOperator().toUpperCase()), condition
+									.getValue());
 				}
 			}
 
@@ -269,7 +278,7 @@ public class GenQueryService extends AbstractIrodsService {
 
 			return responseData;
 		} finally {
-			//getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
+			// getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
 		}
 	}
 

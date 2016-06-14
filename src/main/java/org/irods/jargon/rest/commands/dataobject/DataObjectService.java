@@ -30,6 +30,7 @@ import org.irods.jargon.core.pub.domain.AvuData;
 import org.irods.jargon.core.pub.domain.DataObject;
 import org.irods.jargon.core.pub.io.IRODSFile;
 import org.irods.jargon.rest.commands.AbstractIrodsService;
+import org.irods.jargon.rest.configuration.RestConfiguration;
 import org.irods.jargon.rest.domain.DataObjectData;
 import org.irods.jargon.rest.domain.MetadataEntry;
 import org.irods.jargon.rest.domain.MetadataListing;
@@ -75,7 +76,7 @@ public class DataObjectService extends AbstractIrodsService {
 	@GET
 	@Path("{path:.*}")
 	@Produces({ "application/xml", "application/json" })
-	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = RestConfiguration.NS, jsonName = RestConfiguration.JSON_NAME) })
 	public DataObjectData getDataObjectData(
 			@HeaderParam("Authorization") final String authorization,
 			@PathParam("path") final String path) throws JargonException,
@@ -128,7 +129,7 @@ public class DataObjectService extends AbstractIrodsService {
 	 */
 	@DELETE
 	@Path("{path:.*}")
-	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = RestConfiguration.NS, jsonName = RestConfiguration.JSON_NAME) })
 	public void removeDataObject(
 			@HeaderParam("Authorization") final String authorization,
 			@PathParam("path") final String path,
@@ -187,7 +188,7 @@ public class DataObjectService extends AbstractIrodsService {
 	@GET
 	@Path("{path:.*}/acl")
 	@Produces({ "application/xml", "application/json" })
-	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = RestConfiguration.NS, jsonName = RestConfiguration.JSON_NAME) })
 	public PermissionListing getDataObjectAcl(
 			@HeaderParam("Authorization") final String authorization,
 			@PathParam("path") final String path) throws JargonException {
@@ -228,7 +229,7 @@ public class DataObjectService extends AbstractIrodsService {
 	@GET
 	@Path("{path:.*}/metadata")
 	@Produces({ "application/xml", "application/json" })
-	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = RestConfiguration.NS, jsonName = RestConfiguration.JSON_NAME) })
 	public MetadataListing getDataObjectMetadata(
 			@HeaderParam("Authorization") final String authorization,
 			@PathParam("path") final String path) throws JargonException {
@@ -287,7 +288,7 @@ public class DataObjectService extends AbstractIrodsService {
 	@Path("{path:.*}/metadata")
 	@Consumes({ "application/xml", "application/json" })
 	@Produces({ "application/xml", "application/json" })
-	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = RestConfiguration.NS, jsonName = RestConfiguration.JSON_NAME) })
 	public List<MetadataOperationResultEntry> addCollectionMetadata(
 			@HeaderParam("Authorization") final String authorization,
 			@PathParam("path") final String path,
@@ -369,7 +370,7 @@ public class DataObjectService extends AbstractIrodsService {
 	@Path("{path:.*}/metadata")
 	@Consumes({ "application/xml", "application/json" })
 	@Produces({ "application/xml", "application/json" })
-	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = RestConfiguration.NS, jsonName = RestConfiguration.JSON_NAME) })
 	public List<MetadataOperationResultEntry> deleteDataObjectMetadata(
 			@HeaderParam("Authorization") final String authorization,
 			@PathParam("path") final String path,
@@ -462,7 +463,7 @@ public class DataObjectService extends AbstractIrodsService {
 	@PUT
 	@Path("{path:.*}/acl/{userName}")
 	@Produces({ "application/xml", "application/json" })
-	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = RestConfiguration.NS, jsonName = RestConfiguration.JSON_NAME) })
 	public void addDataObjectAcl(
 			@HeaderParam("Authorization") final String authorization,
 			@PathParam("path") final String path,
@@ -549,7 +550,7 @@ public class DataObjectService extends AbstractIrodsService {
 	@DELETE
 	@Path("{path:.*}/acl/{userName}")
 	@Produces({ "application/xml", "application/json" })
-	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = RestConfiguration.NS, jsonName = RestConfiguration.JSON_NAME) })
 	public void deleteDataObjectAcl(
 			@HeaderParam("Authorization") final String authorization,
 			@PathParam("path") final String path,

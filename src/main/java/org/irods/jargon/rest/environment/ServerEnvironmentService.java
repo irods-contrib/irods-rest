@@ -77,7 +77,7 @@ public class ServerEnvironmentService {
 	 */
 	@GET
 	@Produces({ "application/xml", "application/json" })
-	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = RestConfiguration.NS, jsonName = RestConfiguration.JSON_NAME) })
 	public ServerInfo getServerInfo(
 			@HeaderParam("Authorization") final String authorization)
 			throws JargonException {

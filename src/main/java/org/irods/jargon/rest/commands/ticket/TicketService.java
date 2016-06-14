@@ -107,7 +107,7 @@ public class TicketService extends AbstractIrodsService {
 
 	@DELETE
 	@Path("{ticket:.*}")
-	@Mapped(namespaceMap = { @XmlNsMap(namespace = RestConfiguration.NS, jsonName = "irods-rest") })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = RestConfiguration.NS, jsonName = RestConfiguration.JSON_NAME) })
 	public void deleteTicket(
 			@HeaderParam("Authorization") final String authorization,
 			@PathParam("ticket") final String ticketId) throws JargonException,
@@ -137,7 +137,7 @@ public class TicketService extends AbstractIrodsService {
 	@Path("{ticket:.*}")
 	@Consumes({ "application/xml", "application/json" })
 	@Produces({ "application/xml", "application/json" })
-	@Mapped(namespaceMap = { @XmlNsMap(namespace = RestConfiguration.NS, jsonName = "irods-rest") })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = RestConfiguration.NS, jsonName = RestConfiguration.JSON_NAME) })
 	public void updateTicket(
 			@HeaderParam("Authorization") final String authorization,
 			@PathParam("ticket") final String ticketString,
@@ -226,7 +226,7 @@ public class TicketService extends AbstractIrodsService {
 	@Path("{ticket:.*}")
 	@Consumes({ "application/xml", "application/json" })
 	@Produces({ "application/xml", "application/json" })
-	@Mapped(namespaceMap = { @XmlNsMap(namespace = RestConfiguration.NS, jsonName = "irods-rest") })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = RestConfiguration.NS, jsonName = RestConfiguration.JSON_NAME) })
 	public TicketData listTicket(
 			@HeaderParam("Authorization") final String authorization,
 			@PathParam("ticket") final String ticketString)

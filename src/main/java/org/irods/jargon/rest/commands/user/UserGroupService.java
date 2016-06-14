@@ -23,6 +23,7 @@ import org.irods.jargon.rest.commands.AbstractIrodsService;
 import org.irods.jargon.rest.commands.GenericCommandResponse;
 import org.irods.jargon.rest.commands.GenericCommandResponse.Status;
 import org.irods.jargon.rest.commands.user.UserGroupCommandResponse.UserGroupCommandStatus;
+import org.irods.jargon.rest.configuration.RestConfiguration;
 import org.irods.jargon.rest.exception.InvalidRequestDataException;
 import org.irods.jargon.rest.exception.IrodsRestException;
 import org.jboss.resteasy.annotations.providers.jaxb.json.Mapped;
@@ -55,7 +56,7 @@ public class UserGroupService extends AbstractIrodsService {
 	@PUT
 	@Path("/user")
 	@Consumes("application/json")
-	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = RestConfiguration.NS, jsonName = RestConfiguration.JSON_NAME) })
 	public UserGroupCommandResponse addUserToGroup(
 			@HeaderParam("Authorization") final String authorization,
 			final UserGroupMembershipRequest userAddToGroupRequest)
@@ -140,7 +141,7 @@ public class UserGroupService extends AbstractIrodsService {
 	@DELETE
 	@Path("/{userGroup}")
 	@Consumes("application/json")
-	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = RestConfiguration.NS, jsonName = RestConfiguration.JSON_NAME) })
 	public UserGroupCommandResponse deleteUserGroup(
 			@HeaderParam("Authorization") final String authorization,
 			@PathParam("userGroup") final String userGroup)
@@ -184,7 +185,7 @@ public class UserGroupService extends AbstractIrodsService {
 	@DELETE
 	@Path("/{userGroup}/user/{userName}")
 	// @Consumes("application/json")
-	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = RestConfiguration.NS, jsonName = RestConfiguration.JSON_NAME) })
 	public UserGroupCommandResponse deleteUserFromGroup(
 			@HeaderParam("Authorization") final String authorization,
 			@PathParam("userGroup") final String userGroup,
@@ -238,7 +239,7 @@ public class UserGroupService extends AbstractIrodsService {
 	 */
 	@PUT
 	@Consumes("application/json")
-	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = RestConfiguration.NS, jsonName = RestConfiguration.JSON_NAME) })
 	public UserGroupCommandResponse addUserGroup(
 			@HeaderParam("Authorization") final String authorization,
 			final UserGroupRequest userGroupAddRequest)

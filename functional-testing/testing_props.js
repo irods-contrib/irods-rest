@@ -14,7 +14,7 @@ exports.password1 = "test";
 exports.anonymous = "anonymous";
 exports.protocol = 'http://';
 exports.context = "/irods-rest/rest";
-exports.zone = "zone1";
+exports.zone = "tempZone";
 exports.ticket1 = "frisby-test-tkt1";
 
 /**

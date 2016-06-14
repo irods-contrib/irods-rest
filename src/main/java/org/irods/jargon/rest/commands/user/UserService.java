@@ -23,6 +23,7 @@ import org.irods.jargon.core.pub.domain.User;
 import org.irods.jargon.rest.auth.RestAuthUtils;
 import org.irods.jargon.rest.commands.AbstractIrodsService;
 import org.irods.jargon.rest.commands.user.UserAddActionResponse.UserAddActionResponseCode;
+import org.irods.jargon.rest.configuration.RestConfiguration;
 import org.irods.jargon.rest.domain.UserData;
 import org.irods.jargon.rest.utils.ConfigurationUtils;
 import org.jboss.resteasy.annotations.providers.jaxb.json.Mapped;
@@ -45,12 +46,13 @@ public class UserService extends AbstractIrodsService {
 	@GET
 	@Path("/{userName}")
 	@Produces({ "application/xml", "application/json" })
-	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = RestConfiguration.NS, jsonName = RestConfiguration.JSON_NAME) })
 	public UserData getUser(
 			@HeaderParam("Authorization") final String authorization,
-			@PathParam("userName") final String userName, @QueryParam("admin") @DefaultValue("false") final boolean isAdmin)
+			@PathParam("userName") final String userName,
+			@QueryParam("admin") @DefaultValue("false") final boolean isAdmin)
 			throws JargonException {
-		
+
 		log.info("getUser()");
 
 		if (authorization == null || authorization.isEmpty()) {
@@ -64,7 +66,7 @@ public class UserService extends AbstractIrodsService {
 		if (getIrodsAccessObjectFactory() == null) {
 			throw new IllegalArgumentException("null irodsAccessObjectFactory");
 		}
-		
+
 		log.info("as admin?:{}", isAdmin);
 
 		try {
@@ -104,7 +106,7 @@ public class UserService extends AbstractIrodsService {
 	 */
 	@PUT
 	@Consumes("application/json")
-	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	@Mapped(namespaceMap = { @XmlNsMap(namespace = RestConfiguration.NS, jsonName = RestConfiguration.JSON_NAME) })
 	public UserAddActionResponse addUser(
 			@HeaderParam("Authorization") final String authorization,
 			final UserAddByAdminRequest userAddByAdminRequest) {
