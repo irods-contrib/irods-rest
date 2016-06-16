@@ -1,0 +1,5548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 1.5.4-dev">
+<meta name="author" content="Justin Kyle James, Raphaël Flores">
+<title>iRODS REST API User Documentation</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
+<style>
+/*! normalize.css v2.1.2 | MIT License | git.io/normalize */
+/* ========================================================================== HTML5 display definitions ========================================================================== */
+/** Correct `block` display not defined in IE 8/9. */
+article, aside, details, figcaption, figure, footer, header, hgroup, main, nav, section, summary {
+    display: block;
+}
+
+/** Correct `inline-block` display not defined in IE 8/9. */
+audio, canvas, video {
+    display: inline-block;
+}
+
+/** Prevent modern browsers from displaying `audio` without controls. Remove excess height in iOS 5 devices. */
+audio:not([controls]) {
+    display: none;
+    height: 0;
+}
+
+/** Address `[hidden]` styling not present in IE 8/9. Hide the `template` element in IE, Safari, and Firefox < 22. */
+[hidden], template {
+    display: none;
+}
+
+script {
+    display: none !important;
+}
+
+/* ========================================================================== Base ========================================================================== */
+/** 1. Set default font family to sans-serif. 2. Prevent iOS text size adjust after orientation change, without disabling user zoom. */
+html {
+    font-family: sans-serif; /* 1 */
+    -ms-text-size-adjust: 100%; /* 2 */
+    -webkit-text-size-adjust: 100%; /* 2 */
+}
+
+/** Remove default margin. */
+body {
+    margin: 0;
+}
+
+/* ========================================================================== Links ========================================================================== */
+/** Remove the gray background color from active links in IE 10. */
+a {
+    background: transparent;
+}
+
+/** Address `outline` inconsistency between Chrome and other browsers. */
+a:focus {
+    outline: thin dotted;
+}
+
+/** Improve readability when focused and also mouse hovered in all browsers. */
+a:active, a:hover {
+    outline: 0;
+}
+
+/* ========================================================================== Typography ========================================================================== */
+/** Address variable `h1` font-size and margin within `section` and `article` contexts in Firefox 4+, Safari 5, and Chrome. */
+h1 {
+    font-size: 2em;
+    margin: 0.67em 0;
+}
+
+/** Address styling not present in IE 8/9, Safari 5, and Chrome. */
+abbr[title] {
+    border-bottom: 1px dotted;
+}
+
+/** Address style set to `bolder` in Firefox 4+, Safari 5, and Chrome. */
+b, strong {
+    font-weight: bold;
+}
+
+/** Address styling not present in Safari 5 and Chrome. */
+dfn {
+    font-style: italic;
+}
+
+/** Address differences between Firefox and other browsers. */
+hr {
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
+    height: 0;
+}
+
+/** Address styling not present in IE 8/9. */
+mark {
+    background: #ff0;
+    color: #000;
+}
+
+/** Correct font family set oddly in Safari 5 and Chrome. */
+code, kbd, pre, samp {
+    font-family: monospace, serif;
+    font-size: 1em;
+}
+
+/** Improve readability of pre-formatted text in all browsers. */
+pre {
+    white-space: pre-wrap;
+}
+
+/** Set consistent quote types. */
+q {
+    quotes: "\201C" "\201D" "\2018" "\2019";
+}
+
+/** Address inconsistent and variable font size in all browsers. */
+small {
+    font-size: 80%;
+}
+
+/** Prevent `sub` and `sup` affecting `line-height` in all browsers. */
+sub, sup {
+    font-size: 75%;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+}
+
+sup {
+    top: -0.5em;
+}
+
+sub {
+    bottom: -0.25em;
+}
+
+/* ========================================================================== Embedded content ========================================================================== */
+/** Remove border when inside `a` element in IE 8/9. */
+img {
+    border: 0;
+}
+
+/** Correct overflow displayed oddly in IE 9. */
+svg:not(:root) {
+    overflow: hidden;
+}
+
+/* ========================================================================== Figures ========================================================================== */
+/** Address margin not present in IE 8/9 and Safari 5. */
+figure {
+    margin: 0;
+}
+
+/* ========================================================================== Forms ========================================================================== */
+/** Define consistent border, margin, and padding. */
+fieldset {
+    border: 1px solid #c0c0c0;
+    margin: 0 2px;
+    padding: 0.35em 0.625em 0.75em;
+}
+
+/** 1. Correct `color` not being inherited in IE 8/9. 2. Remove padding so people aren't caught out if they zero out fieldsets. */
+legend {
+    border: 0; /* 1 */
+    padding: 0; /* 2 */
+}
+
+/** 1. Correct font family not being inherited in all browsers. 2. Correct font size not being inherited in all browsers. 3. Address margins set differently in Firefox 4+, Safari 5, and Chrome. */
+button, input, select, textarea {
+    font-family: inherit; /* 1 */
+    font-size: 100%; /* 2 */
+    margin: 0; /* 3 */
+}
+
+/** Address Firefox 4+ setting `line-height` on `input` using `!important` in the UA stylesheet. */
+button, input {
+    line-height: normal;
+}
+
+/** Address inconsistent `text-transform` inheritance for `button` and `select`. All other form control elements do not inherit `text-transform` values. Correct `button` style inheritance in Chrome, Safari 5+, and IE 8+. Correct `select` style inheritance in Firefox 4+ and Opera. */
+button, select {
+    text-transform: none;
+}
+
+/** 1. Avoid the WebKit bug in Android 4.0.* where (2) destroys native `audio` and `video` controls. 2. Correct inability to style clickable `input` types in iOS. 3. Improve usability and consistency of cursor style between image-type `input` and others. */
+button, html input[type="button"], input[type="reset"], input[type="submit"] {
+    -webkit-appearance: button; /* 2 */
+    cursor: pointer; /* 3 */
+}
+
+/** Re-set default cursor for disabled elements. */
+button[disabled], html input[disabled] {
+    cursor: default;
+}
+
+/** 1. Address box sizing set to `content-box` in IE 8/9. 2. Remove excess padding in IE 8/9. */
+input[type="checkbox"], input[type="radio"] {
+    box-sizing: border-box; /* 1 */
+    padding: 0; /* 2 */
+}
+
+/** 1. Address `appearance` set to `searchfield` in Safari 5 and Chrome. 2. Address `box-sizing` set to `border-box` in Safari 5 and Chrome (include `-moz` to future-proof). */
+input[type="search"] {
+    -webkit-appearance: textfield; /* 1 */
+    -moz-box-sizing: content-box;
+    -webkit-box-sizing: content-box; /* 2 */
+    box-sizing: content-box;
+}
+
+/** Remove inner padding and search cancel button in Safari 5 and Chrome on OS X. */
+input[type="search"]::-webkit-search-cancel-button, input[type="search"]::-webkit-search-decoration {
+    -webkit-appearance: none;
+}
+
+/** Remove inner padding and border in Firefox 4+. */
+button::-moz-focus-inner, input::-moz-focus-inner {
+    border: 0;
+    padding: 0;
+}
+
+/** 1. Remove default vertical scrollbar in IE 8/9. 2. Improve readability and alignment in all browsers. */
+textarea {
+    overflow: auto; /* 1 */
+    vertical-align: top; /* 2 */
+}
+
+/* ========================================================================== Tables ========================================================================== */
+/** Remove most spacing between table cells. */
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+meta.foundation-mq-small {
+    font-family: "only screen and (min-width: 768px)";
+    width: 768px;
+}
+
+meta.foundation-mq-medium {
+    font-family: "only screen and (min-width:1280px)";
+    width: 1280px;
+}
+
+meta.foundation-mq-large {
+    font-family: "only screen and (min-width:1440px)";
+    width: 1440px;
+}
+
+*, *:before, *:after {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+html, body {
+    font-size: 100%;
+}
+
+body {
+    background: white;
+    color: rgba(0, 0, 0, 0.8);
+    padding: 0;
+    margin: 0;
+    font-family: "Noto Serif", "DejaVu Serif", serif;
+    font-weight: normal;
+    font-style: normal;
+    line-height: 1;
+    position: relative;
+    cursor: auto;
+}
+
+a:hover {
+    cursor: pointer;
+}
+
+img, object, embed {
+    max-width: 100%;
+    height: auto;
+}
+
+object, embed {
+    height: 100%;
+}
+
+img {
+    -ms-interpolation-mode: bicubic;
+}
+
+#map_canvas img, #map_canvas embed, #map_canvas object, .map_canvas img, .map_canvas embed, .map_canvas object {
+    max-width: none !important;
+}
+
+.left {
+    float: left !important;
+}
+
+.right {
+    float: right !important;
+}
+
+.text-left {
+    text-align: left !important;
+}
+
+.text-right {
+    text-align: right !important;
+}
+
+.text-center {
+    text-align: center !important;
+}
+
+.text-justify {
+    text-align: justify !important;
+}
+
+.hide {
+    display: none;
+}
+
+.antialiased, body {
+    -webkit-font-smoothing: antialiased;
+}
+
+img {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+textarea {
+    height: auto;
+    min-height: 50px;
+}
+
+select {
+    width: 100%;
+}
+
+p.lead, .paragraph.lead > p, #preamble > .sectionbody > .paragraph:first-of-type p {
+    font-size: 1.21875em;
+    line-height: 1.6;
+}
+
+.subheader, .admonitionblock td.content > .title, .audioblock > .title, .exampleblock > .title, .imageblock > .title, .listingblock > .title, .literalblock > .title, .stemblock > .title, .openblock > .title, .paragraph > .title, .quoteblock > .title, table.tableblock > .title, .verseblock > .title, .videoblock > .title, .dlist > .title, .olist > .title, .ulist > .title, .qlist > .title, .hdlist > .title {
+    line-height: 1.45;
+    color: #7a2518;
+    font-weight: normal;
+    margin-top: 0;
+    margin-bottom: 0.25em;
+}
+
+/* Typography resets */
+div, dl, dt, dd, ul, ol, li, h1, h2, h3, #toctitle, .sidebarblock > .content > .title, h4, h5, h6, pre, form, p, blockquote, th, td {
+    margin: 0;
+    padding: 0;
+    direction: ltr;
+}
+
+/* Default Link Styles */
+a {
+    color: #2156a5;
+    text-decoration: underline;
+    line-height: inherit;
+}
+
+a:hover, a:focus {
+    color: #1d4b8f;
+}
+
+a img {
+    border: none;
+}
+
+/* Default paragraph styles */
+p {
+    font-family: inherit;
+    font-weight: normal;
+    font-size: 1em;
+    line-height: 1.6;
+    margin-bottom: 1.25em;
+    text-rendering: optimizeLegibility;
+}
+
+p aside {
+    font-size: 0.875em;
+    line-height: 1.35;
+    font-style: italic;
+}
+
+/* Default header styles */
+h1, h2, h3, #toctitle, .sidebarblock > .content > .title, h4, h5, h6 {
+    font-family: "Open Sans", "DejaVu Sans", sans-serif;
+    font-weight: 300;
+    font-style: normal;
+    color: #ba3925;
+    text-rendering: optimizeLegibility;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    line-height: 1.0125em;
+}
+
+h1 small, h2 small, h3 small, #toctitle small, .sidebarblock > .content > .title small, h4 small, h5 small, h6 small {
+    font-size: 60%;
+    color: #e99b8f;
+    line-height: 0;
+}
+
+h1 {
+    font-size: 2.125em;
+}
+
+h2 {
+    font-size: 1.6875em;
+}
+
+h3, #toctitle, .sidebarblock > .content > .title {
+    font-size: 1.375em;
+}
+
+h4 {
+    font-size: 1.125em;
+}
+
+h5 {
+    font-size: 1.125em;
+}
+
+h6 {
+    font-size: 1em;
+}
+
+hr {
+    border: solid #ddddd8;
+    border-width: 1px 0 0;
+    clear: both;
+    margin: 1.25em 0 1.1875em;
+    height: 0;
+}
+
+/* Helpful Typography Defaults */
+em, i {
+    font-style: italic;
+    line-height: inherit;
+}
+
+strong, b {
+    font-weight: bold;
+    line-height: inherit;
+}
+
+small {
+    font-size: 60%;
+    line-height: inherit;
+}
+
+code {
+    font-family: "Droid Sans Mono", "DejaVu Sans Mono", "Monospace", monospace;
+    font-weight: normal;
+    color: rgba(0, 0, 0, 0.9);
+}
+
+/* Lists */
+ul, ol, dl {
+    font-size: 1em;
+    line-height: 1.6;
+    margin-bottom: 1.25em;
+    list-style-position: outside;
+    font-family: inherit;
+}
+
+ul, ol {
+    margin-left: 1.5em;
+}
+
+ul.no-bullet, ol.no-bullet {
+    margin-left: 1.5em;
+}
+
+/* Unordered Lists */
+ul li ul, ul li ol {
+    margin-left: 1.25em;
+    margin-bottom: 0;
+    font-size: 1em; /* Override nested font-size change */
+}
+
+ul.square li ul, ul.circle li ul, ul.disc li ul {
+    list-style: inherit;
+}
+
+ul.square {
+    list-style-type: square;
+}
+
+ul.circle {
+    list-style-type: circle;
+}
+
+ul.disc {
+    list-style-type: disc;
+}
+
+ul.no-bullet {
+    list-style: none;
+}
+
+/* Ordered Lists */
+ol li ul, ol li ol {
+    margin-left: 1.25em;
+    margin-bottom: 0;
+}
+
+/* Definition Lists */
+dl dt {
+    margin-bottom: 0.3125em;
+    font-weight: bold;
+}
+
+dl dd {
+    margin-bottom: 1.25em;
+}
+
+/* Abbreviations */
+abbr, acronym {
+    text-transform: uppercase;
+    font-size: 90%;
+    color: rgba(0, 0, 0, 0.8);
+    border-bottom: 1px dotted #dddddd;
+    cursor: help;
+}
+
+abbr {
+    text-transform: none;
+}
+
+/* Blockquotes */
+blockquote {
+    margin: 0 0 1.25em;
+    padding: 0.5625em 1.25em 0 1.1875em;
+    border-left: 1px solid #dddddd;
+}
+
+blockquote cite {
+    display: block;
+    font-size: 0.9375em;
+    color: rgba(0, 0, 0, 0.6);
+}
+
+blockquote cite:before {
+    content: "\2014 \0020";
+}
+
+blockquote cite a, blockquote cite a:visited {
+    color: rgba(0, 0, 0, 0.6);
+}
+
+blockquote, blockquote p {
+    line-height: 1.6;
+    color: rgba(0, 0, 0, 0.85);
+}
+
+/* Microformats */
+.vcard {
+    display: inline-block;
+    margin: 0 0 1.25em 0;
+    border: 1px solid #dddddd;
+    padding: 0.625em 0.75em;
+}
+
+.vcard li {
+    margin: 0;
+    display: block;
+}
+
+.vcard .fn {
+    font-weight: bold;
+    font-size: 0.9375em;
+}
+
+.vevent .summary {
+    font-weight: bold;
+}
+
+.vevent abbr {
+    cursor: auto;
+    text-decoration: none;
+    font-weight: bold;
+    border: none;
+    padding: 0 0.0625em;
+}
+
+@media only screen and (min-width: 768px) {
+    h1, h2, h3, #toctitle, .sidebarblock > .content > .title, h4, h5, h6 {
+        line-height: 1.2;
+    }
+
+    h1 {
+        font-size: 2.75em;
+    }
+
+    h2 {
+        font-size: 2.3125em;
+    }
+
+    h3, #toctitle, .sidebarblock > .content > .title {
+        font-size: 1.6875em;
+    }
+
+    h4 {
+        font-size: 1.4375em;
+    }
+}
+
+/* Tables */
+table {
+    background: white;
+    margin-bottom: 1.25em;
+    border: solid 1px #dedede;
+}
+
+table thead, table tfoot {
+    background: #f7f8f7;
+    font-weight: bold;
+}
+
+table thead tr th, table thead tr td, table tfoot tr th, table tfoot tr td {
+    padding: 0.5em 0.625em 0.625em;
+    font-size: inherit;
+    color: rgba(0, 0, 0, 0.8);
+    text-align: left;
+}
+
+table tr th, table tr td {
+    padding: 0.5625em 0.625em;
+    font-size: inherit;
+    color: rgba(0, 0, 0, 0.8);
+}
+
+table tr.even, table tr.alt, table tr:nth-of-type(even) {
+    background: #f8f8f7;
+}
+
+table thead tr th, table tfoot tr th, table tbody tr td, table tr td, table tfoot tr td {
+    display: table-cell;
+    line-height: 1.6;
+}
+
+h1, h2, h3, #toctitle, .sidebarblock > .content > .title, h4, h5, h6 {
+    line-height: 1.2;
+    word-spacing: -0.05em;
+}
+
+h1 strong, h2 strong, h3 strong, #toctitle strong, .sidebarblock > .content > .title strong, h4 strong, h5 strong, h6 strong {
+    font-weight: 400;
+}
+
+.clearfix:before, .clearfix:after, .float-group:before, .float-group:after {
+    content: " ";
+    display: table;
+}
+
+.clearfix:after, .float-group:after {
+    clear: both;
+}
+
+*:not(pre) > code {
+    font-size: 0.9375em;
+    font-style: normal !important;
+    letter-spacing: 0;
+    padding: 0.1em 0.5ex;
+    word-spacing: -0.15em;
+    background-color: #f7f7f8;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    line-height: 1.45;
+    text-rendering: optimizeSpeed;
+}
+
+pre, pre > code {
+    line-height: 1.45;
+    color: rgba(0, 0, 0, 0.9);
+    font-family: "Droid Sans Mono", "DejaVu Sans Mono", "Monospace", monospace;
+    font-weight: normal;
+    text-rendering: optimizeSpeed;
+}
+
+.keyseq {
+    color: rgba(51, 51, 51, 0.8);
+}
+
+kbd {
+    display: inline-block;
+    color: rgba(0, 0, 0, 0.8);
+    font-size: 0.75em;
+    line-height: 1.4;
+    background-color: #f7f7f7;
+    border: 1px solid #ccc;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    -webkit-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 0.1em white inset;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 0.1em white inset;
+    margin: -0.15em 0.15em 0 0.15em;
+    padding: 0.2em 0.6em 0.2em 0.5em;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.keyseq kbd:first-child {
+    margin-left: 0;
+}
+
+.keyseq kbd:last-child {
+    margin-right: 0;
+}
+
+.menuseq, .menu {
+    color: rgba(0, 0, 0, 0.8);
+}
+
+b.button:before, b.button:after {
+    position: relative;
+    top: -1px;
+    font-weight: normal;
+}
+
+b.button:before {
+    content: "[";
+    padding: 0 3px 0 2px;
+}
+
+b.button:after {
+    content: "]";
+    padding: 0 2px 0 3px;
+}
+
+p a > code:hover {
+    color: rgba(0, 0, 0, 0.9);
+}
+
+#header, #content, #footnotes, #footer {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 0;
+    margin-bottom: 0;
+    max-width: 62.5em;
+    *zoom: 1;
+    position: relative;
+    padding-left: 0.9375em;
+    padding-right: 0.9375em;
+}
+
+#header:before, #header:after, #content:before, #content:after, #footnotes:before, #footnotes:after, #footer:before, #footer:after {
+    content: " ";
+    display: table;
+}
+
+#header:after, #content:after, #footnotes:after, #footer:after {
+    clear: both;
+}
+
+#content {
+    margin-top: 1.25em;
+}
+
+#content:before {
+    content: none;
+}
+
+#header > h1:first-child {
+    color: rgba(0, 0, 0, 0.85);
+    margin-top: 2.25rem;
+    margin-bottom: 0;
+}
+
+#header > h1:first-child + #toc {
+    margin-top: 8px;
+    border-top: 1px solid #ddddd8;
+}
+
+#header > h1:only-child, body.toc2 #header > h1:nth-last-child(2) {
+    border-bottom: 1px solid #ddddd8;
+    padding-bottom: 8px;
+}
+
+#header .details {
+    border-bottom: 1px solid #ddddd8;
+    line-height: 1.45;
+    padding-top: 0.25em;
+    padding-bottom: 0.25em;
+    padding-left: 0.25em;
+    color: rgba(0, 0, 0, 0.6);
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -ms-flex-flow: row wrap;
+    -webkit-flex-flow: row wrap;
+    flex-flow: row wrap;
+}
+
+#header .details span:first-child {
+    margin-left: -0.125em;
+}
+
+#header .details span.email a {
+    color: rgba(0, 0, 0, 0.85);
+}
+
+#header .details br {
+    display: none;
+}
+
+#header .details br + span:before {
+    content: "\00a0\2013\00a0";
+}
+
+#header .details br + span.author:before {
+    content: "\00a0\22c5\00a0";
+    color: rgba(0, 0, 0, 0.85);
+}
+
+#header .details br + span#revremark:before {
+    content: "\00a0|\00a0";
+}
+
+#header #revnumber {
+    text-transform: capitalize;
+}
+
+#header #revnumber:after {
+    content: "\00a0";
+}
+
+#content > h1:first-child:not([class]) {
+    color: rgba(0, 0, 0, 0.85);
+    border-bottom: 1px solid #ddddd8;
+    padding-bottom: 8px;
+    margin-top: 0;
+    padding-top: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+#toc {
+    border-bottom: 1px solid #efefed;
+    padding-bottom: 0.5em;
+}
+
+#toc > ul {
+    margin-left: 0.125em;
+}
+
+#toc ul.sectlevel0 > li > a {
+    font-style: italic;
+}
+
+#toc ul.sectlevel0 ul.sectlevel1 {
+    margin: 0.5em 0;
+}
+
+#toc ul {
+    font-family: "Open Sans", "DejaVu Sans", sans-serif;
+    list-style-type: none;
+}
+
+#toc a {
+    text-decoration: none;
+}
+
+#toc a:active {
+    text-decoration: underline;
+}
+
+#toctitle {
+    color: #7a2518;
+    font-size: 1.2em;
+}
+
+@media only screen and (min-width: 768px) {
+    #toctitle {
+        font-size: 1.375em;
+    }
+
+    body.toc2 {
+        padding-left: 15em;
+        padding-right: 0;
+    }
+
+    #toc.toc2 {
+        margin-top: 0 !important;
+        background-color: #f8f8f7;
+        position: fixed;
+        width: 15em;
+        left: 0;
+        top: 0;
+        border-right: 1px solid #efefed;
+        border-top-width: 0 !important;
+        border-bottom-width: 0 !important;
+        z-index: 1000;
+        padding: 1.25em 1em;
+        height: 100%;
+        overflow: auto;
+    }
+
+    #toc.toc2 #toctitle {
+        margin-top: 0;
+        font-size: 1.2em;
+    }
+
+    #toc.toc2 > ul {
+        font-size: 0.9em;
+        margin-bottom: 0;
+    }
+
+    #toc.toc2 ul ul {
+        margin-left: 0;
+        padding-left: 1em;
+    }
+
+    #toc.toc2 ul.sectlevel0 ul.sectlevel1 {
+        padding-left: 0;
+        margin-top: 0.5em;
+        margin-bottom: 0.5em;
+    }
+
+    body.toc2.toc-right {
+        padding-left: 0;
+        padding-right: 15em;
+    }
+
+    body.toc2.toc-right #toc.toc2 {
+        border-right-width: 0;
+        border-left: 1px solid #efefed;
+        left: auto;
+        right: 0;
+    }
+}
+
+@media only screen and (min-width: 1280px) {
+    body.toc2 {
+        padding-left: 20em;
+        padding-right: 0;
+    }
+
+    #toc.toc2 {
+        width: 20em;
+    }
+
+    #toc.toc2 #toctitle {
+        font-size: 1.375em;
+    }
+
+    #toc.toc2 > ul {
+        font-size: 0.95em;
+    }
+
+    #toc.toc2 ul ul {
+        padding-left: 1.25em;
+    }
+
+    body.toc2.toc-right {
+        padding-left: 0;
+        padding-right: 20em;
+    }
+}
+
+#content #toc {
+    border-style: solid;
+    border-width: 1px;
+    border-color: #e0e0dc;
+    margin-bottom: 1.25em;
+    padding: 1.25em;
+    background: #f8f8f7;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+}
+
+#content #toc > :first-child {
+    margin-top: 0;
+}
+
+#content #toc > :last-child {
+    margin-bottom: 0;
+}
+
+#footer {
+    max-width: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 1.25em;
+}
+
+#footer-text {
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.44;
+}
+
+.sect1 {
+    padding-bottom: 0.625em;
+}
+
+@media only screen and (min-width: 768px) {
+    .sect1 {
+        padding-bottom: 1.25em;
+    }
+}
+
+.sect1 + .sect1 {
+    border-top: 1px solid #efefed;
+}
+
+#content h1 > a.anchor, h2 > a.anchor, h3 > a.anchor, #toctitle > a.anchor, .sidebarblock > .content > .title > a.anchor, h4 > a.anchor, h5 > a.anchor, h6 > a.anchor {
+    position: absolute;
+    z-index: 1001;
+    width: 1.5ex;
+    margin-left: -1.5ex;
+    display: block;
+    text-decoration: none !important;
+    visibility: hidden;
+    text-align: center;
+    font-weight: normal;
+}
+
+#content h1 > a.anchor:before, h2 > a.anchor:before, h3 > a.anchor:before, #toctitle > a.anchor:before, .sidebarblock > .content > .title > a.anchor:before, h4 > a.anchor:before, h5 > a.anchor:before, h6 > a.anchor:before {
+    content: "\00A7";
+    font-size: 0.85em;
+    display: block;
+    padding-top: 0.1em;
+}
+
+#content h1:hover > a.anchor, #content h1 > a.anchor:hover, h2:hover > a.anchor, h2 > a.anchor:hover, h3:hover > a.anchor, #toctitle:hover > a.anchor, .sidebarblock > .content > .title:hover > a.anchor, h3 > a.anchor:hover, #toctitle > a.anchor:hover, .sidebarblock > .content > .title > a.anchor:hover, h4:hover > a.anchor, h4 > a.anchor:hover, h5:hover > a.anchor, h5 > a.anchor:hover, h6:hover > a.anchor, h6 > a.anchor:hover {
+    visibility: visible;
+}
+
+#content h1 > a.link, h2 > a.link, h3 > a.link, #toctitle > a.link, .sidebarblock > .content > .title > a.link, h4 > a.link, h5 > a.link, h6 > a.link {
+    color: #ba3925;
+    text-decoration: none;
+}
+
+#content h1 > a.link:hover, h2 > a.link:hover, h3 > a.link:hover, #toctitle > a.link:hover, .sidebarblock > .content > .title > a.link:hover, h4 > a.link:hover, h5 > a.link:hover, h6 > a.link:hover {
+    color: #a53221;
+}
+
+.audioblock, .imageblock, .literalblock, .listingblock, .stemblock, .videoblock {
+    margin-bottom: 1.25em;
+}
+
+.admonitionblock td.content > .title, .audioblock > .title, .exampleblock > .title, .imageblock > .title, .listingblock > .title, .literalblock > .title, .stemblock > .title, .openblock > .title, .paragraph > .title, .quoteblock > .title, table.tableblock > .title, .verseblock > .title, .videoblock > .title, .dlist > .title, .olist > .title, .ulist > .title, .qlist > .title, .hdlist > .title {
+    text-rendering: optimizeLegibility;
+    text-align: left;
+    font-family: "Noto Serif", "DejaVu Serif", serif;
+    font-size: 1rem;
+    font-style: italic;
+}
+
+table.tableblock > caption.title {
+    white-space: nowrap;
+    overflow: visible;
+    max-width: 0;
+}
+
+.paragraph.lead > p, #preamble > .sectionbody > .paragraph:first-of-type p {
+    color: rgba(0, 0, 0, 0.85);
+}
+
+table.tableblock #preamble > .sectionbody > .paragraph:first-of-type p {
+    font-size: inherit;
+}
+
+.admonitionblock > table {
+    border-collapse: separate;
+    border: 0;
+    background: none;
+    width: 100%;
+}
+
+.admonitionblock > table td.icon {
+    text-align: center;
+    width: 80px;
+}
+
+.admonitionblock > table td.icon img {
+    max-width: none;
+}
+
+.admonitionblock > table td.icon .title {
+    font-weight: bold;
+    font-family: "Open Sans", "DejaVu Sans", sans-serif;
+    text-transform: uppercase;
+}
+
+.admonitionblock > table td.content {
+    padding-left: 1.125em;
+    padding-right: 1.25em;
+    border-left: 1px solid #ddddd8;
+    color: rgba(0, 0, 0, 0.6);
+}
+
+.admonitionblock > table td.content > :last-child > :last-child {
+    margin-bottom: 0;
+}
+
+.exampleblock > .content {
+    border-style: solid;
+    border-width: 1px;
+    border-color: #e6e6e6;
+    margin-bottom: 1.25em;
+    padding: 1.25em;
+    background: white;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+}
+
+.exampleblock > .content > :first-child {
+    margin-top: 0;
+}
+
+.exampleblock > .content > :last-child {
+    margin-bottom: 0;
+}
+
+.sidebarblock {
+    border-style: solid;
+    border-width: 1px;
+    border-color: #e0e0dc;
+    margin-bottom: 1.25em;
+    padding: 1.25em;
+    background: #f8f8f7;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+}
+
+.sidebarblock > :first-child {
+    margin-top: 0;
+}
+
+.sidebarblock > :last-child {
+    margin-bottom: 0;
+}
+
+.sidebarblock > .content > .title {
+    color: #7a2518;
+    margin-top: 0;
+    text-align: center;
+}
+
+.exampleblock > .content > :last-child > :last-child, .exampleblock > .content .olist > ol > li:last-child > :last-child, .exampleblock > .content .ulist > ul > li:last-child > :last-child, .exampleblock > .content .qlist > ol > li:last-child > :last-child, .sidebarblock > .content > :last-child > :last-child, .sidebarblock > .content .olist > ol > li:last-child > :last-child, .sidebarblock > .content .ulist > ul > li:last-child > :last-child, .sidebarblock > .content .qlist > ol > li:last-child > :last-child {
+    margin-bottom: 0;
+}
+
+.literalblock pre, .listingblock pre:not(.highlight), .listingblock pre[class="highlight"], .listingblock pre[class^="highlight "], .listingblock pre.CodeRay, .listingblock pre.prettyprint {
+    background: #f7f7f8;
+}
+
+.sidebarblock .literalblock pre, .sidebarblock .listingblock pre:not(.highlight), .sidebarblock .listingblock pre[class="highlight"], .sidebarblock .listingblock pre[class^="highlight "], .sidebarblock .listingblock pre.CodeRay, .sidebarblock .listingblock pre.prettyprint {
+    background: #f2f1f1;
+}
+
+.literalblock pre, .literalblock pre[class], .listingblock pre, .listingblock pre[class] {
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    word-wrap: break-word;
+    padding: 1em;
+    font-size: 0.8125em;
+}
+
+.literalblock pre.nowrap, .literalblock pre[class].nowrap, .listingblock pre.nowrap, .listingblock pre[class].nowrap {
+    overflow-x: auto;
+    white-space: pre;
+    word-wrap: normal;
+}
+
+@media only screen and (min-width: 768px) {
+    .literalblock pre, .literalblock pre[class], .listingblock pre, .listingblock pre[class] {
+        font-size: 0.90625em;
+    }
+}
+
+@media only screen and (min-width: 1280px) {
+    .literalblock pre, .literalblock pre[class], .listingblock pre, .listingblock pre[class] {
+        font-size: 1em;
+    }
+}
+
+.literalblock.output pre {
+    color: #f7f7f8;
+    background-color: rgba(0, 0, 0, 0.9);
+}
+
+.listingblock pre.highlightjs {
+    padding: 0;
+}
+
+.listingblock pre.highlightjs > code {
+    padding: 1em;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+}
+
+.listingblock pre.prettyprint {
+    border-width: 0;
+}
+
+.listingblock > .content {
+    position: relative;
+}
+
+.listingblock code[data-lang]:before {
+    display: none;
+    content: attr(data-lang);
+    position: absolute;
+    font-size: 0.75em;
+    top: 0.425rem;
+    right: 0.5rem;
+    line-height: 1;
+    text-transform: uppercase;
+    color: #999;
+}
+
+.listingblock:hover code[data-lang]:before {
+    display: block;
+}
+
+.listingblock.terminal pre .command:before {
+    content: attr(data-prompt);
+    padding-right: 0.5em;
+    color: #999;
+}
+
+.listingblock.terminal pre .command:not([data-prompt]):before {
+    content: "$";
+}
+
+table.pyhltable {
+    border-collapse: separate;
+    border: 0;
+    margin-bottom: 0;
+    background: none;
+}
+
+table.pyhltable td {
+    vertical-align: top;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+table.pyhltable td.code {
+    padding-left: .75em;
+    padding-right: 0;
+}
+
+pre.pygments .lineno, table.pyhltable td:not(.code) {
+    color: #999;
+    padding-left: 0;
+    padding-right: .5em;
+    border-right: 1px solid #ddddd8;
+}
+
+pre.pygments .lineno {
+    display: inline-block;
+    margin-right: .25em;
+}
+
+table.pyhltable .linenodiv {
+    background: none !important;
+    padding-right: 0 !important;
+}
+
+.quoteblock {
+    margin: 0 1em 1.25em 1.5em;
+    display: table;
+}
+
+.quoteblock > .title {
+    margin-left: -1.5em;
+    margin-bottom: 0.75em;
+}
+
+.quoteblock blockquote, .quoteblock blockquote p {
+    color: rgba(0, 0, 0, 0.85);
+    font-size: 1.15rem;
+    line-height: 1.75;
+    word-spacing: 0.1em;
+    letter-spacing: 0;
+    font-style: italic;
+    text-align: justify;
+}
+
+.quoteblock blockquote {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.quoteblock blockquote:before {
+    content: "\201c";
+    float: left;
+    font-size: 2.75em;
+    font-weight: bold;
+    line-height: 0.6em;
+    margin-left: -0.6em;
+    color: #7a2518;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.quoteblock blockquote > .paragraph:last-child p {
+    margin-bottom: 0;
+}
+
+.quoteblock .attribution {
+    margin-top: 0.5em;
+    margin-right: 0.5ex;
+    text-align: right;
+}
+
+.quoteblock .quoteblock {
+    margin-left: 0;
+    margin-right: 0;
+    padding: 0.5em 0;
+    border-left: 3px solid rgba(0, 0, 0, 0.6);
+}
+
+.quoteblock .quoteblock blockquote {
+    padding: 0 0 0 0.75em;
+}
+
+.quoteblock .quoteblock blockquote:before {
+    display: none;
+}
+
+.verseblock {
+    margin: 0 1em 1.25em 1em;
+}
+
+.verseblock pre {
+    font-family: "Open Sans", "DejaVu Sans", sans;
+    font-size: 1.15rem;
+    color: rgba(0, 0, 0, 0.85);
+    font-weight: 300;
+    text-rendering: optimizeLegibility;
+}
+
+.verseblock pre strong {
+    font-weight: 400;
+}
+
+.verseblock .attribution {
+    margin-top: 1.25rem;
+    margin-left: 0.5ex;
+}
+
+.quoteblock .attribution, .verseblock .attribution {
+    font-size: 0.9375em;
+    line-height: 1.45;
+    font-style: italic;
+}
+
+.quoteblock .attribution br, .verseblock .attribution br {
+    display: none;
+}
+
+.quoteblock .attribution cite, .verseblock .attribution cite {
+    display: block;
+    letter-spacing: -0.05em;
+    color: rgba(0, 0, 0, 0.6);
+}
+
+.quoteblock.abstract {
+    margin: 0 0 1.25em 0;
+    display: block;
+}
+
+.quoteblock.abstract blockquote, .quoteblock.abstract blockquote p {
+    text-align: left;
+    word-spacing: 0;
+}
+
+.quoteblock.abstract blockquote:before, .quoteblock.abstract blockquote p:first-of-type:before {
+    display: none;
+}
+
+table.tableblock {
+    max-width: 100%;
+    border-collapse: separate;
+}
+
+table.tableblock td > .paragraph:last-child p > p:last-child, table.tableblock th > p:last-child, table.tableblock td > p:last-child {
+    margin-bottom: 0;
+}
+
+table.spread {
+    width: 100%;
+}
+
+table.tableblock, th.tableblock, td.tableblock {
+    border: 0 solid #dedede;
+}
+
+table.grid-all th.tableblock, table.grid-all td.tableblock {
+    border-width: 0 1px 1px 0;
+}
+
+table.grid-all tfoot > tr > th.tableblock, table.grid-all tfoot > tr > td.tableblock {
+    border-width: 1px 1px 0 0;
+}
+
+table.grid-cols th.tableblock, table.grid-cols td.tableblock {
+    border-width: 0 1px 0 0;
+}
+
+table.grid-all * > tr > .tableblock:last-child, table.grid-cols * > tr > .tableblock:last-child {
+    border-right-width: 0;
+}
+
+table.grid-rows th.tableblock, table.grid-rows td.tableblock {
+    border-width: 0 0 1px 0;
+}
+
+table.grid-all tbody > tr:last-child > th.tableblock, table.grid-all tbody > tr:last-child > td.tableblock, table.grid-all thead:last-child > tr > th.tableblock, table.grid-rows tbody > tr:last-child > th.tableblock, table.grid-rows tbody > tr:last-child > td.tableblock, table.grid-rows thead:last-child > tr > th.tableblock {
+    border-bottom-width: 0;
+}
+
+table.grid-rows tfoot > tr > th.tableblock, table.grid-rows tfoot > tr > td.tableblock {
+    border-width: 1px 0 0 0;
+}
+
+table.frame-all {
+    border-width: 1px;
+}
+
+table.frame-sides {
+    border-width: 0 1px;
+}
+
+table.frame-topbot {
+    border-width: 1px 0;
+}
+
+th.halign-left, td.halign-left {
+    text-align: left;
+}
+
+th.halign-right, td.halign-right {
+    text-align: right;
+}
+
+th.halign-center, td.halign-center {
+    text-align: center;
+}
+
+th.valign-top, td.valign-top {
+    vertical-align: top;
+}
+
+th.valign-bottom, td.valign-bottom {
+    vertical-align: bottom;
+}
+
+th.valign-middle, td.valign-middle {
+    vertical-align: middle;
+}
+
+table thead th, table tfoot th {
+    font-weight: bold;
+}
+
+tbody tr th {
+    display: table-cell;
+    line-height: 1.6;
+    background: #f7f8f7;
+}
+
+tbody tr th, tbody tr th p, tfoot tr th, tfoot tr th p {
+    color: rgba(0, 0, 0, 0.8);
+    font-weight: bold;
+}
+
+p.tableblock > code:only-child {
+    background: none;
+    padding: 0;
+}
+
+p.tableblock {
+    font-size: 1em;
+}
+
+td > div.verse {
+    white-space: pre;
+}
+
+ol {
+    margin-left: 1.75em;
+}
+
+ul li ol {
+    margin-left: 1.5em;
+}
+
+dl dd {
+    margin-left: 1.125em;
+}
+
+dl dd:last-child, dl dd:last-child > :last-child {
+    margin-bottom: 0;
+}
+
+ol > li p, ul > li p, ul dd, ol dd, .olist .olist, .ulist .ulist, .ulist .olist, .olist .ulist {
+    margin-bottom: 0.625em;
+}
+
+ul.unstyled, ol.unnumbered, ul.checklist, ul.none {
+    list-style-type: none;
+}
+
+ul.unstyled, ol.unnumbered, ul.checklist {
+    margin-left: 0.625em;
+}
+
+ul.checklist li > p:first-child > .fa-check-square-o:first-child, ul.checklist li > p:first-child > input[type="checkbox"]:first-child {
+    margin-right: 0.25em;
+}
+
+ul.checklist li > p:first-child > input[type="checkbox"]:first-child {
+    position: relative;
+    top: 1px;
+}
+
+ul.inline {
+    margin: 0 auto 0.625em auto;
+    margin-left: -1.375em;
+    margin-right: 0;
+    padding: 0;
+    list-style: none;
+    overflow: hidden;
+}
+
+ul.inline > li {
+    list-style: none;
+    float: left;
+    margin-left: 1.375em;
+    display: block;
+}
+
+ul.inline > li > * {
+    display: block;
+}
+
+.unstyled dl dt {
+    font-weight: normal;
+    font-style: normal;
+}
+
+ol.arabic {
+    list-style-type: decimal;
+}
+
+ol.decimal {
+    list-style-type: decimal-leading-zero;
+}
+
+ol.loweralpha {
+    list-style-type: lower-alpha;
+}
+
+ol.upperalpha {
+    list-style-type: upper-alpha;
+}
+
+ol.lowerroman {
+    list-style-type: lower-roman;
+}
+
+ol.upperroman {
+    list-style-type: upper-roman;
+}
+
+ol.lowergreek {
+    list-style-type: lower-greek;
+}
+
+.hdlist > table, .colist > table {
+    border: 0;
+    background: none;
+}
+
+.hdlist > table > tbody > tr, .colist > table > tbody > tr {
+    background: none;
+}
+
+td.hdlist1 {
+    padding-right: .75em;
+    font-weight: bold;
+}
+
+td.hdlist1, td.hdlist2 {
+    vertical-align: top;
+}
+
+.literalblock + .colist, .listingblock + .colist {
+    margin-top: -0.5em;
+}
+
+.colist > table tr > td:first-of-type {
+    padding: 0 0.75em;
+    line-height: 1;
+}
+
+.colist > table tr > td:last-of-type {
+    padding: 0.25em 0;
+}
+
+.thumb, .th {
+    line-height: 0;
+    display: inline-block;
+    border: solid 4px white;
+    -webkit-box-shadow: 0 0 0 1px #dddddd;
+    box-shadow: 0 0 0 1px #dddddd;
+}
+
+.imageblock.left, .imageblock[style*="float: left"] {
+    margin: 0.25em 0.625em 1.25em 0;
+}
+
+.imageblock.right, .imageblock[style*="float: right"] {
+    margin: 0.25em 0 1.25em 0.625em;
+}
+
+.imageblock > .title {
+    margin-bottom: 0;
+}
+
+.imageblock.thumb, .imageblock.th {
+    border-width: 6px;
+}
+
+.imageblock.thumb > .title, .imageblock.th > .title {
+    padding: 0 0.125em;
+}
+
+.image.left, .image.right {
+    margin-top: 0.25em;
+    margin-bottom: 0.25em;
+    display: inline-block;
+    line-height: 0;
+}
+
+.image.left {
+    margin-right: 0.625em;
+}
+
+.image.right {
+    margin-left: 0.625em;
+}
+
+a.image {
+    text-decoration: none;
+}
+
+span.footnote, span.footnoteref {
+    vertical-align: super;
+    font-size: 0.875em;
+}
+
+span.footnote a, span.footnoteref a {
+    text-decoration: none;
+}
+
+span.footnote a:active, span.footnoteref a:active {
+    text-decoration: underline;
+}
+
+#footnotes {
+    padding-top: 0.75em;
+    padding-bottom: 0.75em;
+    margin-bottom: 0.625em;
+}
+
+#footnotes hr {
+    width: 20%;
+    min-width: 6.25em;
+    margin: -.25em 0 .75em 0;
+    border-width: 1px 0 0 0;
+}
+
+#footnotes .footnote {
+    padding: 0 0.375em;
+    line-height: 1.3;
+    font-size: 0.875em;
+    margin-left: 1.2em;
+    text-indent: -1.2em;
+    margin-bottom: .2em;
+}
+
+#footnotes .footnote a:first-of-type {
+    font-weight: bold;
+    text-decoration: none;
+}
+
+#footnotes .footnote:last-of-type {
+    margin-bottom: 0;
+}
+
+#content #footnotes {
+    margin-top: -0.625em;
+    margin-bottom: 0;
+    padding: 0.75em 0;
+}
+
+.gist .file-data > table {
+    border: 0;
+    background: #fff;
+    width: 100%;
+    margin-bottom: 0;
+}
+
+.gist .file-data > table td.line-data {
+    width: 99%;
+}
+
+div.unbreakable {
+    page-break-inside: avoid;
+}
+
+.big {
+    font-size: larger;
+}
+
+.small {
+    font-size: smaller;
+}
+
+.underline {
+    text-decoration: underline;
+}
+
+.overline {
+    text-decoration: overline;
+}
+
+.line-through {
+    text-decoration: line-through;
+}
+
+.aqua {
+    color: #00bfbf;
+}
+
+.aqua-background {
+    background-color: #00fafa;
+}
+
+.black {
+    color: black;
+}
+
+.black-background {
+    background-color: black;
+}
+
+.blue {
+    color: #0000bf;
+}
+
+.blue-background {
+    background-color: #0000fa;
+}
+
+.fuchsia {
+    color: #bf00bf;
+}
+
+.fuchsia-background {
+    background-color: #fa00fa;
+}
+
+.gray {
+    color: #606060;
+}
+
+.gray-background {
+    background-color: #7d7d7d;
+}
+
+.green {
+    color: #006000;
+}
+
+.green-background {
+    background-color: #007d00;
+}
+
+.lime {
+    color: #00bf00;
+}
+
+.lime-background {
+    background-color: #00fa00;
+}
+
+.maroon {
+    color: #600000;
+}
+
+.maroon-background {
+    background-color: #7d0000;
+}
+
+.navy {
+    color: #000060;
+}
+
+.navy-background {
+    background-color: #00007d;
+}
+
+.olive {
+    color: #606000;
+}
+
+.olive-background {
+    background-color: #7d7d00;
+}
+
+.purple {
+    color: #600060;
+}
+
+.purple-background {
+    background-color: #7d007d;
+}
+
+.red {
+    color: #bf0000;
+}
+
+.red-background {
+    background-color: #fa0000;
+}
+
+.silver {
+    color: #909090;
+}
+
+.silver-background {
+    background-color: #bcbcbc;
+}
+
+.teal {
+    color: #006060;
+}
+
+.teal-background {
+    background-color: #007d7d;
+}
+
+.white {
+    color: #bfbfbf;
+}
+
+.white-background {
+    background-color: #fafafa;
+}
+
+.yellow {
+    color: #bfbf00;
+}
+
+.yellow-background {
+    background-color: #fafa00;
+}
+
+span.icon > .fa {
+    cursor: default;
+}
+
+.admonitionblock td.icon [class^="fa icon-"] {
+    font-size: 2.5em;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    cursor: default;
+}
+
+.admonitionblock td.icon .icon-note:before {
+    content: "\f05a";
+    color: #19407c;
+}
+
+.admonitionblock td.icon .icon-tip:before {
+    content: "\f0eb";
+    text-shadow: 1px 1px 2px rgba(155, 155, 0, 0.8);
+    color: #111;
+}
+
+.admonitionblock td.icon .icon-warning:before {
+    content: "\f071";
+    color: #bf6900;
+}
+
+.admonitionblock td.icon .icon-caution:before {
+    content: "\f06d";
+    color: #bf3400;
+}
+
+.admonitionblock td.icon .icon-important:before {
+    content: "\f06a";
+    color: #bf0000;
+}
+
+.conum[data-value] {
+    display: inline-block;
+    color: #fff !important;
+    background-color: rgba(0, 0, 0, 0.8);
+    -webkit-border-radius: 100px;
+    border-radius: 100px;
+    text-align: center;
+    font-size: 0.75em;
+    width: 1.67em;
+    height: 1.67em;
+    line-height: 1.67em;
+    font-family: "Open Sans", "DejaVu Sans", sans-serif;
+    font-style: normal;
+    font-weight: bold;
+}
+
+.conum[data-value] * {
+    color: #fff !important;
+}
+
+.conum[data-value] + b {
+    display: none;
+}
+
+.conum[data-value]:after {
+    content: attr(data-value);
+}
+
+pre .conum[data-value] {
+    position: relative;
+    top: -0.125em;
+}
+
+b.conum * {
+    color: inherit !important;
+}
+
+.conum:not([data-value]):empty {
+    display: none;
+}
+
+h1, h2 {
+    letter-spacing: -0.01em;
+}
+
+dt, th.tableblock, td.content {
+    text-rendering: optimizeLegibility;
+}
+
+p, td.content {
+    letter-spacing: -0.01em;
+}
+
+p strong, td.content strong {
+    letter-spacing: -0.005em;
+}
+
+p, blockquote, dt, td.content {
+    font-size: 1.0625rem;
+}
+
+p {
+    margin-bottom: 1.25rem;
+}
+
+.sidebarblock p, .sidebarblock dt, .sidebarblock td.content, p.tableblock {
+    font-size: 1em;
+}
+
+.exampleblock > .content {
+    background-color: #fffef7;
+    border-color: #e0e0dc;
+    -webkit-box-shadow: 0 1px 4px #e0e0dc;
+    box-shadow: 0 1px 4px #e0e0dc;
+}
+
+.print-only {
+    display: none !important;
+}
+
+@media print {
+    @page {
+        margin: 1.25cm 0.75cm;
+    }
+
+    * {
+        -webkit-box-shadow: none !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+
+    a {
+        color: inherit !important;
+        text-decoration: underline !important;
+    }
+
+    a.bare, a[href^="#"], a[href^="mailto:"] {
+        text-decoration: none !important;
+    }
+
+    a[href^="http:"]:not(.bare):after, a[href^="https:"]:not(.bare):after, a[href^="mailto:"]:not(.bare):after {
+        content: "(" attr(href) ")";
+        display: inline-block;
+        font-size: 0.875em;
+        padding-left: 0.25em;
+    }
+
+    abbr[title]:after {
+        content: " (" attr(title) ")";
+    }
+
+    pre, blockquote, tr, img {
+        page-break-inside: avoid;
+    }
+
+    thead {
+        display: table-header-group;
+    }
+
+    img {
+        max-width: 100% !important;
+    }
+
+    p, blockquote, dt, td.content {
+        font-size: 1em;
+        orphans: 3;
+        widows: 3;
+    }
+
+    h2, h3, #toctitle, .sidebarblock > .content > .title, #toctitle, .sidebarblock > .content > .title {
+        page-break-after: avoid;
+    }
+
+    #toc, .sidebarblock, .exampleblock > .content {
+        background: none !important;
+    }
+
+    #toc {
+        border-bottom: 1px solid #ddddd8 !important;
+        padding-bottom: 0 !important;
+    }
+
+    .sect1 {
+        padding-bottom: 0 !important;
+    }
+
+    .sect1 + .sect1 {
+        border: 0 !important;
+    }
+
+    #header > h1:first-child {
+        margin-top: 1.25rem;
+    }
+
+    body.book #header {
+        text-align: center;
+    }
+
+    body.book #header > h1:first-child {
+        border: 0 !important;
+        margin: 2.5em 0 1em 0;
+    }
+
+    body.book #header .details {
+        border: 0 !important;
+        display: block;
+        padding: 0 !important;
+    }
+
+    body.book #header .details span:first-child {
+        margin-left: 0 !important;
+    }
+
+    body.book #header .details br {
+        display: block;
+    }
+
+    body.book #header .details br + span:before {
+        content: none !important;
+    }
+
+    body.book #toc {
+        border: 0 !important;
+        text-align: left !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    body.book #toc, body.book #preamble, body.book h1.sect0, body.book .sect1 > h2 {
+        page-break-before: always;
+    }
+
+    .listingblock code[data-lang]:before {
+        display: block;
+    }
+
+    #footer {
+        background: none !important;
+        padding: 0 0.9375em;
+    }
+
+    #footer-text {
+        color: rgba(0, 0, 0, 0.6) !important;
+        font-size: 0.9em;
+    }
+
+    .hide-on-print {
+        display: none !important;
+    }
+
+    .print-only {
+        display: block !important;
+    }
+
+    .hide-for-print {
+        display: none !important;
+    }
+
+    .show-for-print {
+        display: inherit !important;
+    }
+}
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css">
+</head>
+<body class="book toc2 toc-left">
+<div id="header">
+<h1>iRODS REST API User Documentation</h1>
+<div class="details">
+<span id="author" class="author">Justin Kyle James, Raphaël Flores</span><br>
+</div>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#trueintroduction">1. Introduction</a>
+<ul class="sectlevel2">
+<li><a href="#truetechnology">1.1. Technology</a></li>
+<li><a href="#truedesign-points-resources-and-url-paths">1.2. Design Points, Resources and URL Paths</a></li>
+<li><a href="#truecors-support">1.3. CORS Support</a></li>
+<li><a href="#trueinstallation-and-configuration">1.4. Installation and Configuration</a></li>
+<li><a href="#trueoperations-on-collections">1.5. Operations on Collections</a></li>
+<li><a href="#trueoperations-on-collection-avu-metadata">1.6. Operations on Collection AVU Metadata</a></li>
+<li><a href="#truegenquery-operations">1.7. GenQuery Operations</a></li>
+<li><a href="#trueoperations-on-tickets">1.8. Operations on Tickets</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="trueintroduction"><a class="anchor" href="#trueintroduction"></a>1. Introduction</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This is the official REST API for iRODS, and provides a simple, common API that can support diverse client use cases.</p>
+</div>
+<div class="paragraph">
+<p>The iRODS REST API is designed to be:
+* 'Proper' REST, with a resource orientation and sensible mapping of HTTP verbs to iRODS actions
+* Compliant, with a JAX-RS compliant framework, and supporting content negotiation for requests and responses in both XML and JSON
+* Flexible, by running in standard frameworks on commodity application servers, isolating the iRODS grid and running in a Java sandbox, requiring only an open 1247 port between the REST service layer and the iRODS data grid
+* Well-tested, with reference tests for each function and use case that are continuously tested against each version of iRODS</p>
+</div>
+<div class="paragraph">
+<p>This document describes the REST API, and the parameters and documents associated with each function.</p>
+</div>
+<div class="sect2">
+<h3 id="truetechnology"><a class="anchor" href="#truetechnology"></a>1.1. Technology</h3>
+<div class="paragraph">
+<p>The REST API is based on Java, and uses the <a href="https://code.renci.org/gf/project/jargon/">Jargon API</a> to communicate with iRODS.  The source code and project information for the REST API is available on <a href="https://code.renci.org/gf/project/irods-rest/">GForge</a>.</p>
+</div>
+<div class="paragraph">
+<p>The REST API is built on top of the JBoss <a href="http://www.jboss.org/resteasy">RESTEasy</a> framework, and deploys as a Java web application (.war).  RESTEasy is a certified <a href="http://en.wikipedia.org/wiki/Java_API_for_RESTful_Web_Services">JAX-RS</a> implementation and as such is easily extended and customized using standard development practices.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="truedesign-points-resources-and-url-paths"><a class="anchor" href="#truedesign-points-resources-and-url-paths"></a>1.2. Design Points, Resources and URL Paths</h3>
+<div class="paragraph">
+<p>Like the Jargon API, the REST API is organized around the domain model of the iRODS catalog (ICAT).   Consistent with REST, each of these iRODS catalog domains is roughly equivalent to a resource.  For example, an iRODS Collection, or directory, maps to the Collection object in Jargon, and is represented by a CollectionService in the REST API, responding to the /collection/ parent URL.</p>
+</div>
+<div class="paragraph">
+<p>For Collections and Data Objects (data files), the iRODS logical path name is used to describe the iRODS file being acted upon.  In this way, a REST operation to <code>GET</code> information on a collection has a path of:</p>
+</div>
+<div class="paragraph">
+<p>http:/localhost/irods-rest/rest/<span class="maroon">collection</span>/<span class="blue">the/logical/irods/path</span></p>
+</div>
+<div class="paragraph">
+<p>The collection in the URL indicates that this is an operation on a collection, and the remaining path information is used to resolve the iRODS logical path being acted upon.</p>
+</div>
+<div class="paragraph">
+<p>Note that iRODS logical path names can be quite complex, and often contain special characters and spaces that are invalid in a URL. For this reason, the API supports optionally URL encoded iRODS absolute paths.  This can be accomplished by URL encoding the logical path name before creating the URL string that will be sent to the REST service.  The encoding is not necessary if there are no embedded spaces or special characters.</p>
+</div>
+<div class="paragraph">
+<p>Continuing this resource orientation, the REST API follows the philosophy that each resource in the iRODS domain, such as Collection and Data Object, may have sub-resources that are particular to the parent resource at a given path.   This means that AVU metadata services for a Collection in iRODS are a sub-resource of a given collection at a given path, and a URL such as the one below would be used to act on that sub-resource:</p>
+</div>
+<div class="paragraph">
+<p>http:/localhost/irods-rest/rest/<span class="maroon">collection</span>/<span class="blue">the/logical/irods/path</span>/<span class="green">metadata</span></p>
+</div>
+<div class="paragraph">
+<p>In the above example, sending a <code>GET</code> request to that URL will return a listing of AVU metadata associated with a given iRODS collection.</p>
+</div>
+<div class="paragraph">
+<p>When appropriate, a ticket string may be added to the URL parameter&#8217;s ticket field for ticket based access to iRODS objects.   The following is an example of using a ticket to get the file contents of a collection.</p>
+</div>
+<div class="paragraph">
+<p><code>GET <a href="http://user1:user1password@localhost:8080/irods-rest/rest/collection/tempZone/home/rods?ticket=111222333444555" class="bare">http://user1:user1password@localhost:8080/irods-rest/rest/collection/tempZone/home/rods?ticket=111222333444555</a></code></p>
+</div>
+<div class="paragraph">
+<p>If the server is set up for anonymous access, the user is not required to provide credentials if requesting a resource via a ticket.</p>
+</div>
+<div class="paragraph">
+<p><code>GET <a href="http://localhost:8080/irods-rest/rest/collection/tempZone/home/rods?ticket=11122233344455" class="bare">http://localhost:8080/irods-rest/rest/collection/tempZone/home/rods?ticket=11122233344455</a></code></p>
+</div>
+<div class="sect3">
+<h4 id="truehttp-verbs-and-request-parameters"><a class="anchor" href="#truehttp-verbs-and-request-parameters"></a>1.2.1. HTTP Verbs and request parameters</h4>
+<div class="paragraph">
+<p>Note that REST describes a set of HTTP verbs, and the iRODS REST API maps these verbs to resource as follows:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>PUT</code> - creates a new resource at the given URI</p>
+</li>
+<li>
+<p><code>POST</code> - updates a resource at the given URI, and often is used to create a sub-resource of the given URI</p>
+</li>
+<li>
+<p><code>GET</code> - retrieves a resource or metadata about the resource</p>
+</li>
+<li>
+<p><code>DELETE</code> - removes the resource at the given URI</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Note that some arbitrary assignment of verbs is necessary due to technical or other considerations, but this will be documented and kept to a minimum.</p>
+</div>
+<div class="paragraph">
+<p>The approach of this API is that HTTP parameters can be added to any requests in order to further refine the request or control the execution of the request or returned data.  For example, a <code>GET</code> request to list children of a collection may include an offset parameter to page through multiple pages of children.  The available parameters are documented along with each method.</p>
+</div>
+<div class="paragraph">
+<p>Some requests, especially for sub-resources such as AVU metadata, are too complex to be placed into URLs or as parameters.  For example, to add or delete AVU metadata associated with a collection, one uses a <code>POST</code> method and sends the required AVU actions as an XML or JSON request body. This approach for certain operations has the advantage of treating a set of metadata as a document, allowing the update of several attributes within one HTTP request.  These operations that require a request body are documented with each method.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="trueauthentication"><a class="anchor" href="#trueauthentication"></a>1.2.2. Authentication</h4>
+<div class="paragraph">
+<p>The REST API for iRODS makes use of standard <a href="http://en.wikipedia.org/wiki/Basic_access_authentication">Basic Authentication</a> for HTTP requests.  In this approach, the Authorization HTTP header is populated with username:password information that maps to the underlying iRODS account.</p>
+</div>
+<div class="paragraph">
+<p>Basic Authentication passes these headers to the REST API with each request, and a new connection is made and authenticated as each request is made.  Note that your deployed REST service should use an SSL certificate to secure this credential passing.</p>
+</div>
+<div class="paragraph">
+<p>As noted in the ‘Installation and Configuration’ section, a deployment of the REST API is configured to point to a specific iRODS grid at deployment time, so the user and password information passed in via the headers are combined with the configured grid zone, host, port, and default storage resource information to derive the IRODSAccount used to authenticate to the data grid.</p>
+</div>
+<div class="paragraph">
+<p>Currently, both STANDARD and PAM auth schemes are supported.  The RestConfiguration object determines which scheme to use, and that option is then combined with the rest of the account configuration information to augment the user and password passed in through the basic auth processing.</p>
+</div>
+<div class="paragraph">
+<p>In the following example, using the jargon-beans.xml file in src/main/resources to wire in custom configuration options, STANDARD authentication is indicated:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;beans:bean id="restConfiguration"
+		class="org.irods.jargon.rest.configuration.RestConfiguration"&gt;
+		&lt;beans:property name="irodsHost" value="fedzone1.irods.org" /&gt;
+		&lt;beans:property name="irodsPort" value="1247" /&gt;
+		&lt;beans:property name="irodsZone" value="fedZone1" /&gt;
+		&lt;beans:property name="authType" value="STANDARD" /&gt; &lt;!--  STANDARD,PAM --&gt;
+		&lt;beans:property name="defaultStorageResource" value="test1-resc" /&gt;
+		&lt;beans:property name="privateCertAbsPath" value="c:/temp/test-certs/private.pem" /&gt;
+		&lt;beans:property name="publicKeyAbsPath" value="c:/temp/test-certs/public.pem" /&gt;
+		&lt;beans:property name="webInterfaceURL"
+			value="https://iren-web.renci.org:8443/idrop-web2" /&gt;
+		&lt;beans:property name="allowCors" value="false" /&gt;
+		&lt;beans:property name="corsAllowCredentials" value="false" /&gt;
+		&lt;beans:property name="corsOrigins"&gt;
+			&lt;util:list id="myList" value-type="java.lang.String"&gt;
+				&lt;beans:value&gt;*&lt;/beans:value&gt;
+			&lt;/util:list&gt;
+		&lt;/beans:property&gt;
+		&lt;beans:property name="corsMethods"&gt;
+			&lt;util:list id="myList" value-type="java.lang.String"&gt;
+				&lt;beans:value&gt;GET&lt;/beans:value&gt;
+				&lt;beans:value&gt;POST&lt;/beans:value&gt;
+				&lt;beans:value&gt;DELETE&lt;/beans:value&gt;
+				&lt;beans:value&gt;PUT&lt;/beans:value&gt;
+			&lt;/util:list&gt;
+		&lt;/beans:property&gt;
+
+	&lt;/beans:bean&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that STANDARD and PAM auth may also be requested by prepending STANDARD* or PAM* to the user id portion of the Basic Authentication credentials.  This will signal to the REST service to opt for those specified auth methods, even if not configured in the spring xml configuration.</p>
+</div>
+<div class="sect4">
+<h5 id="truecontent-negotiation-for-requests"><a class="anchor" href="#truecontent-negotiation-for-requests"></a>Content Negotiation for Requests</h5>
+<div class="paragraph">
+<p>The REST API understands both XML and JSON for Request and Response bodies.</p>
+</div>
+<div class="paragraph">
+<p>To receive JSON in response to a request, you may either:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Set the Accept header in the request to ‘application/json;</p>
+</li>
+<li>
+<p>Set a parameter in the request URL of the form  contentType="application/json"</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>To receive XML in the response, you may either:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Set the Accept header in the request to ‘application/xml;</p>
+</li>
+<li>
+<p>Set a parameter in the request URL of the form  contentType="application/xml"</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>To send XML in a request, set the Content-type header as follows:</p>
+</div>
+<div class="paragraph">
+<p><em>"Content-Type", "application/xml"</em></p>
+</div>
+<div class="paragraph">
+<p>To send JSON in a request, set the Content-type header as follows:</p>
+</div>
+<div class="paragraph">
+<p><em>"Content-Type", "application/json"</em></p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="truecors-support"><a class="anchor" href="#truecors-support"></a>1.3. CORS Support</h3>
+<div class="paragraph">
+<p>CORS is an acronym for Cross-Origin-Resource-Sharing.  Overviews of CORS are out of the scope of this document, but W3C has a good reference here: <a href="http://www.w3.org/TR/cors/" class="bare">http://www.w3.org/TR/cors/</a></p>
+</div>
+<div class="paragraph">
+<p>The iRODS REST API has support for CORS, adding the appropriate headers when configured in the RestConfiguration class.  The RestConfiguration class is wired in with Spring in the jargon-beans.xml file located in the src/main/resources folder of the REST source code.</p>
+</div>
+<div class="paragraph">
+<p>The CORS configuration section of the jargon-beans.xml file looks like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;beans:property name="allowCors" value="true" /&gt;
+		&lt;beans:property name="corsAllowCredentials" value="false" /&gt;
+		&lt;beans:property name="corsOrigins"&gt;
+			&lt;util:list id="myList" value-type="java.lang.String"&gt;
+				&lt;beans:value&gt;*&lt;/beans:value&gt;
+			&lt;/util:list&gt;
+		&lt;/beans:property&gt;
+		&lt;beans:property name="corsMethods"&gt;
+			&lt;util:list id="myList" value-type="java.lang.String"&gt;
+				&lt;beans:value&gt;GET&lt;/beans:value&gt;
+				&lt;beans:value&gt;POST&lt;/beans:value&gt;
+				&lt;beans:value&gt;DELETE&lt;/beans:value&gt;
+				&lt;beans:value&gt;PUT&lt;/beans:value&gt;
+			&lt;/util:list&gt;
+&lt;/beans:property&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that <code>allowCors</code> is a global setting, and if set to false no header processing is done.  If set to ‘true’, then CORS headers for origin, methods, and allow credentials will be set in the response headers of the REST service.</p>
+</div>
+<div class="paragraph">
+<p>If <code>allowCors</code> is set to true, and no corsOrigins are set, it will default to the origin of <code>'*'</code>.  Otherwise, it will be set to the list of origins provided.  Similarly, if corsMethods are not set, it will default to <code>GET</code>, <code>POST</code>, <code>DELETE</code>, <code>PUT</code>, otherwise, it will be set to the provided list.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="trueinstallation-and-configuration"><a class="anchor" href="#trueinstallation-and-configuration"></a>1.4. Installation and Configuration</h3>
+<div class="paragraph">
+<p>The REST API is available as a .war file as indicated for each release in GitHub.  This .war can be deployed on any standard servlet container, such as Jetty or Tomcat.  Tomcat is the version we test with.  The configuration of the REST API is necessary so it knows what host/port/zone/default resource, and default authentication method is in use.  These presets are combined with the Basic Authentication credentials to connect to the target iRODS grid.  This also prevents any installation of REST from being hijacked to talk to another iRODS grid!</p>
+</div>
+<div class="paragraph">
+<p>The REST API .war file can be deployed to your servlet container,and once that is done, there is an /etc/irods-ext/irods-rest.properties file that must be put onto your server, readable by the servlet container.  This .properties file looks like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-shell" data-lang="shell">irods.host=localhost
+irods.port=1247
+irods.zone=tempZone
+utilize.packing.streams=true
+auth.type=STANDARD
+default.storage.resource=
+web.interface.url=
+cors.allow=true</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Of course, the settings should correspond to your host.  You will need to restart the servlet container or REST package to pick up these settings.</p>
+</div>
+<div class="paragraph">
+<p>The REST API can be obtained via the GIT version control system, or via download, from the RENCI <a href="https://code.renci.org/gf/project/irods-rest/">GForge</a> site.  This package is built using <a href="http://maven.apache.org/">Maven</a>, and all necessary Jargon dependencies are available on the RENCI Maven repository.</p>
+</div>
+<div class="paragraph">
+<p>When you download the irods-rest project, you can cd into that directory and issue the command:</p>
+</div>
+<div class="paragraph">
+<p><code>&gt;mvn package -Dmaven.test.skip=true</code></p>
+</div>
+<div class="paragraph">
+<p>to build a deployable .war file that can then be installed on Tomcat, Jetty, Glassfish, or any other compliant servlet container.  Note the flag to skip the unit test phase, which requires further configuration to run.</p>
+</div>
+<div class="paragraph">
+<p>The iRODS REST API uses Spring for wiring and configuration, and before packaging your application, you should edit the jargon-beans.xml file under src/main/resources to point to your target grid.  For example, to run the REST API against an iRODS grid on fedZone1, the configuration would look like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;beans:bean id="restConfiguration"
+		class="org.irods.jargon.rest.configuration.RestConfiguration"&gt;
+		&lt;beans:property name="irodsHost" value="fedZone1" /&gt;
+		&lt;beans:property name="irodsPort" value="1247" /&gt;
+		&lt;beans:property name="irodsZone" value="fedZone1" /&gt;
+		&lt;beans:property name="defaultStorageResource" value="test1-resc" /&gt;
+		&lt;beans:property name="webInterfaceURL"
+			value="https://iren-web.renci.org:8443/idrop-web2" /&gt;
+&lt;/beans:bean&gt;</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Note the standard iRODS grid configuration as well as an optional URL to an installation of iDROP Web. (Work in Progress here).
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Note that as this API develops, we’ll probably add an ability today? configure the REST API via an /etc/idrop-web configuration file like the web interface.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Once the API is configured, and then built with Maven, it may be deployed, and then accessed at the URL you configure.  The typical URL is something like:</p>
+</div>
+<div class="paragraph">
+<p><a href="http://host:port/irods-rest/rest/resource/extrapathinformation" class="bare">http://host:port/irods-rest/rest/resource/extrapathinformation</a></p>
+</div>
+<div class="paragraph">
+<p>A handy way to test via a browser is to use the ‘ping’ service by going to a browser and entering a request like:</p>
+</div>
+<div class="paragraph">
+<p><a href="http://localhost:8081/irods-rest-0.0.1-SNAPSHOT/rest/server" class="bare">http://localhost:8081/irods-rest-0.0.1-SNAPSHOT/rest/server</a></p>
+</div>
+<div class="paragraph">
+<p>Which is a <code>GET</code> service that will ping the server and return some basic server information.  For example, in XML, it should return something similar to this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;ns2:serverInfo xmlns:ns2="http://irods.org/irods-rest"&gt;
+&lt;apiVersion&gt;d&lt;/apiVersion&gt;
+&lt;currentServerTime&gt;1388922589000&lt;/currentServerTime&gt;
+&lt;icatEnabled&gt;ICAT_ENABLED&lt;/icatEnabled&gt;
+&lt;initializeDate&gt;2014-01-06T10:32:54.722-05:00&lt;/initializeDate&gt;
+&lt;relVersion&gt;rods3.3&lt;/relVersion&gt;
+&lt;rodsZone&gt;fedZone1&lt;/rodsZone&gt;
+&lt;serverBootTime&gt;1387383118&lt;/serverBootTime&gt;
+&lt;/ns2:serverInfo&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This action should require you to provide the iRODS user name and password in a Basic Authentication dialog before retrieving that information.  This verifies that the service is working!</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="trueoperations-on-collections"><a class="anchor" href="#trueoperations-on-collections"></a>1.5. Operations on Collections</h3>
+<div class="sect3">
+<h4 id="trueget-collection-information"><a class="anchor" href="#trueget-collection-information"></a>1.5.1. Get Collection Information</h4>
+<div class="sect4">
+<h5 id="truedescription"><a class="anchor" href="#truedescription"></a>Description</h5>
+<div class="paragraph">
+<p>This <code>GET</code> operation will retrieve basic catalog metadata about the iRODS collection.   This method can also optionally provide a pageable listing of the child collections and data objects underneath the given collection.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="truerequests"><a class="anchor" href="#truerequests"></a>Requests</h5>
+<div class="paragraph">
+<p><strong>Syntax</strong></p>
+</div>
+<div class="paragraph">
+<p><code>GET /collection/irodsabsolutepathtocollection
+Request Parameters</code></p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Table 1. Collection information</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">offset</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>number &gt;=0</code> that indicates the offset into child collections or data objects when displaying children</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">listing</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code> if a listing of children of this collection should be provided in the response</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">listType</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>both|collections|data</code> that indicates the type of listing.  Using <code>both</code> will list all data objects and collections.  Subsequent pages of data objects or collections are retrieved by sending <code>collections</code> or <code>data</code> with an offset.
+</p><p class="tableblock">Default = <code>both</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Responses - XML</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;ns2:collection xmlns:ns2="http://irods.org/irods-rest" collectionId="187864"&gt;
+&lt;children count="1" id="187865" lastResult="true" specColType="NORMAL" totalRecords="5"&gt;
+&lt;createdAt&gt;2013-08-09T23:10:41-04:00&lt;/createdAt&gt;
+&lt;dataSize&gt;345217&lt;/dataSize&gt;
+&lt;modifiedAt&gt;2013-08-09T23:10:41-04:00&lt;/modifiedAt&gt;
+&lt;objectType&gt;DATA_OBJECT&lt;/objectType&gt;
+&lt;ownerName&gt;rods&lt;/ownerName&gt;
+&lt;ownerZone&gt;fedZone1&lt;/ownerZone&gt;
+&lt;parentPath&gt;/fedZone1/home/rods/shared&lt;/parentPath&gt;
+&lt;pathOrName&gt;cpylog&lt;/pathOrName&gt;
+&lt;specialObjectPath/&gt;
+&lt;/children&gt;
+...
+&lt;collectionInheritance&gt;1&lt;/collectionInheritance&gt;
+&lt;collectionMapId&gt;0&lt;/collectionMapId&gt;
+&lt;collectionName&gt;/fedZone1/home/rods/shared&lt;/collectionName&gt;
+&lt;collectionOwnerName&gt;rods&lt;/collectionOwnerName&gt;
+&lt;collectionOwnerZone&gt;fedZone1&lt;/collectionOwnerZone&gt;
+&lt;collectionParentName&gt;/fedZone1/home/rods/&lt;/collectionParentName&gt;
+&lt;comments/&gt;
+&lt;createdAt&gt;2013-08-09T23:10:15-04:00&lt;/createdAt&gt;
+&lt;info1/&gt;
+&lt;info2/&gt;
+&lt;modifiedAt&gt;2013-08-28T21:50:06-04:00&lt;/modifiedAt&gt;
+&lt;objectPath/&gt;
+&lt;specColType&gt;NORMAL&lt;/specColType&gt;
+&lt;/ns2:collection&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Responses - JSON</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
+   "collectionId":187864,
+   "collectionName":"/fedZone1/home/rods/shared",
+   "objectPath":"",
+   "collectionParentName":"/fedZone1/home/rods/",
+   "collectionOwnerName":"rods",
+   "collectionOwnerZone":"fedZone1",
+   "collectionMapId":"0",
+   "collectionInheritance":"1",
+   "comments":"",
+   "info1":"",
+   "info2":"",
+   "createdAt":1376104215000,
+   "modifiedAt":1377741006000,
+   "specColType":"NORMAL",
+   "children":[
+      {
+         "parentPath":"/fedZone1/home/rods/shared",
+         "pathOrName":"cpylog",
+         "specialObjectPath":"",
+         "objectType":"DATA_OBJECT",
+         "createdAt":1376104241000,
+         "modifiedAt":1376104241000,
+         "dataSize":345217,
+         "ownerName":"rods",
+         "ownerZone":"fedZone1",
+         "id":187865,
+         "specColType":"NORMAL",
+         "count":1,
+         "lastResult":true,
+         "totalRecords":5
+      }
+   ]
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="truecreate-a-new-collection"><a class="anchor" href="#truecreate-a-new-collection"></a>1.5.2. Create a New Collection</h4>
+<div class="sect4">
+<h5 id="truedescription-2"><a class="anchor" href="#truedescription-2"></a>Description</h5>
+<div class="paragraph">
+<p>This <code>PUT</code> operation will first create a new collection, and then return back a description of the iRODS catalog entry for the newly created collection.  This is an idempotent method, and if the collection already exists, the data for the existing collection is returned.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="truerequests-2"><a class="anchor" href="#truerequests-2"></a>Requests</h5>
+<div class="paragraph">
+<p><strong>Syntax</strong></p>
+</div>
+<div class="paragraph">
+<p><code>PUT /collection/irodsabsolutepathtocollection
+Request Parameters</code></p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Table 2. Collection creation</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">n/a</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Responses - XML</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;ns2:collection xmlns:ns2="http://irods.org/irods-rest" collectionId="187864"&gt;
+&lt;collectionInheritance&gt;1&lt;/collectionInheritance&gt;
+&lt;collectionMapId&gt;0&lt;/collectionMapId&gt;
+&lt;collectionName&gt;/fedZone1/home/rods/shared&lt;/collectionName&gt;
+&lt;collectionOwnerName&gt;rods&lt;/collectionOwnerName&gt;
+&lt;collectionOwnerZone&gt;fedZone1&lt;/collectionOwnerZone&gt;
+&lt;collectionParentName&gt;/fedZone1/home/rods/&lt;/collectionParentName&gt;
+&lt;comments/&gt;
+&lt;createdAt&gt;2013-08-09T23:10:15-04:00&lt;/createdAt&gt;
+&lt;info1/&gt;
+&lt;info2/&gt;
+&lt;modifiedAt&gt;2013-08-28T21:50:06-04:00&lt;/modifiedAt&gt;
+&lt;objectPath/&gt;
+&lt;specColType&gt;NORMAL&lt;/specColType&gt;
+&lt;/ns2:collection&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Responses - JSON</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
+   "collectionId":187864,
+   "collectionName":"/fedZone1/home/rods/shared",
+   "objectPath":"",
+   "collectionParentName":"/fedZone1/home/rods/",
+   "collectionOwnerName":"rods",
+   "collectionOwnerZone":"fedZone1",
+   "collectionMapId":"0",
+   "collectionInheritance":"1",
+   "comments":"",
+   "info1":"",
+   "info2":"",
+   "createdAt":1376104215000,
+   "modifiedAt":1377741006000,
+   "specColType":"NORMAL",
+ }</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="truedelete-a-collection"><a class="anchor" href="#truedelete-a-collection"></a>1.5.3. Delete a Collection</h4>
+<div class="sect4">
+<h5 id="truedescription-3"><a class="anchor" href="#truedescription-3"></a>Description</h5>
+<div class="paragraph">
+<p>This <code>DELETE</code> operation will remove the given collection.  A <code>force</code> option is provided with an additional request parameter.  This method will silently ignore deletes of non-existent collections.</p>
+</div>
+<div class="paragraph">
+<p>Note that <code>DELETE</code> requests do not return a body in HTTP.  This method will instead return a <code>204 No Content</code> response.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="truerequests-3"><a class="anchor" href="#truerequests-3"></a>Requests</h5>
+<div class="paragraph">
+<p><strong>Syntax</strong></p>
+</div>
+<div class="paragraph">
+<p><code>DELETE /collection/irodsabsolutepathtocollection</code></p>
+</div>
+<div class="paragraph">
+<p><strong>Request Parameters</strong></p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Table 3. Collection deletion</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">force</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code> to use a force option
+</p><p class="tableblock">Default = <code>false</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Responses - XML</strong></p>
+</div>
+<div class="paragraph">
+<p>n/a</p>
+</div>
+<div class="paragraph">
+<p><strong>Responses - JSON</strong></p>
+</div>
+<div class="paragraph">
+<p>n/a</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="trueoperations-on-collection-avu-metadata"><a class="anchor" href="#trueoperations-on-collection-avu-metadata"></a>1.6. Operations on Collection AVU Metadata</h3>
+<div class="paragraph">
+<p>The following operations apply to the AVU sub-resource of an iRODS collection, and represents AVU metadata attached to the given collection.</p>
+</div>
+<div class="sect3">
+<h4 id="trueget-collection-avu-metadata"><a class="anchor" href="#trueget-collection-avu-metadata"></a>1.6.1. Get Collection AVU Metadata</h4>
+<div class="sect4">
+<h5 id="truedescription-4"><a class="anchor" href="#truedescription-4"></a>Description</h5>
+<div class="paragraph">
+<p>This <code>GET</code> operation will retrieve the AVU metadata associated with an iRODS parent collection</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="truerequests-4"><a class="anchor" href="#truerequests-4"></a>Requests</h5>
+<div class="paragraph">
+<p><strong>Syntax</strong></p>
+</div>
+<div class="paragraph">
+<p><code>GET /collection/irodsabsolutepathtocollection/metadata</code></p>
+</div>
+<div class="paragraph">
+<p><strong>Request Parameters</strong></p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Table 4. Collection AVU Metadata</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">n/a</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Responses - XML</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;ns2:metadataListing xmlns:ns2="http://irods.org/irods-rest" objectType="COLLECTION"&gt;
+&lt;metadataEntries count="1" lastResult="true" totalRecords="0"&gt;
+&lt;attribute&gt;attr1&lt;/attribute&gt;
+&lt;unit&gt;unit1&lt;/unit&gt;
+&lt;value&gt;val1&lt;/value&gt;
+&lt;/metadataEntries&gt;
+&lt;uniqueNameString&gt;fedZone1/home/rods/shared&lt;/uniqueNameString&gt;
+&lt;/ns2:metadataListing&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Responses - JSON</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
+   "metadataEntries":[
+      {
+         "attribute":"attr1",
+         "value":"val1",
+         "unit":"unit1",
+         "count":1,
+         "lastResult":true,
+         "totalRecords":0
+      }
+   ],
+   "objectType":"COLLECTION",
+   "uniqueNameString":"fedZone1/home/rods/shared"
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="trueadd-collection-avu-metadata"><a class="anchor" href="#trueadd-collection-avu-metadata"></a>1.6.2. Add Collection AVU Metadata</h4>
+<div class="sect4">
+<h5 id="truedescription-5"><a class="anchor" href="#truedescription-5"></a>Description</h5>
+<div class="paragraph">
+<p>This <code>PUT</code> operation will bulk add the provided  AVU metadata associated with an iRODS parent collection.</p>
+</div>
+<div class="paragraph">
+<p>This bulk operation requires a request body in XML or JSON, as AVU metadata is too large and complex for proper expression as a URL or parameter.  This bulk mode also is more efficient for larger amounts of metadata, requiring fewer round trips.</p>
+</div>
+<div class="paragraph">
+<p>Note that the response will detail the disposition, and any errors that occurred for individual AVU values.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="truerequests-5"><a class="anchor" href="#truerequests-5"></a>Requests</h5>
+<div class="paragraph">
+<p><strong>Syntax</strong></p>
+</div>
+<div class="paragraph">
+<p><code>PUT /collection/irodsabsolutepathtocollection/metadata</code></p>
+</div>
+<div class="paragraph">
+<p><strong>Request Parameters</strong></p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Table 5. Collection AVU Metadata addition</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">n/a</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Request Body - XML</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+&lt;ns2:metadataOperation xmlns:ns2="http://irods.org/irods-rest"&gt;
+	&lt;metadataEntries&gt;
+		&lt;attribute&gt;testBulkAddCollectionAVUSendXMLAttr1&lt;/attribute&gt;
+		&lt;unit&gt;testBulkAddCollectionAVUSendXMLUnit1&lt;/unit&gt;
+		&lt;value&gt;testBulkAddCollectionAVUSendXMLValue1&lt;/value&gt;
+	&lt;/metadataEntries&gt;
+	&lt;metadataEntries&gt;
+		&lt;attribute&gt;testBulkAddCollectionAVUSendXMLAttr2&lt;/attribute&gt;
+		&lt;unit&gt;testBulkAddCollectionAVUSendXMLUnit2&lt;/unit&gt;
+		&lt;value&gt;testBulkAddCollectionAVUSendXMLValue2&lt;/value&gt;
+	&lt;/metadataEntries&gt;
+&lt;/ns2:metadataOperation&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Request Body - JSON</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
+  "metadataEntries": [
+    {
+      "attribute": "testBulkAddCollectionAVUJsonAttr1",
+      "value": "testBulkAddCollectionAVUJsonValue1",
+      "unit": "testBulkAddCollectionAVUJsonUnit1"
+    },
+    {
+      "attribute": "testBulkAddCollectionAVUJsonAttr2",
+      "value": "testBulkAddCollectionAVUJsonValue2",
+      "unit": "testBulkAddCollectionAVUJsonUnit2"
+    }
+  ]
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Responses - XML</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+&lt;collection xmlns:ns2="http://irods.org/irods-rest"&gt;
+	&lt;ns2:metadataOperationResultEntry
+		resultStatus="OK"&gt;
+		&lt;attributeString&gt;testBulkAddCollectionAVUSendXMLAttr1&lt;/attributeString&gt;
+		&lt;message /&gt;
+		&lt;unit&gt;testBulkAddCollectionAVUSendXMLUnit1&lt;/unit&gt;
+		&lt;valueString&gt;testBulkAddCollectionAVUSendXMLValue1&lt;/valueString&gt;
+	&lt;/ns2:metadataOperationResultEntry&gt;
+	&lt;ns2:metadataOperationResultEntry
+		resultStatus="OK"&gt;
+		&lt;attributeString&gt;testBulkAddCollectionAVUSendXMLAttr2&lt;/attributeString&gt;
+		&lt;message /&gt;
+		&lt;unit&gt;testBulkAddCollectionAVUSendXMLUnit2&lt;/unit&gt;
+		&lt;valueString&gt;testBulkAddCollectionAVUSendXMLValue2&lt;/valueString&gt;
+	&lt;/ns2:metadataOperationResultEntry&gt;
+&lt;/collection&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Responses - JSON</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json" data-lang="json">[
+  {
+    "attributeString": "testBulkAddCollectionAVUJsonAttr1",
+    "valueString": "testBulkAddCollectionAVUJsonValue1",
+    "unit": "testBulkAddCollectionAVUJsonUnit1",
+    "resultStatus": "OK",
+    "message": ""
+  },
+  {
+    "attributeString": "testBulkAddCollectionAVUJsonAttr2",
+    "valueString": "testBulkAddCollectionAVUJsonValue2",
+    "unit": "testBulkAddCollectionAVUJsonUnit2",
+    "resultStatus": "OK",
+    "message": ""
+  }
+]</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="truedelete-collection-avu-metadata"><a class="anchor" href="#truedelete-collection-avu-metadata"></a>1.6.3. Delete Collection AVU Metadata</h4>
+<div class="sect4">
+<h5 id="truedescription-6"><a class="anchor" href="#truedescription-6"></a>Description</h5>
+<div class="paragraph">
+<p>This <code>POST</code> operation will bulk delete the provided AVU metadata associated with an iRODS parent collection. <code>POST</code> is used here as an HTTP <code>DELETE</code> action cannot have a body.</p>
+</div>
+<div class="paragraph">
+<p>This bulk operation requires a request body in XML or JSON, as AVU metadata is too large and complex for proper expression as a URL or parameter.  This bulk mode also is more efficient for larger amounts of metadata, requiring fewer round trips.</p>
+</div>
+<div class="paragraph">
+<p>Note that the response will detail the disposition, and any errors that occurred for individual AVU values.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="truerequests-6"><a class="anchor" href="#truerequests-6"></a>Requests</h5>
+<div class="paragraph">
+<p><strong>Syntax</strong></p>
+</div>
+<div class="paragraph">
+<p><code>POST /collection/irodsabsolutepathtocollection/metadata</code></p>
+</div>
+<div class="paragraph">
+<p><strong>Request Parameters</strong></p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Table 6. Collection AVU Metadata deletion</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">n/a</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Request Body - XML</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+&lt;ns2:metadataOperation xmlns:ns2="http://irods.org/irods-rest"&gt;
+	&lt;metadataEntries&gt;
+		&lt;attribute&gt;testBulkAddCollectionAVUSendXMLAttr1&lt;/attribute&gt;
+		&lt;unit&gt;testBulkAddCollectionAVUSendXMLUnit1&lt;/unit&gt;
+		&lt;value&gt;testBulkAddCollectionAVUSendXMLValue1&lt;/value&gt;
+	&lt;/metadataEntries&gt;
+	&lt;metadataEntries&gt;
+		&lt;attribute&gt;testBulkAddCollectionAVUSendXMLAttr2&lt;/attribute&gt;
+		&lt;unit&gt;testBulkAddCollectionAVUSendXMLUnit2&lt;/unit&gt;
+		&lt;value&gt;testBulkAddCollectionAVUSendXMLValue2&lt;/value&gt;
+	&lt;/metadataEntries&gt;
+&lt;/ns2:metadataOperation&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Request Body - JSON</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
+  "metadataEntries": [
+    {
+      "attribute": "testBulkAddCollectionAVUJsonAttr1",
+      "value": "testBulkAddCollectionAVUJsonValue1",
+      "unit": "testBulkAddCollectionAVUJsonUnit1"
+    },
+    {
+      "attribute": "testBulkAddCollectionAVUJsonAttr2",
+      "value": "testBulkAddCollectionAVUJsonValue2",
+      "unit": "testBulkAddCollectionAVUJsonUnit2"
+    }
+  ]
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Responses - XML</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+&lt;collection xmlns:ns2="http://irods.org/irods-rest"&gt;
+	&lt;ns2:metadataOperationResultEntry
+		resultStatus="OK"&gt;
+		&lt;attributeString&gt;testBulkAddCollectionAVUSendXMLAttr1&lt;/attributeString&gt;
+		&lt;message /&gt;
+		&lt;unit&gt;testBulkAddCollectionAVUSendXMLUnit1&lt;/unit&gt;
+		&lt;valueString&gt;testBulkAddCollectionAVUSendXMLValue1&lt;/valueString&gt;
+	&lt;/ns2:metadataOperationResultEntry&gt;
+	&lt;ns2:metadataOperationResultEntry
+		resultStatus="OK"&gt;
+		&lt;attributeString&gt;testBulkAddCollectionAVUSendXMLAttr2&lt;/attributeString&gt;
+		&lt;message /&gt;
+		&lt;unit&gt;testBulkAddCollectionAVUSendXMLUnit2&lt;/unit&gt;
+		&lt;valueString&gt;testBulkAddCollectionAVUSendXMLValue2&lt;/valueString&gt;
+	&lt;/ns2:metadataOperationResultEntry&gt;
+&lt;/collection&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Responses - JSON</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json" data-lang="json">[
+  {
+    "attributeString": "testBulkAddCollectionAVUJsonAttr1",
+    "valueString": "testBulkAddCollectionAVUJsonValue1",
+    "unit": "testBulkAddCollectionAVUJsonUnit1",
+    "resultStatus": "OK",
+    "message": ""
+  },
+  {
+    "attributeString": "testBulkAddCollectionAVUJsonAttr2",
+    "valueString": "testBulkAddCollectionAVUJsonValue2",
+    "unit": "testBulkAddCollectionAVUJsonUnit2",
+    "resultStatus": "OK",
+    "message": ""
+  }
+]</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="trueoperations-on-collection-acls-permissions"><a class="anchor" href="#trueoperations-on-collection-acls-permissions"></a>1.6.4. Operations on Collection ACLs (Permissions)</h4>
+<div class="paragraph">
+<p>The following operations apply to the ACL sub-resource of iRODS collections, and can alter access permissions.
+Get Collection Permissions</p>
+</div>
+<div class="sect4">
+<h5 id="truedescription-7"><a class="anchor" href="#truedescription-7"></a>Description</h5>
+<div class="paragraph">
+<p>This <code>GET</code> operation will retrieve the permissions associated with an iRODS collection</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="truerequests-7"><a class="anchor" href="#truerequests-7"></a>Requests</h5>
+<div class="paragraph">
+<p><strong>Syntax</strong></p>
+</div>
+<div class="paragraph">
+<p><code>GET /collection/irodsabsolutepathtocollection/acl</code></p>
+</div>
+<div class="paragraph">
+<p><strong>Request Parameters</strong></p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Table 7. Collection ACL</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">n/a</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Responses - XML</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+&lt;ns2:permissionListing xmlns:ns2="http://irods.org/irods-rest"&gt;
+	&lt;absolutePathString&gt;/fedZone1/home/test1/jargon-scratch/RestCollectionServiceTest/testGetCollectionAclXML
+	&lt;/absolutePathString&gt;
+	&lt;inheritance&gt;true&lt;/inheritance&gt;
+	&lt;objectType&gt;COLLECTION&lt;/objectType&gt;
+	&lt;permissionEntries&gt;
+		&lt;filePermissionEnum&gt;OWN&lt;/filePermissionEnum&gt;
+		&lt;userId&gt;10007&lt;/userId&gt;
+		&lt;userName&gt;rods&lt;/userName&gt;
+		&lt;userType&gt;RODS_ADMIN&lt;/userType&gt;
+		&lt;userZone&gt;fedZone1&lt;/userZone&gt;
+	&lt;/permissionEntries&gt;
+	&lt;permissionEntries&gt;
+		&lt;filePermissionEnum&gt;OWN&lt;/filePermissionEnum&gt;
+		&lt;userId&gt;10012&lt;/userId&gt;
+		&lt;userName&gt;test1&lt;/userName&gt;
+		&lt;userType&gt;RODS_ADMIN&lt;/userType&gt;
+		&lt;userZone&gt;fedZone1&lt;/userZone&gt;
+	&lt;/permissionEntries&gt;
+&lt;/ns2:permissionListing&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Responses - JSON</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
+  "permissionEntries": [
+    {
+      "userName": "rods",
+      "userZone": "fedZone1",
+      "userId": "10007",
+      "userType": "RODS_ADMIN",
+      "filePermissionEnum": "OWN"
+    },
+    {
+      "userName": "test1",
+      "userZone": "fedZone1",
+      "userId": "10012",
+      "userType": "RODS_ADMIN",
+      "filePermissionEnum": "OWN"
+    }
+  ],
+  "objectType": "COLLECTION",
+  "absolutePathString": "/fedZone1/home/test1/jargon-scratch/RestCollectionServiceTest/testGetCollectionAclJson",
+  "inheritance": true
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="trueadd-collection-permission"><a class="anchor" href="#trueadd-collection-permission"></a>1.6.5. Add Collection Permission</h4>
+<div class="sect4">
+<h5 id="truedescription-8"><a class="anchor" href="#truedescription-8"></a>Description</h5>
+<div class="paragraph">
+<p>This <code>PUT</code> operation will set a collection permission.  Note that this is an idempotent method, and if an existing permission is already stored, the new permission will replace it. This means updating a permission is accomplished using this same method.</p>
+</div>
+<div class="paragraph">
+<p>Note that this method returns no body, and a normal operation returns an <code>HTTP 204 response code</code>.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="truerequests-8"><a class="anchor" href="#truerequests-8"></a>Requests</h5>
+<div class="paragraph">
+<p><strong>Syntax</strong></p>
+</div>
+<div class="paragraph">
+<p><code>PUT  /collection/irodsabsolutepathtocollection/acl/username</code></p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Note on username: iRODS supports a <code>user#zone</code> format to describe user names.  This special format is useful when defining permissions on a federated grid.  In normal circumstances, just the user name is required.  If the zone information is also required, it should be expressed in the username portion of the url path in <code>username,zone</code> format rather than <code>username#zone</code> format.  This helps clarify the URL and prevents conflicts with the URL anchor pattern.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><strong>Request Parameters</strong></p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Table 8. Collection ACL addition</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">recursive</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates whether the operation should be applied recursively.  (<code>true</code>|<code>false</code>)
+</p><p class="tableblock">The default is <code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">permission</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The permission value to set (<code>READ</code> | <code>WRITE</code> | <code>OWN</code>).
+</p><p class="tableblock">The default is READ</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Responses - XML</strong></p>
+</div>
+<div class="paragraph">
+<p>n/a</p>
+</div>
+<div class="paragraph">
+<p><strong>Responses - JSON</strong></p>
+</div>
+<div class="paragraph">
+<p>n/a</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="trueremove-collection-permission"><a class="anchor" href="#trueremove-collection-permission"></a>1.6.6. Remove Collection Permission</h4>
+<div class="sect4">
+<h5 id="truedescription-9"><a class="anchor" href="#truedescription-9"></a>Description</h5>
+<div class="paragraph">
+<p>This <code>DELETE</code> operation will remove a collection permission.  Note that this is an idempotent method, and if no permission exists, it will silently ignore the request and return a normal response.</p>
+</div>
+<div class="paragraph">
+<p>This method returns no body, and a normal operation returns an <code>HTTP 204 response code</code>.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="truerequests-9"><a class="anchor" href="#truerequests-9"></a>Requests</h5>
+<div class="paragraph">
+<p><strong>Syntax</strong></p>
+</div>
+<div class="paragraph">
+<p><code>DELETE  /collection/irodsabsolutepathtocollection/acl/username</code></p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+note on username: iRODS supports a <code>user#zone</code> format to describe user names.  This special format is useful when defining permissions on a federated grid.  In normal circumstances, just the user name is required.  If the zone information is also required, it should be expressed in the username portion of the url path in <code>username,zone</code> format rather than <code>username#zone</code> format.  This helps clarify the URL and prevents conflicts with the URL anchor pattern._
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><strong>Request Parameters</strong></p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Table 9. Collection ACL deletion</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">recursive</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates whether the operation should be applied recursively.  (<code>true</code>|<code>false</code>)
+</p><p class="tableblock">The default is <code>false</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Responses - XML</strong></p>
+</div>
+<div class="paragraph">
+<p>n/a</p>
+</div>
+<div class="paragraph">
+<p><strong>Responses - JSON</strong></p>
+</div>
+<div class="paragraph">
+<p>n/a</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="trueoperations-on-data-objects"><a class="anchor" href="#trueoperations-on-data-objects"></a>1.6.7. Operations on Data Objects</h4>
+<div class="paragraph">
+<p>The following operations concern iRODS Data Objects, which are files, as opposed to directories).</p>
+</div>
+<div class="paragraph">
+<p>Get Data Object Information</p>
+</div>
+<div class="sect4">
+<h5 id="truedescription-10"><a class="anchor" href="#truedescription-10"></a>Description</h5>
+<div class="paragraph">
+<p>This <code>GET</code> operation will retrieve basic catalog metadata about the iRODS Data Object.
+===== Requests</p>
+</div>
+<div class="paragraph">
+<p><strong>Syntax</strong></p>
+</div>
+<div class="paragraph">
+<p><code>GET /dataObject/irodsabsolutepathtodataobject.extension</code></p>
+</div>
+<div class="paragraph">
+<p><strong>Request Parameters</strong></p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">n/a</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Responses - XML</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+&lt;ns2:dataObject xmlns:ns2="http://irods.org/irods-rest"
+	collectionId="614201" id="614202"&gt;
+	&lt;checksum /&gt;
+	&lt;collectionName&gt;/fedZone1/home/test1/jargon-scratch/RestDataObjectServiceTest
+	&lt;/collectionName&gt;
+	&lt;comments /&gt;
+	&lt;createdAt&gt;2014-01-06T03:58:35-05:00&lt;/createdAt&gt;
+	&lt;dataMapId&gt;0&lt;/dataMapId&gt;
+	&lt;dataName&gt;testGetDataObjectDataXML.dat&lt;/dataName&gt;
+	&lt;dataOwnerName&gt;test1&lt;/dataOwnerName&gt;
+	&lt;dataOwnerZone&gt;fedZone1&lt;/dataOwnerZone&gt;
+	&lt;dataPath&gt;/opt/iRODS/iRODS3.3/Vault1/home/test1/jargon-scratch/RestDataObjectServiceTest/testGetDataObjectDataXML.dat
+	&lt;/dataPath&gt;
+	&lt;dataReplicationNumber&gt;0&lt;/dataReplicationNumber&gt;
+	&lt;dataSize&gt;1&lt;/dataSize&gt;
+	&lt;dataStatus /&gt;
+	&lt;dataTypeName&gt;generic&lt;/dataTypeName&gt;
+	&lt;dataVersion&gt;0&lt;/dataVersion&gt;
+	&lt;expiry /&gt;
+	&lt;objectPath /&gt;
+	&lt;replicationStatus&gt;1&lt;/replicationStatus&gt;
+	&lt;resourceGroupName /&gt;
+	&lt;resourceName&gt;test1-resc&lt;/resourceName&gt;
+	&lt;specColType&gt;NORMAL&lt;/specColType&gt;
+	&lt;updatedAt&gt;2014-01-06T03:58:35-05:00&lt;/updatedAt&gt;
+&lt;/ns2:dataObject&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Responses - JSON</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code>{
+  "id": 614206,
+  "collectionId": 614205,
+  "dataName": "testFindByAbsolutePath.dat",
+  "collectionName": "/fedZone1/home/test1/jargon-scratch/RestDataObjectServiceTest",
+  "dataReplicationNumber": 0,
+  "dataVersion": 0,
+  "dataTypeName": "generic",
+  "dataSize": 0,
+  "resourceGroupName": "",
+  "resourceName": "test1-resc",
+  "dataPath": "/opt/iRODS/iRODS3.3/Vault1/home/test1/jargon-scratch/RestDataObjectServiceTest/testFindByAbsolutePath.dat",
+  "dataOwnerName": "test1",
+  "dataOwnerZone": "fedZone1",
+  "replicationStatus": "1",
+  "dataStatus": "",
+  "checksum": "",
+  "expiry": "",
+  "dataMapId": 0,
+  "comments": "",
+  "createdAt": 1388998844000,
+  "updatedAt": 1388998844000,
+  "specColType": "NORMAL",
+  "objectPath": ""
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="truerequests-10"><a class="anchor" href="#truerequests-10"></a>Requests</h5>
+<div class="paragraph">
+<p><strong>Syntax</strong></p>
+</div>
+<div class="paragraph">
+<p><code>DELETE /dataObject/irodsabsolutepathtodataobject.extension</code></p>
+</div>
+<div class="paragraph">
+<p><strong>Request Parameters</strong></p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">n/a</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Responses - XML</strong></p>
+</div>
+<div class="paragraph">
+<p>n/a</p>
+</div>
+<div class="paragraph">
+<p><strong>Responses - JSON</strong></p>
+</div>
+<div class="paragraph">
+<p>n/a</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="trueget-data-object-file-content-file-download"><a class="anchor" href="#trueget-data-object-file-content-file-download"></a>1.6.8. Get Data Object File Content (File Download)</h4>
+<div class="sect4">
+<h5 id="truedescription-11"><a class="anchor" href="#truedescription-11"></a>Description</h5>
+<div class="paragraph">
+<p>This <code>GET</code> operation will retrieve the actual contents of a Data Object in iRODS.  This causes an HTTP file download action.  Note that the service uses a parent resource of ‘fileContents’ as opposed to ‘dataObject’.  This is to preserve the symmetry between upload (POST) and download (GET) while allowing <code>GET</code> for a Data Object to return the catalog metadata instead of the contents.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Should we here consider the file contents as a sub-resource instead?  This might make it more consistent?
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The response to this request will be an application/octet-stream with the binary file data.  Here is an example snippet in Java, from the JUnit tests in the FileContentsServiceTest using the Apache HTTPClient library:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java" data-lang="java">	HttpGet httpGet = new HttpGet(sb.toString());
+
+	HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpGet, clientAndContext.getHttpContext());
+
+	HttpEntity entity = response.getEntity();
+	long len = 0;
+	InputStream inputStream = null;
+
+	if (entity != null) {
+		len = entity.getContentLength();
+		inputStream = entity.getContent();
+		// write the file to wherever you want it.
+	}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="truerequests-11"><a class="anchor" href="#truerequests-11"></a>Requests</h5>
+<div class="paragraph">
+<p><strong>Syntax</strong></p>
+</div>
+<div class="paragraph">
+<p><code>GET /fileContents/irodsabsolutepathtodataobject.extension</code></p>
+</div>
+<div class="paragraph">
+<p><strong>Request Parameters</strong></p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+TODO: add param to download segments of a file with offset and length
+</td>
+</tr>
+</table>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Table 10. Data object file content retrieval</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">n/a</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Responses - XML</strong></p>
+</div>
+<div class="paragraph">
+<p>n/a</p>
+</div>
+<div class="paragraph">
+<p><strong>Responses - JSON</strong></p>
+</div>
+<div class="paragraph">
+<p>n/a</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="truepost-data-object-file-content-file-upload"><a class="anchor" href="#truepost-data-object-file-content-file-upload"></a>1.6.9. Post Data Object File Content (File Upload)</h4>
+<div class="sect4">
+<h5 id="truedescription-12"><a class="anchor" href="#truedescription-12"></a>Description</h5>
+<div class="paragraph">
+<p>This <code>POST</code> operation will upload binary data to the actual contents of a Data Object in iRODS.  This causes an HTTP multipart upload action.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Should we here consider the file contents as a sub-resource instead?  This might make it more consistent?
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The request should be a <code>POST</code> of multipart form data, with the attached file set to the form parameter uploadFile. The following JUnit test snippet in the FileContentsServiceTest, illustrates an upload using the Apache HTTPClient library.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java" data-lang="java">	HttpPost httpPost = new HttpPost(sb.toString());
+	httpPost.addHeader("accept", "application/json");
+	// httpPost.addHeader("Content-type", "multipart/form-data");
+	FileBody fileEntity = new FileBody(localFile,
+					"application/octet-stream");
+	MultipartEntity reqEntity = new MultipartEntity(
+					HttpMultipartMode.BROWSER_COMPATIBLE);
+	reqEntity.addPart("uploadFile", fileEntity);
+	httpPost.setEntity(reqEntity);
+	HttpResponse response = clientAndContext.getHttpClient().execute(
+	httpPost, clientAndContext.getHttpContext());</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that the response to this operation is equivalent to the <code>GET</code> of the Data Object catalog metadata, reflecting the file that was uploaded to iRODS.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="truerequests-12"><a class="anchor" href="#truerequests-12"></a>Requests</h5>
+<div class="paragraph">
+<p><strong>Syntax</strong></p>
+</div>
+<div class="paragraph">
+<p><code>POST /fileContents/irodsabsolutepathtodataobject.extension</code></p>
+</div>
+<div class="paragraph">
+<p><strong>Request Parameters</strong></p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+TODO: add param to upload segments of a file with offset and length
+</td>
+</tr>
+</table>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">n/a</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Responses - XML</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+&lt;ns2:dataObject xmlns:ns2="http://irods.org/irods-rest"
+	collectionId="614201" id="614202"&gt;
+	&lt;checksum /&gt;
+	&lt;collectionName&gt;/fedZone1/home/test1/jargon-scratch/RestDataObjectServiceTest
+	&lt;/collectionName&gt;
+	&lt;comments /&gt;
+	&lt;createdAt&gt;2014-01-06T03:58:35-05:00&lt;/createdAt&gt;
+	&lt;dataMapId&gt;0&lt;/dataMapId&gt;
+	&lt;dataName&gt;testGetDataObjectDataXML.dat&lt;/dataName&gt;
+	&lt;dataOwnerName&gt;test1&lt;/dataOwnerName&gt;
+	&lt;dataOwnerZone&gt;fedZone1&lt;/dataOwnerZone&gt;
+	&lt;dataPath&gt;/opt/iRODS/iRODS3.3/Vault1/home/test1/jargon-scratch/RestDataObjectServiceTest/testGetDataObjectDataXML.dat
+	&lt;/dataPath&gt;
+	&lt;dataReplicationNumber&gt;0&lt;/dataReplicationNumber&gt;
+	&lt;dataSize&gt;1&lt;/dataSize&gt;
+	&lt;dataStatus /&gt;
+	&lt;dataTypeName&gt;generic&lt;/dataTypeName&gt;
+	&lt;dataVersion&gt;0&lt;/dataVersion&gt;
+	&lt;expiry /&gt;
+	&lt;objectPath /&gt;
+	&lt;replicationStatus&gt;1&lt;/replicationStatus&gt;
+	&lt;resourceGroupName /&gt;
+	&lt;resourceName&gt;test1-resc&lt;/resourceName&gt;
+	&lt;specColType&gt;NORMAL&lt;/specColType&gt;
+	&lt;updatedAt&gt;2014-01-06T03:58:35-05:00&lt;/updatedAt&gt;
+&lt;/ns2:dataObject&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Responses - JSON</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
+  "id": 614206,
+  "collectionId": 614205,
+  "dataName": "testFindByAbsolutePath.dat",
+  "collectionName": "/fedZone1/home/test1/jargon-scratch/RestDataObjectServiceTest",
+  "dataReplicationNumber": 0,
+  "dataVersion": 0,
+  "dataTypeName": "generic",
+  "dataSize": 1,
+  "resourceGroupName": "",
+  "resourceName": "test1-resc",
+  "dataPath": "/opt/iRODS/iRODS3.3/Vault1/home/test1/jargon-scratch/RestDataObjectServiceTest/testFindByAbsolutePath.dat",
+  "dataOwnerName": "test1",
+  "dataOwnerZone": "fedZone1",
+  "replicationStatus": "1",
+  "dataStatus": "",
+  "checksum": "",
+  "expiry": "",
+  "dataMapId": 0,
+  "comments": "",
+  "createdAt": 1388998844000,
+  "updatedAt": 1388998844000,
+  "specColType": "NORMAL",
+  "objectPath": ""
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="trueoperations-on-data-object-avu-metadata"><a class="anchor" href="#trueoperations-on-data-object-avu-metadata"></a>1.6.10. Operations on Data Object AVU Metadata</h4>
+<div class="paragraph">
+<p>The following operations apply to the AVU sub-resource of an iRODS data objects, and represents AVU metadata attached to the given data object</p>
+</div>
+<div class="paragraph">
+<p>Get Data Object AVU Metadata</p>
+</div>
+<div class="sect4">
+<h5 id="truedescription-13"><a class="anchor" href="#truedescription-13"></a>Description</h5>
+<div class="paragraph">
+<p>This <code>GET</code> operation will retrieve the AVU metadata associated with an iRODS data object</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="truerequests-13"><a class="anchor" href="#truerequests-13"></a>Requests</h5>
+<div class="paragraph">
+<p><strong>Syntax</strong></p>
+</div>
+<div class="paragraph">
+<p><code>GET /dataObject/irodsabsolutepathtodataobject.extension/metadata</code></p>
+</div>
+<div class="paragraph">
+<p><strong>Request Parameters</strong></p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">n/a</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Responses - XML</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;ns2:metadataListing xmlns:ns2="http://irods.org/irods-rest" objectType="DATA_OBJECT"&gt;
+&lt;metadataEntries count="1" lastResult="true" totalRecords="0"&gt;
+&lt;attribute&gt;attr1&lt;/attribute&gt;
+&lt;unit&gt;unit1&lt;/unit&gt;
+&lt;value&gt;val1&lt;/value&gt;
+&lt;/metadataEntries&gt;
+&lt;uniqueNameString&gt;fedZone1/home/rods/shared&lt;/uniqueNameString&gt;
+&lt;/ns2:metadataListing&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Responses - JSON</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
+   "metadataEntries":[
+      {
+         "attribute":"attr1",
+         "value":"val1",
+         "unit":"unit1",
+         "count":1,
+         "lastResult":true,
+         "totalRecords":0
+      }
+   ],
+   "objectType":’DATA_OBJECT",
+   "uniqueNameString":"fedZone1/home/rods/shared"
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="trueadd-data-object-avu-metadata"><a class="anchor" href="#trueadd-data-object-avu-metadata"></a>1.6.11. Add Data Object AVU Metadata</h4>
+<div class="sect4">
+<h5 id="truedescription-14"><a class="anchor" href="#truedescription-14"></a>Description</h5>
+<div class="paragraph">
+<p>This <code>PUT</code> operation will bulk add the provided AVU metadata associated with an iRODS data object.</p>
+</div>
+<div class="paragraph">
+<p>This bulk operation requires a request body in XML or JSON, as AVU metadata is too large and complex for proper expression as a URL or parameter.  This bulk mode also is more efficient for larger amounts of metadata, requiring fewer round trips.</p>
+</div>
+<div class="paragraph">
+<p>Note that the response will detail the disposition, and any errors that occurred for individual AVU values.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="truerequests-14"><a class="anchor" href="#truerequests-14"></a>Requests</h5>
+<div class="paragraph">
+<p><strong>Syntax</strong></p>
+</div>
+<div class="paragraph">
+<p><code>PUT /dataObject/irodsabsolutepathtodataobject.extension/metadata</code></p>
+</div>
+<div class="paragraph">
+<p><strong>Request Parameters</strong></p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">n/a</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Request Body - XML</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+&lt;ns2:metadataOperation xmlns:ns2="http://irods.org/irods-rest"&gt;
+	&lt;metadataEntries&gt;
+		&lt;attribute&gt;testBulkAddCollectionAVUSendXMLAttr1&lt;/attribute&gt;
+		&lt;unit&gt;testBulkAddCollectionAVUSendXMLUnit1&lt;/unit&gt;
+		&lt;value&gt;testBulkAddCollectionAVUSendXMLValue1&lt;/value&gt;
+	&lt;/metadataEntries&gt;
+	&lt;metadataEntries&gt;
+		&lt;attribute&gt;testBulkAddCollectionAVUSendXMLAttr2&lt;/attribute&gt;
+		&lt;unit&gt;testBulkAddCollectionAVUSendXMLUnit2&lt;/unit&gt;
+		&lt;value&gt;testBulkAddCollectionAVUSendXMLValue2&lt;/value&gt;
+	&lt;/metadataEntries&gt;
+&lt;/ns2:metadataOperation&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Request Body - JSON</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json" data-lang="json">{"metadataEntries":
+[{"attribute":"testBulkAddCollectionAVUJsonAttr1","value":"testBulkAddCollectionAVUJsonValue1","unit":"testBulkAddCollectionAVUJsonUnit1"},
+{"attribute":"testBulkAddCollectionAVUJsonAttr2","value":"testBulkAddCollectionAVUJsonValue2","unit":"testBulkAddCollectionAVUJsonUnit2"}]}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Responses - XML</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+&lt;collection xmlns:ns2="http://irods.org/irods-rest"&gt;
+	&lt;ns2:metadataOperationResultEntry
+		resultStatus="OK"&gt;
+		&lt;attributeString&gt;testBulkAddCollectionAVUSendXMLAttr1&lt;/attributeString&gt;
+		&lt;message /&gt;
+		&lt;unit&gt;testBulkAddCollectionAVUSendXMLUnit1&lt;/unit&gt;
+		&lt;valueString&gt;testBulkAddCollectionAVUSendXMLValue1&lt;/valueString&gt;
+	&lt;/ns2:metadataOperationResultEntry&gt;
+	&lt;ns2:metadataOperationResultEntry
+		resultStatus="OK"&gt;
+		&lt;attributeString&gt;testBulkAddCollectionAVUSendXMLAttr2&lt;/attributeString&gt;
+		&lt;message /&gt;
+		&lt;unit&gt;testBulkAddCollectionAVUSendXMLUnit2&lt;/unit&gt;
+		&lt;valueString&gt;testBulkAddCollectionAVUSendXMLValue2&lt;/valueString&gt;
+	&lt;/ns2:metadataOperationResultEntry&gt;
+&lt;/collection&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Responses - JSON</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json" data-lang="json">[
+  {
+    "attributeString": "testBulkAddCollectionAVUJsonAttr1",
+    "valueString": "testBulkAddCollectionAVUJsonValue1",
+    "unit": "testBulkAddCollectionAVUJsonUnit1",
+    "resultStatus": "OK",
+    "message": ""
+  },
+  {
+    "attributeString": "testBulkAddCollectionAVUJsonAttr2",
+    "valueString": "testBulkAddCollectionAVUJsonValue2",
+    "unit": "testBulkAddCollectionAVUJsonUnit2",
+    "resultStatus": "OK",
+    "message": ""
+  }
+]</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="truedelete-data-object-avu-metadata"><a class="anchor" href="#truedelete-data-object-avu-metadata"></a>1.6.12. Delete Data Object AVU Metadata</h4>
+<div class="sect4">
+<h5 id="truedescription-15"><a class="anchor" href="#truedescription-15"></a>Description</h5>
+<div class="paragraph">
+<p>This <code>POST</code> operation will bulk delete the provided AVU metadata associated with an iRODS data object.  <code>POST</code> is used here as an HTTP <code>DELETE</code> action cannot have a body.</p>
+</div>
+<div class="paragraph">
+<p>This bulk operation requires a request body in XML or JSON, as AVU metadata is too large and complex for proper expression as a URL or parameter.  This bulk mode also is more efficient for larger amounts of metadata, requiring fewer round trips.</p>
+</div>
+<div class="paragraph">
+<p>Note that the response will detail the disposition, and any errors that occurred for individual AVU values.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="truerequests-15"><a class="anchor" href="#truerequests-15"></a>Requests</h5>
+<div class="paragraph">
+<p><strong>Syntax</strong></p>
+</div>
+<div class="paragraph">
+<p><code>POST /dataObject/irodsabsolutepathtodataobject.extension/metadata</code></p>
+</div>
+<div class="paragraph">
+<p><strong>Request Parameters</strong></p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">n/a</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Request Body - XML</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+&lt;ns2:metadataOperation xmlns:ns2="http://irods.org/irods-rest"&gt;
+	&lt;metadataEntries&gt;
+		&lt;attribute&gt;testBulkAddCollectionAVUSendXMLAttr1&lt;/attribute&gt;
+		&lt;unit&gt;testBulkAddCollectionAVUSendXMLUnit1&lt;/unit&gt;
+		&lt;value&gt;testBulkAddCollectionAVUSendXMLValue1&lt;/value&gt;
+	&lt;/metadataEntries&gt;
+	&lt;metadataEntries&gt;
+		&lt;attribute&gt;testBulkAddCollectionAVUSendXMLAttr2&lt;/attribute&gt;
+		&lt;unit&gt;testBulkAddCollectionAVUSendXMLUnit2&lt;/unit&gt;
+		&lt;value&gt;testBulkAddCollectionAVUSendXMLValue2&lt;/value&gt;
+	&lt;/metadataEntries&gt;
+&lt;/ns2:metadataOperation&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Request Body - JSON</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
+  "metadataEntries": [
+    {
+      "attribute": "attr1",
+      "value": "val1",
+      "unit": "unit1",
+      "count": 1,
+      "lastResult": true,
+      "totalRecords": 0
+    }
+  ],
+  "objectType": "DATA_OBJECT",
+  "uniqueNameString": "fedZone1/home/rods/shared"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Responses - XML</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+&lt;collection xmlns:ns2="http://irods.org/irods-rest"&gt;
+	&lt;ns2:metadataOperationResultEntry
+		resultStatus="OK"&gt;
+		&lt;attributeString&gt;testBulkAddCollectionAVUSendXMLAttr1&lt;/attributeString&gt;
+		&lt;message /&gt;
+		&lt;unit&gt;testBulkAddCollectionAVUSendXMLUnit1&lt;/unit&gt;
+		&lt;valueString&gt;testBulkAddCollectionAVUSendXMLValue1&lt;/valueString&gt;
+	&lt;/ns2:metadataOperationResultEntry&gt;
+	&lt;ns2:metadataOperationResultEntry
+		resultStatus="OK"&gt;
+		&lt;attributeString&gt;testBulkAddCollectionAVUSendXMLAttr2&lt;/attributeString&gt;
+		&lt;message /&gt;
+		&lt;unit&gt;testBulkAddCollectionAVUSendXMLUnit2&lt;/unit&gt;
+		&lt;valueString&gt;testBulkAddCollectionAVUSendXMLValue2&lt;/valueString&gt;
+	&lt;/ns2:metadataOperationResultEntry&gt;
+&lt;/collection&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Responses - JSON</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json" data-lang="json">[
+  {
+    "attributeString": "testBulkAddCollectionAVUJsonAttr1",
+    "valueString": "testBulkAddCollectionAVUJsonValue1",
+    "unit": "testBulkAddCollectionAVUJsonUnit1",
+    "resultStatus": "OK",
+    "message": ""
+  },
+  {
+    "attributeString": "testBulkAddCollectionAVUJsonAttr2",
+    "valueString": "testBulkAddCollectionAVUJsonValue2",
+    "unit": "testBulkAddCollectionAVUJsonUnit2",
+    "resultStatus": "OK",
+    "message": ""
+  }
+]</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="trueoperations-on-data-object-acls-permissions"><a class="anchor" href="#trueoperations-on-data-object-acls-permissions"></a>1.6.13. Operations on Data Object ACLs (Permissions)</h4>
+<div class="paragraph">
+<p>The following operations apply to the ACL sub-resource of iRODS data objects, and can alter access permissions.
+Get Data Object Permissions</p>
+</div>
+<div class="sect4">
+<h5 id="truedescription-16"><a class="anchor" href="#truedescription-16"></a>Description</h5>
+<div class="paragraph">
+<p>This <code>GET</code> operation will retrieve the permissions associated with an iRODS data object</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="truerequests-16"><a class="anchor" href="#truerequests-16"></a>Requests</h5>
+<div class="paragraph">
+<p><strong>Syntax</strong></p>
+</div>
+<div class="paragraph">
+<p><code>GET /dataObject/irodsabsolutepathtodataobject.extension/acl</code></p>
+</div>
+<div class="paragraph">
+<p><strong>Request Parameters</strong></p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">n/a</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Responses - XML</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+&lt;ns2:permissionListing xmlns:ns2="http://irods.org/irods-rest"&gt;
+	&lt;absolutePathString&gt;/fedZone1/home/test1/jargon-scratch/RestCollectionServiceTest/testGetCollectionAclXML
+	&lt;/absolutePathString&gt;
+	&lt;inheritance&gt;true&lt;/inheritance&gt;
+	&lt;objectType&gt;COLLECTION&lt;/objectType&gt;
+	&lt;permissionEntries&gt;
+		&lt;filePermissionEnum&gt;OWN&lt;/filePermissionEnum&gt;
+		&lt;userId&gt;10007&lt;/userId&gt;
+		&lt;userName&gt;rods&lt;/userName&gt;
+		&lt;userType&gt;RODS_ADMIN&lt;/userType&gt;
+		&lt;userZone&gt;fedZone1&lt;/userZone&gt;
+	&lt;/permissionEntries&gt;
+	&lt;permissionEntries&gt;
+		&lt;filePermissionEnum&gt;OWN&lt;/filePermissionEnum&gt;
+		&lt;userId&gt;10012&lt;/userId&gt;
+		&lt;userName&gt;test1&lt;/userName&gt;
+		&lt;userType&gt;RODS_ADMIN&lt;/userType&gt;
+		&lt;userZone&gt;fedZone1&lt;/userZone&gt;
+	&lt;/permissionEntries&gt;
+&lt;/ns2:permissionListing&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Responses - JSON</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
+  "permissionEntries": [
+    {
+      "userName": "rods",
+      "userZone": "fedZone1",
+      "userId": "10007",
+      "userType": "RODS_ADMIN",
+      "filePermissionEnum": "OWN"
+    },
+    {
+      "userName": "test1",
+      "userZone": "fedZone1",
+      "userId": "10012",
+      "userType": "RODS_ADMIN",
+      "filePermissionEnum": "OWN"
+    }
+  ],
+  "objectType": "COLLECTION",
+  "absolutePathString": "/fedZone1/home/test1/jargon-scratch/RestCollectionServiceTest/testGetCollectionAclJson",
+  "inheritance": true
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="trueadd-data-object-permission"><a class="anchor" href="#trueadd-data-object-permission"></a>1.6.14. Add Data Object Permission</h4>
+<div class="sect4">
+<h5 id="truedescription-17"><a class="anchor" href="#truedescription-17"></a>Description</h5>
+<div class="paragraph">
+<p>This <code>PUT</code> operation will set a data object permission.  Note that this is an idempotent method, and if an existing permission is already stored, the new permission will replace it. This means updating a permission is accomplished using this same method.</p>
+</div>
+<div class="paragraph">
+<p>Note that this method returns no body, and a normal operation returns an <code>HTTP 204 response code</code>.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="truerequests-17"><a class="anchor" href="#truerequests-17"></a>Requests</h5>
+<div class="paragraph">
+<p><strong>Syntax</strong></p>
+</div>
+<div class="paragraph">
+<p><code>PUT /dataObject/irodsabsolutepathtodataobject.extension/acl/username</code></p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Note on username iRODS supports a <code>user#zone</code> format to describe user names. This special format is useful when defining permissions on a federated grid. In normal circumstances, just the user name is required. If the zone information is also required, it should be expressed in the username portion of the url path in <code>username,zone</code> format rather than <code>username#zone</code> format.  This helps clarify the URL and prevents conflicts with the URL anchor pattern.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><strong>Request Parameters</strong></p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Table 11. Data object permission addition</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">recursive</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates whether the operation should be applied recursively.  (<code>true</code>|<code>false</code>)
+</p><p class="tableblock">The default is <code>false</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">permission</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The permission value to set (<code>READ</code> | <code>WRITE</code> | <code>OWN</code>).
+</p><p class="tableblock">The default is <code>READ</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Responses - XML</strong></p>
+</div>
+<div class="paragraph">
+<p>n/a</p>
+</div>
+<div class="paragraph">
+<p><strong>Responses - JSON</strong></p>
+</div>
+<div class="paragraph">
+<p>n/a</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="trueremove-data-object-permission"><a class="anchor" href="#trueremove-data-object-permission"></a>1.6.15. Remove Data Object Permission</h4>
+<div class="sect4">
+<h5 id="truedescription-18"><a class="anchor" href="#truedescription-18"></a>Description</h5>
+<div class="paragraph">
+<p>This <code>DELETE</code> operation will remove a data object permission.  Note that this is an idempotent method, and if no permission exists, it will silently ignore the request and return a normal response.</p>
+</div>
+<div class="paragraph">
+<p>This method returns no body, and a normal operation returns an <code>HTTP 204 response code</code>.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="truerequests-18"><a class="anchor" href="#truerequests-18"></a>Requests</h5>
+<div class="paragraph">
+<p><strong>Syntax</strong></p>
+</div>
+<div class="paragraph">
+<p><code>DELETE  /dataObject/irodsabsolutepathtodataobject.extension/acl/username</code></p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Note on username: iRODS supports a <code>user#zone</code> format to describe user names. This special format is useful when defining permissions on a federated grid. In normal circumstances, just the user name is required. If the zone information is also required, it should be expressed in the username portion of the url path in <code>username,zone</code> format rather than <code>username#zone</code> format. This helps clarify the URL and prevents conflicts with the URL anchor pattern.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><strong>Request Parameters</strong></p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Table 12. Data object permission deletion</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">recursive</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates whether the operation should be applied recursively.  (<code>true</code>|<code>false</code>)
+</p><p class="tableblock">The default is <code>false</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Responses - XML</strong></p>
+</div>
+<div class="paragraph">
+<p>n/a</p>
+</div>
+<div class="paragraph">
+<p><strong>Responses - JSON</strong></p>
+</div>
+<div class="paragraph">
+<p>n/a</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="trueoperations-on-rules"><a class="anchor" href="#trueoperations-on-rules"></a>1.6.16. Operations on Rules</h4>
+<div class="paragraph">
+<p>Execute an iRODS Rule by providing a rule body and any override parameters</p>
+</div>
+<div class="sect4">
+<h5 id="truedescription-19"><a class="anchor" href="#truedescription-19"></a>Description</h5>
+<div class="paragraph">
+<p>This <code>POST</code> operation will send a client-submitted rule to iRODS for invocation, returning back a document that contains the configured output parameters and log information.</p>
+</div>
+<div class="paragraph">
+<p>In this case, the rule is provided in the request, and optional override parameters can be provided to specify values for iRODS rule input parameters.  These are substituted in the rule processing code.</p>
+</div>
+<div class="paragraph">
+<p>Note that iRODS rules can either be the <code>old</code> format, pre iRODS 3.2, or they can be in the updated format of the enhanced rule engine.  The rule processing type will be specified in the request body along with the rule string.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="truerequests-19"><a class="anchor" href="#truerequests-19"></a>Requests</h5>
+<div class="paragraph">
+<p><strong>Syntax</strong></p>
+</div>
+<div class="paragraph">
+<p><code>POST /rule</code></p>
+</div>
+<div class="paragraph">
+<p><strong>Request Parameters</strong></p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">n/a</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Note that the rule processing is controlled by the JSON or XML request body, as demonstrated below. The following examples show the inclusion of an override parameter.  Also note that
+the request includes a ‘ruleProcessingType’ element that will be (<code>CLASSIC | INTERNAL | EXTERNAL</code>).  The <code>CLASSIC</code> form is appropriate for the old rule engine format, <code>INTERNAL</code> and <code>EXTERNAL</code> are options of the new rule engine syntax.</p>
+</div>
+<div class="paragraph">
+<p><strong>Request - XML</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+&lt;ns2:rule xmlns:ns2="http://irods.org/irods-rest"&gt;
+	&lt;ruleAsOriginalText&gt;HelloWorld {
+		writeLine("stdout", "Hello, world!");
+		}
+		INPUT null
+		OUTPUT ruleExecOut
+	&lt;/ruleAsOriginalText&gt;
+	&lt;ruleProcessingType&gt;INTERNAL&lt;/ruleProcessingType&gt;
+&lt;/ns2:rule&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Request - JSON</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
+  "ruleProcessingType": "INTERNAL",
+  "ruleAsOriginalText": "myTestRule {\r\n# Input parameters are:\r\n#  Data object path\r\n#  Optional flags in form Keyword=value\r\n#    ChksumAll=\r\n#    verifyChksum=\r\n#    forceChksum=\r\n#    replNum=\r\n# Output parameters are:\r\n#  Checksum value\r\n# Output from running the example is\r\n#  Collection is /tempZone/home/rods/sub1 and file is foo1\r\n#  Saved checksum for file foo1 is f03e80c9994d137614935e4913e53417, new checksum is f03e80c9994d137614935e4913e53417 \r\n   msiSplitPath(*dataObject,*Coll,*File);\r\n   writeLine(\"stdout\",\"Collection is *Coll and file is *File\");\r\n   msiMakeGenQuery(\"DATA_CHECKSUM\",\"DATA_NAME = '*File' AND COLL_NAME = '*Coll'\",*GenQInp);\r\n   msiExecGenQuery(*GenQInp,*GenQOut);\r\n   foreach(*GenQOut) {\r\n     msiGetValByKey(*GenQOut,\"DATA_CHECKSUM\",*chkSumS);\r\n     msiDataObjChksum(*dataObject,*Flags,*chkSum);\r\n     writeLine(\"stdout\",\"Saved checksum for file *File is *chkSumS, new checksum is *chkSum\");\r\n  }\r\n}\r\nINPUT *dataObject=\"/test1/home/test1/jargon-scratch/RuleProcessingAOImplTest/testExecuteRuleFromResourceWithOverrides.txt\", *Flags=\"forceChksum=true\"\r\nOUTPUT ruleExecOut\r\n",
+  "irodsRuleInputParameters": [
+    {
+      "name": "*dataObject",
+      "value": "\"/fedZone1/home/test1/jargon-scratch/RuleServiceTest/testExecuteNewFormatRuleWithOverride.txt\""
+    }
+  ]
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Responses - XML</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+&lt;ns2:rule xmlns:ns2="http://irods.org/irods-rest"&gt;
+	&lt;ruleAsOriginalText&gt;HelloWorld {
+		writeLine("stdout", "Hello, world!");
+		}
+		INPUT null
+		OUTPUT ruleExecOut
+	&lt;/ruleAsOriginalText&gt;
+	&lt;ruleProcessingType&gt;INTERNAL&lt;/ruleProcessingType&gt;
+&lt;/ns2:rule&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Responses - JSON</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
+  "outputParameterResults": [
+    {
+      "parameterName": "ruleExecOut",
+      "outputParamType": "STRING",
+      "resultObject": "Collection is \"/fedZone1/home/test1/jargon-scratch/RuleServiceTest and file is testExecuteNewFormatRuleWithOverride.txt\"\n"
+    },
+    {
+      "parameterName": "ruleExecErrorOut",
+      "outputParamType": "STRING",
+      "resultObject": ""
+    }
+  ]
+}</code></pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Add user and group operations currently undocumented!</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="trueoperations-on-users"><a class="anchor" href="#trueoperations-on-users"></a>1.6.17. Operations on Users</h4>
+<div class="paragraph">
+<p>Obtain a temporary iRODS password for a user</p>
+</div>
+<div class="sect4">
+<h5 id="truedescription-20"><a class="anchor" href="#truedescription-20"></a>Description</h5>
+<div class="paragraph">
+<p>This <code>PUT</code> operation will obtain a temporary iRODS password for a user.  This may be used by any user to obtain a temporary password for themselves, and may be used in admin mode by a properly authorized user to generate a temporary password for a different user.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="truerequests-20"><a class="anchor" href="#truerequests-20"></a>Requests</h5>
+<div class="paragraph">
+<p><strong>Syntax</strong></p>
+</div>
+<div class="paragraph">
+<p><code>PUT /user/userName/temppassword</code></p>
+</div>
+<div class="paragraph">
+<p><strong>Request Parameters</strong></p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Table 13. Temporary user password generation</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">admin</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code> | <code>false</code>, with <code>false</code> as the default.  This indicates the request is in admin mode, allowing obtaining a temporary password for a different user than the logged in user.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Response - JSON</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
+  "userName": "test2",
+  "password": "83328ce8166933efab694b6dbeed102a"
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="truegenquery-operations"><a class="anchor" href="#truegenquery-operations"></a>1.7. GenQuery Operations</h3>
+<div class="sect4">
+<h5 id="truedescription-21"><a class="anchor" href="#truedescription-21"></a>Description</h5>
+<div class="paragraph">
+<p>This <code>POST</code> operation performs GenQuery queries.  The query&#8217;s request body consists of one or more of the following fields:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>select</code> -  A list of fields that are to be selected.  The field names must match one of the enums in <code>org.irods.jargon.core.query.RodsGenQueryEnum</code>.</p>
+</li>
+<li>
+<p><code>aggregate_type</code> – An optional attribute for the select field.  The aggregate_type must match one of the enums in <code>org.irods.jargon.core.query.GenQueryField.SelectFieldTypes</code>.</p>
+</li>
+<li>
+<p><code>condition</code> – A list of query conditions.  Each condition includes the following:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>column</code> – The query column.  This must match one of the enums in <code>org.irods.jargon.core.query.RodsGenQueryEnum</code>.</p>
+</li>
+<li>
+<p><code>operator</code> – The operator for the conditional test.  This must match one of the enums in <code>org.irods.jargon.core.query.QueryConditionOperators</code>.</p>
+</li>
+<li>
+<p><code>value</code> – The value the column is being tested against.  This applies to all operators except the <code>IN</code> operator.</p>
+</li>
+<li>
+<p><code>value_list</code> – A list of values for the IN operator.  The <code>value_list</code> contains one or more value fields.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>order_by</code> – A list of order-by conditions.  Each order-by condition includes the following:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>column</code> – The order-by column.  This must match one of the enums in <code>org.irods.jargon.core.query.RodsGenQueryEnum</code>.</p>
+</li>
+<li>
+<p><code>order_condition</code> – The order condition.  This must match one of the enums in <code>org.irods.jargon.core.query.OrderByType</code>.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="trueexample-non-aggregate-query"><a class="anchor" href="#trueexample-non-aggregate-query"></a>1.7.2. Example Non Aggregate Query</h4>
+<div class="paragraph">
+<p>The XML and JSON queries listed below are the equivalent of the following query.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql" data-lang="sql">select RESC_NAME, COLL_NAME, DATA_NAME, DATA_SIZE
+where  COLL_NAME = '/tempZone/home/rods' and DATA_NAME like '%.dat'
+order by DATA_SIZE DESC</code></pre>
+</div>
+</div>
+<div class="sect4">
+<h5 id="truerequests-21"><a class="anchor" href="#truerequests-21"></a>Requests</h5>
+<div class="paragraph">
+<p><strong>Syntax</strong></p>
+</div>
+<div class="paragraph">
+<p><code>POST /genQuery</code></p>
+</div>
+<div class="paragraph">
+<p><strong>Request Parameters</strong></p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">n/a</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Request Body - XML</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;ns2:query xmlns:ns2="http://irods.org/irods-rest"&gt;
+  &lt;select&gt;RESC_NAME&lt;/select&gt;
+  &lt;select&gt;COLL_NAME&lt;/select&gt;
+  &lt;select&gt;DATA_NAME&lt;/select&gt;
+  &lt;select&gt;DATA_SIZE&lt;/select&gt;
+  &lt;condition&gt;
+    &lt;column&gt;COLL_NAME&lt;/column&gt;
+    &lt;operator&gt;EQUAL&lt;/operator&gt;
+    &lt;value&gt;/tempZone/home/rods&lt;/value&gt;
+  &lt;/condition&gt;
+  &lt;condition&gt;
+    &lt;column&gt;DATA_NAME&lt;/column&gt;
+    &lt;operator&gt;LIKE&lt;/operator&gt;
+    &lt;value&gt;%.dat&lt;/value&gt;
+  &lt;/condition&gt;
+  &lt;order_by&gt;
+    &lt;column&gt;DATA_SIZE&lt;/column&gt;
+    &lt;order_condition&gt;DESC&lt;/order_condition&gt;
+  &lt;/order_by&gt;
+&lt;/ns2:query&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Request Body - JSON</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
+  "select": [
+    {
+      "value": "RESC_NAME"
+    },
+    {
+      "value": "COLL_NAME"
+    },
+    {
+      "value": "DATA_NAME"
+    },
+    {
+      "value": "DATA_SIZE"
+    }
+  ],
+  "condition": [
+    {
+      "column": "COLL_NAME",
+      "operator": "EQUAL",
+      "value": "/tempZone/home/rods/"
+    },
+    {
+      "column": "DATA_NAME",
+      "operator": "LIKE",
+      "value": "%.dat"
+    }
+  ],
+  "order_by": [
+    {
+      "column": "DATA_SIZE",
+      "order_condition": "DESC"
+    }
+  ]
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Responses - XML</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+  &lt;ns2:results xmlns:ns2="http://irods.org/irods-rest"&gt;
+  &lt;row&gt;
+    &lt;column name="RESC_NAME"&gt;demoResc&lt;/column&gt;
+    &lt;column name="COLL_NAME"&gt;/tempZone/home/rods/&lt;/column&gt;
+    &lt;column name="DATA_NAME"&gt;testfile3.dat&lt;/column&gt;
+    &lt;column name="DATA_SIZE"&gt;40&lt;/column&gt;
+  &lt;/row&gt;
+  &lt;row&gt;
+    &lt;column name="RESC_NAME"&gt;demoResc&lt;/column&gt;
+    &lt;column name="COLL_NAME"&gt;/tempZone/home/rods&lt;/column&gt;
+    &lt;column name="DATA_NAME"&gt;testfile2.dat&lt;/column&gt;
+    &lt;column name="DATA_SIZE"&gt;30&lt;/column&gt;
+  &lt;/row&gt;
+  &lt;row&gt;
+    &lt;column name="RESC_NAME"&gt;demoResc&lt;/column&gt;
+    &lt;column name="COLL_NAME"&gt;/tempZone/home/rods/&lt;/column&gt;
+    &lt;column name="DATA_NAME"&gt;testfile1.dat&lt;/column&gt;
+    &lt;column name="DATA_SIZE"&gt;20&lt;/column&gt;
+  &lt;/row&gt;
+&lt;/ns2:results&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Responses - JSON</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
+  "row": [
+    {
+      "column": [
+        {
+          "name": "RESC_NAME",
+          "value": "demoResc"
+        },
+        {
+          "name": "COLL_NAME",
+          "value": "/tempZone/home/rods/"
+        },
+        {
+          "name": "DATA_NAME",
+          "value": "testfile3.dat"
+        },
+        {
+          "name": "DATA_SIZE",
+          "value": "40"
+        }
+      ]
+    },
+    {
+      "column": [
+        {
+          "name": "RESC_NAME",
+          "value": "demoResc"
+        },
+        {
+          "name": "COLL_NAME",
+          "value": "/tempZone/home/rods/"
+        },
+        {
+          "name": "DATA_NAME",
+          "value": "testfile2.dat"
+        },
+        {
+          "name": "DATA_SIZE",
+          "value": "30"
+        }
+      ]
+    },
+    {
+      "column": [
+        {
+          "name": "RESC_NAME",
+          "value": "demoResc"
+        },
+        {
+          "name": "COLL_NAME",
+          "value": "/tempZone/home/rods/"
+        },
+        {
+          "name": "DATA_NAME",
+          "value": "testfile1.dat"
+        },
+        {
+          "name": "DATA_SIZE",
+          "value": "20"
+        }
+      ]
+    }
+  ]
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="trueexample-aggregate-query"><a class="anchor" href="#trueexample-aggregate-query"></a>1.7.3. Example Aggregate Query</h4>
+<div class="paragraph">
+<p>The XML and JSON queries listed below are the equivalent of the following query:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql" data-lang="sql">select SUM(DATA_SIZE)
+where COLL_NAME = '/tempZone/home/rods' and DATA_NAME like '%.dat'</code></pre>
+</div>
+</div>
+<div class="sect4">
+<h5 id="truerequests-22"><a class="anchor" href="#truerequests-22"></a>Requests</h5>
+<div class="paragraph">
+<p><strong>Syntax</strong></p>
+</div>
+<div class="paragraph">
+<p><code>POST /genQuery</code></p>
+</div>
+<div class="paragraph">
+<p><strong>Request Parameters</strong></p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">n/a</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Request Body - XML</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;ns2:query xmlns:ns2="http://irods.org/irods-rest"&gt;
+  &lt;select aggregate_type="SUM"&gt;DATA_SIZE&lt;/select&gt;
+  &lt;condition&gt;
+    &lt;column&gt;COLL_NAME&lt;/column&gt;
+    &lt;operator&gt;EQUAL&lt;/operator&gt;
+    &lt;value&gt;/tempZone/home/rods&lt;/value&gt;
+  &lt;/condition&gt;
+  &lt;condition&gt;
+    &lt;column&gt;DATA_NAME&lt;/column&gt;
+    &lt;operator&gt;LIKE&lt;/operator&gt;
+    &lt;value&gt;%.dat&lt;/value&gt;
+  &lt;/condition&gt;
+&lt;/ns2:query&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Request Body - JSON</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
+  "select": [
+    {
+      "value": "DATA_SIZE",
+      "aggregate_type": "SUM"
+    }
+  ],
+  "condition": [
+    {
+      "column": "COLL_NAME",
+      "operator": "EQUAL",
+      "value": "/tempZone/home/rods"
+    },
+    {
+      "column": "DATA_NAME",
+      "operator": "LIKE",
+      "value": "%.dat"
+    }
+  ]
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Responses - XML</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+&lt;ns2:results xmlns:ns2="http://irods.org/irods-rest"&gt;
+  &lt;row&gt;
+    &lt;column name="SUM(DATA_SIZE)"&gt;90&lt;/column&gt;
+  &lt;/row&gt;
+&lt;/ns2:results&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Responses - JSON</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
+  "row": [
+    {
+      "column": [
+        {
+          "name": "SUM(DATA_SIZE)",
+          "value": "90"
+        }
+      ]
+    }
+  ]
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Example Using <code>IN</code> Clause with a <code>value_list</code></p>
+</div>
+<div class="paragraph">
+<p>The XML and JSON queries listed below are the equivalent of the following query:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-sql" data-lang="sql">select COLL_NAME, DATA_NAME
+where COLL_NAME = '/tempZone/home/rods/dir/GenQueryTestDirectory' and DATA_NAME in ('test_file1.dat', 'test_file2.dat')</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="truerequests-23"><a class="anchor" href="#truerequests-23"></a>Requests</h5>
+<div class="paragraph">
+<p><strong>Syntax</strong></p>
+</div>
+<div class="paragraph">
+<p><code>POST /genQuery</code></p>
+</div>
+<div class="paragraph">
+<p><strong>Request Parameters</strong></p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">n/a</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Request Body - XML</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;ns2:query xmlns:ns2="http://irods.org/irods-rest"&gt;
+  &lt;select&gt;COLL_NAME&lt;/select&gt;
+  &lt;select&gt;DATA_NAME&lt;/select&gt;
+  &lt;condition&gt;
+    &lt;column&gt;COLL_NAME&lt;/column&gt;
+    &lt;operator&gt;EQUAL&lt;/operator&gt;
+    &lt;value&gt;/tempZone/home/rods/dir/GenQueryTestDirectory&lt;/value&gt;
+  &lt;/condition&gt;
+  &lt;condition&gt;
+    &lt;column&gt;DATA_NAME&lt;/column&gt;
+    &lt;operator&gt;IN&lt;/operator&gt;
+    &lt;value_list&gt;
+      &lt;value&gt;testfile1.dat&lt;/value&gt;
+      &lt;value&gt;testfile2.dat&lt;/value&gt;
+    &lt;/value_list&gt;
+  &lt;/condition&gt;
+&lt;/ns2:query&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Request Body - JSON</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
+  "select": [
+    {
+      "value": "COLL_NAME"
+    },
+    {
+      "value": "DATA_NAME"
+    }
+  ],
+  "condition": [
+    {
+      "column": "COLL_NAME",
+      "operator": "EQUAL",
+      "value": "/tempZone/home/rods/dir/GenQueryTestDirectory"
+    },
+    {
+      "column": "DATA_NAME",
+      "operator": "IN",
+      "value_list": {
+        "value": [
+          "testfile1.dat",
+          "testfile2.dat"
+        ]
+      }
+    }
+  ]
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Responses - XML</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+&lt;ns2:results xmlns:ns2="http://irods.org/irods-rest"&gt;
+  &lt;row&gt;
+    &lt;column name="COLL_NAME"&gt;/tempZone/home/rods/dir/GenQueryTestDirectory&lt;/column&gt;
+    &lt;column name="DATA_NAME"&gt;testfile1.dat&lt;/column&gt;
+  &lt;/row&gt;
+  &lt;row&gt;
+    &lt;column name="COLL_NAME"&gt;/tempZone/home/rods/dir/GenQueryTestDirectory&lt;/column&gt;
+    &lt;column name="DATA_NAME"&gt;testfile2.dat&lt;/column&gt;
+  &lt;/row&gt;
+&lt;/ns2:results&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Responses - JSON</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
+  "row": [
+    {
+      "column": [
+        {
+          "name": "COLL_NAME",
+          "value": "/tempZone/home/rods/dir/GenQueryTestDirectory"
+        },
+        {
+          "name": "DATA_NAME",
+          "value": "testfile1.dat"
+        }
+      ]
+    },
+    {
+      "column": [
+        {
+          "name": "COLL_NAME",
+          "value": "/tempZone/home/rods/dir/GenQueryTestDirectory"
+        },
+        {
+          "name": "DATA_NAME",
+          "value": "testfile2.dat"
+        }
+      ]
+    }
+  ]
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="trueoperations-on-tickets"><a class="anchor" href="#trueoperations-on-tickets"></a>1.8. Operations on Tickets</h3>
+<div class="sect3">
+<h4 id="truecreate-a-ticket"><a class="anchor" href="#truecreate-a-ticket"></a>1.8.1. Create a Ticket</h4>
+<div class="sect4">
+<h5 id="truedescription-22"><a class="anchor" href="#truedescription-22"></a>Description</h5>
+<div class="paragraph">
+<p>This <code>POST</code> operation will create an iRODS ticket.</p>
+</div>
+<div class="paragraph">
+<p>The input fields are:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>mode</code> – either <code>read</code> or <code>write</code></p>
+</li>
+<li>
+<p><code>object_path</code> – the full path to the data object or collections</p>
+</li>
+<li>
+<p><code>ticket_string</code> – the ticket&#8217;s string.  This is optional.  If it is not provided the string will be generated by the system.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect4">
+<h5 id="truerequests-24"><a class="anchor" href="#truerequests-24"></a>Requests</h5>
+<div class="paragraph">
+<p><strong>Syntax</strong></p>
+</div>
+<div class="paragraph">
+<p><code>POST /ticket</code></p>
+</div>
+<div class="paragraph">
+<p><strong>Request Parameters</strong></p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">n/a</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Request Body - XML</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;ns2:ticket xmlns:ns2="http://irods.org/irods-rest"&gt;
+    &lt;mode&gt;read&lt;/mode&gt;
+    &lt;object_path&gt;/tempZone/home/rods&lt;/object_path&gt;
+    &lt;ticket_string&gt;111222333444555&lt;/ticket_string&gt;
+&lt;/ns2:ticket&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Request Body - JSON</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
+  "mode": "read",
+  "object_path": "/tempZone/home/rods",
+  "ticket_string": "111222333444555"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Responses - XML</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+&lt;ns2:ticket xmlns:ns2="http://irods.org/irods-rest"&gt;
+    &lt;ticket_string&gt;111222333444555&lt;/ticket_string&gt;
+&lt;/ns2:ticket&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Responses - JSON</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
+  "ticket_string": "111222333444555"
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="truedelete-a-ticket"><a class="anchor" href="#truedelete-a-ticket"></a>1.8.2. Delete a Ticket</h4>
+<div class="sect4">
+<h5 id="truedescription-23"><a class="anchor" href="#truedescription-23"></a>Description</h5>
+<div class="paragraph">
+<p>This <code>DELETE</code> operation will delete an iRODS ticket.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="truerequests-25"><a class="anchor" href="#truerequests-25"></a>Requests</h5>
+<div class="paragraph">
+<p><strong>Syntax</strong></p>
+</div>
+<div class="paragraph">
+<p><code>DELETE /ticket/ticketString</code></p>
+</div>
+<div class="paragraph">
+<p><strong>Request Parameters</strong></p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">n/a</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="trueupdate-a-ticket"><a class="anchor" href="#trueupdate-a-ticket"></a>1.8.3. Update a Ticket</h4>
+<div class="sect4">
+<h5 id="truedescription-24"><a class="anchor" href="#truedescription-24"></a>Description</h5>
+<div class="paragraph">
+<p>This <code>PUT</code> operation will update an iRODS ticket.</p>
+</div>
+<div class="paragraph">
+<p>The updates has two files – <code>restriction_type</code> and <code>restriction_value</code>.</p>
+</div>
+<div class="paragraph">
+<p>The following are the valid restriction types and values:</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Table 14. Valid restriction types and values</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">restriction_type</th>
+<th class="tableblock halign-left valign-top">restriction_value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>offset</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A recognizable hostname.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>remove_host</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A hostname that had been previously added.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>add_group</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An iRODS group.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>remove_group</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An iRODS group that had been previously added.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>add_user</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An iRODS user.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>remove_user</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An iRODS user that had been previously added.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>byte_write_limit</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An integer</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>file_write_limit</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An integer</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>uses_limit</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An integer</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>expiration</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The date/time in the format yyyy-MM-dd HH:mm:ss</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect4">
+<h5 id="truerequests-26"><a class="anchor" href="#truerequests-26"></a>Requests</h5>
+<div class="paragraph">
+<p><strong>Syntax</strong></p>
+</div>
+<div class="paragraph">
+<p><code>PUT /ticket/ticketString</code></p>
+</div>
+<div class="paragraph">
+<p><strong>Request Body - XML</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;ns2:ticket xmlns:ns2="http://irods.org/irods-rest"&gt;
+  &lt;restriction_type&gt;expiration&lt;/restriction_type&gt;
+  &lt;restriction_value&gt;2016-02-27 13:00:00&lt;/restriction_value&gt;
+&lt;/ns2:ticket&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Request Body - JSON</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
+  "restriction_type": "uses_limit",
+  "restriction_value": "12"
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="truelist-ticket-information"><a class="anchor" href="#truelist-ticket-information"></a>1.8.4. List Ticket Information</h4>
+<div class="sect4">
+<h5 id="truedescription-25"><a class="anchor" href="#truedescription-25"></a>Description</h5>
+<div class="paragraph">
+<p>This <code>GET</code> operation will list the information for the selected ticket.</p>
+</div>
+<div class="paragraph">
+<p><strong>Syntax</strong></p>
+</div>
+<div class="paragraph">
+<p><code>GET /ticket/ticketString</code></p>
+</div>
+<div class="paragraph">
+<p><strong>Request Parameters</strong></p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">n/a</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Responses - XML</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+&lt;ns2:ticket xmlns:ns2="http://irods.org/irods-rest"&gt;
+  &lt;ticket_id&gt;15542&lt;/ticket_id&gt;
+  &lt;ticket_string&gt;kZeGACQHEjRHFyC&lt;/ticket_string&gt;
+  &lt;ticket_type&gt;read&lt;/ticket_type&gt;
+  &lt;object_type&gt;data_object&lt;/object_type&gt;
+  &lt;owner_name&gt;rods&lt;/owner_name&gt;
+  &lt;owner_zone&gt;tempZone&lt;/owner_zone&gt;
+  &lt;uses_count&gt;0&lt;/uses_count&gt;
+  &lt;uses_limit&gt;20&lt;/uses_limit&gt;
+  &lt;write_file_count&gt;0&lt;/write_file_count&gt;
+  &lt;write_file_limit&gt;10&lt;/write_file_limit&gt;
+  &lt;write_byte_count&gt;0&lt;/write_byte_count&gt;
+  &lt;write_byte_limit&gt;1000&lt;/write_byte_limit&gt;
+  &lt;expire_time&gt;2017-02-07 14:18:28&lt;/expire_time&gt;
+  &lt;irods_path&gt;/tempZone/home/rods/dir/TicketTestDirectory/testfile.dat&lt;/irods_path&gt;
+  &lt;host_restrictions&gt;127.0.0.1&lt;/host_restrictions&gt;
+  &lt;user_restrictions&gt;rods&lt;/user_restrictions&gt;
+  &lt;group_restrictions&gt;rodsadmin&lt;/group_restrictions&gt;
+&lt;/ns2:ticket&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Responses - JSON</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
+  "ticket_id": "15532",
+  "ticket_string": "g7gwI7OK21mrWy9",
+  "ticket_type": "read",
+  "object_type": "data_object",
+  "owner_name": "rods",
+  "owner_zone": "tempZone",
+  "uses_count": 0,
+  "uses_limit": 20,
+  "write_file_count": 0,
+  "write_file_limit": 10,
+  "write_byte_count": 0,
+  "write_byte_limit": 1000,
+  "expire_time": "2017-02-07 14:09:24",
+  "irods_path": "/tempZone/home/rods/dir/TicketTestDirectory/testfile.dat",
+  "host_restrictions": [
+    "127.0.0.1"
+  ],
+  "user_restrictions": [
+    "rods"
+  ],
+  "group_restrictions": [
+    "rodsadmin"
+  ]
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="truelist-all-tickets"><a class="anchor" href="#truelist-all-tickets"></a>1.8.5. List All Tickets</h4>
+<div class="sect4">
+<h5 id="truedescription-26"><a class="anchor" href="#truedescription-26"></a>Description</h5>
+<div class="paragraph">
+<p>This <code>GET</code> operation will list the information for all tickets.</p>
+</div>
+<div class="paragraph">
+<p><strong>Syntax</strong></p>
+</div>
+<div class="paragraph">
+<p><code>GET /listAllTickets</code></p>
+</div>
+<div class="paragraph">
+<p><strong>Request Parameters</strong></p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">n/a</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Responses - XML</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+&lt;ns2:tickets xmlns:ns2="http://irods.org/irods-rest"&gt;
+  &lt;ticket&gt;
+    &lt;ticket_id&gt;15542&lt;/ticket_id&gt;
+    &lt;ticket_string&gt;kZeGACQHEjRHFyC&lt;/ticket_string&gt;
+    &lt;ticket_type&gt;read&lt;/ticket_type&gt;
+    &lt;object_type&gt;data_object&lt;/object_type&gt;
+    &lt;owner_name&gt;rods&lt;/owner_name&gt;
+    &lt;owner_zone&gt;tempZone&lt;/owner_zone&gt;
+    &lt;uses_count&gt;0&lt;/uses_count&gt;
+    &lt;uses_limit&gt;20&lt;/uses_limit&gt;
+    &lt;write_file_count&gt;0&lt;/write_file_count&gt;
+    &lt;write_file_limit&gt;10&lt;/write_file_limit&gt;
+    &lt;write_byte_count&gt;0&lt;/write_byte_count&gt;
+    &lt;write_byte_limit&gt;1000&lt;/write_byte_limit&gt;
+    &lt;expire_time&gt;2017-02-07 14:18:28&lt;/expire_time&gt;
+    &lt;irods_path&gt;/tempZone/home/rods/dir/TicketTestDirectory/testfile.dat&lt;/irods_path&gt;
+    &lt;host_restrictions&gt;127.0.0.1&lt;/host_restrictions&gt;
+    &lt;user_restrictions&gt;rods&lt;/user_restrictions&gt;
+    &lt;group_restrictions&gt;rodsadmin&lt;/group_restrictions&gt;
+  &lt;/ticket&gt;
+  &lt;ticket&gt;
+    &lt;ticket_id&gt;15543&lt;/ticket_id&gt;
+    &lt;ticket_string&gt;111222333444555&lt;/ticket_string&gt;
+    &lt;ticket_type&gt;read&lt;/ticket_type&gt;
+    &lt;object_type&gt;data_object&lt;/object_type&gt;
+    &lt;owner_name&gt;rods&lt;/owner_name&gt;
+    &lt;owner_zone&gt;tempZone&lt;/owner_zone&gt;
+    &lt;uses_count&gt;0&lt;/uses_count&gt;
+    &lt;uses_limit&gt;20&lt;/uses_limit&gt;
+    &lt;write_file_count&gt;0&lt;/write_file_count&gt;
+    &lt;write_file_limit&gt;10&lt;/write_file_limit&gt;
+    &lt;write_byte_count&gt;0&lt;/write_byte_count&gt;
+    &lt;write_byte_limit&gt;1000&lt;/write_byte_limit&gt;
+    &lt;expire_time&gt;2017-02-07 14:18:28&lt;/expire_time&gt;
+    &lt;irods_path&gt;/tempZone/home/rods/dir/TicketTestDirectory/testfile.dat&lt;/irods_path&gt;
+    &lt;host_restrictions&gt;127.0.0.1&lt;/host_restrictions&gt;
+    &lt;user_restrictions&gt;rods&lt;/user_restrictions&gt;
+    &lt;group_restrictions&gt;rodsadmin&lt;/group_restrictions&gt;
+  &lt;/ticket&gt;
+&lt;/ns2:tickets&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Responses - JSON</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
+  "ticket": [
+    {
+      "ticket_id": "15532",
+      "ticket_string": "g7gwI7OK21mrWy9",
+      "ticket_type": "read",
+      "object_type": "data_object",
+      "owner_name": "rods",
+      "owner_zone": "tempZone",
+      "uses_count": 0,
+      "uses_limit": 20,
+      "write_file_count": 0,
+      "write_file_limit": 10,
+      "write_byte_count": 0,
+      "write_byte_limit": 1000,
+      "expire_time": "2017-02-07 14:09:24",
+      "irods_path": "/tempZone/home/rods/dir/TicketTestDirectory/testfile.dat",
+      "host_restrictions": [
+        "127.0.0.1"
+      ],
+      "user_restrictions": [
+        "rods"
+      ],
+      "group_restrictions": [
+        "rodsadmin"
+      ]
+    },
+    {
+      "ticket_id": "15533",
+      "ticket_string": "111222333444555",
+      "ticket_type": "read",
+      "object_type": "data_object",
+      "owner_name": "rods",
+      "owner_zone": "tempZone",
+      "uses_count": 0,
+      "uses_limit": 20,
+      "write_file_count": 0,
+      "write_file_limit": 10,
+      "write_byte_count": 0,
+      "write_byte_limit": 1000,
+      "expire_time": "2017-02-07 14:09:24",
+      "irods_path": "/tempZone/home/rods/dir/TicketTestDirectory/testfile.dat",
+      "host_restrictions": [
+        "127.0.0.1"
+      ],
+      "user_restrictions": [
+        "rods"
+      ],
+      "group_restrictions": [
+        "rodsadmin"
+      ]
+    }
+  ]
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>notes….nice json formatter <a href="http://jsonformatter.curiousconcept.com/" class="bare">http://jsonformatter.curiousconcept.com/</a></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2016-06-16 19:49:40 CEST
+</div>
+</div>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/highlight.min.js"></script>
+<script>hljs.initHighlighting()</script>
+</body>
+</html>
