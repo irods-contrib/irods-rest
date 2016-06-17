@@ -2143,12 +2143,78 @@ p {
 <ul class="sectlevel2">
 <li><a href="#truetechnology">1.1. Technology</a></li>
 <li><a href="#truedesign-points-resources-and-url-paths">1.2. Design Points, Resources and URL Paths</a></li>
-<li><a href="#truecors-support">1.3. CORS Support</a></li>
-<li><a href="#trueinstallation-and-configuration">1.4. Installation and Configuration</a></li>
-<li><a href="#trueoperations-on-collections">1.5. Operations on Collections</a></li>
-<li><a href="#trueoperations-on-collection-avu-metadata">1.6. Operations on Collection AVU Metadata</a></li>
-<li><a href="#truegenquery-operations">1.7. GenQuery Operations</a></li>
-<li><a href="#trueoperations-on-tickets">1.8. Operations on Tickets</a></li>
+<li><a href="#trueauthentication">1.3. Authentication</a></li>
+</ul>
+</li>
+<li><a href="#truecors-support">2. CORS Support</a></li>
+<li><a href="#trueinstallation-and-configuration">3. Installation and Configuration</a></li>
+<li><a href="#trueoperations-on-collections">4. Operations on Collections</a>
+<ul class="sectlevel2">
+<li><a href="#trueget-collection-information">4.1. Get Collection Information</a></li>
+<li><a href="#truecreate-a-new-collection">4.2. Create a New Collection</a></li>
+<li><a href="#truedelete-a-collection">4.3. Delete a Collection</a></li>
+</ul>
+</li>
+<li><a href="#trueoperations-on-collection-avu-metadata">5. Operations on Collection AVU Metadata</a>
+<ul class="sectlevel2">
+<li><a href="#trueget-collection-avu-metadata">5.1. Get Collection AVU Metadata</a></li>
+<li><a href="#trueadd-collection-avu-metadata">5.2. Add Collection AVU Metadata</a></li>
+<li><a href="#truedelete-collection-avu-metadata">5.3. Delete Collection AVU Metadata</a></li>
+</ul>
+</li>
+<li><a href="#trueoperations-on-collection-acls-permissions">6. Operations on Collection ACLs (Permissions)</a>
+<ul class="sectlevel2">
+<li><a href="#trueget-collection-permissions">6.1. Get Collection Permissions</a></li>
+<li><a href="#trueadd-collection-permission">6.2. Add Collection Permission</a></li>
+<li><a href="#trueremove-collection-permission">6.3. Remove Collection Permission</a></li>
+</ul>
+</li>
+<li><a href="#trueoperations-on-data-objects">7. Operations on Data Objects</a>
+<ul class="sectlevel2">
+<li><a href="#trueget-data-object-information">7.1. Get Data Object Information</a></li>
+<li><a href="#trueget-data-object-file-content-file-download">7.2. Get Data Object File Content (File Download)</a></li>
+<li><a href="#truepost-data-object-file-content-file-upload">7.3. Post Data Object File Content (File Upload)</a></li>
+</ul>
+</li>
+<li><a href="#trueoperations-on-data-object-avu-metadata">8. Operations on Data Object AVU Metadata</a>
+<ul class="sectlevel2">
+<li><a href="#trueget-data-object-avu-metadata">8.1. Get Data Object AVU Metadata</a></li>
+<li><a href="#trueadd-data-object-avu-metadata">8.2. Add Data Object AVU Metadata</a></li>
+<li><a href="#truedelete-data-object-avu-metadata">8.3. Delete Data Object AVU Metadata</a></li>
+</ul>
+</li>
+<li><a href="#trueoperations-on-data-object-acls-permissions">9. Operations on Data Object ACLs (Permissions)</a>
+<ul class="sectlevel2">
+<li><a href="#trueget-data-object-permissions">9.1. Get Data Object Permissions</a></li>
+<li><a href="#trueadd-data-object-permission">9.2. Add Data Object Permission</a></li>
+<li><a href="#trueremove-data-object-permission">9.3. Remove Data Object Permission</a></li>
+</ul>
+</li>
+<li><a href="#trueoperations-on-rules">10. Operations on Rules</a>
+<ul class="sectlevel2">
+<li><a href="#trueexecute-an-irods-rule-by-providing-a-rule-body-and-any-override-parameters">10.1. Execute an iRODS Rule by providing a rule body and any override parameters</a></li>
+</ul>
+</li>
+<li><a href="#trueoperations-on-users">11. Operations on Users</a>
+<ul class="sectlevel2">
+<li><a href="#trueobtain-a-temporary-irods-password-for-a-user">11.1. Obtain a temporary iRODS password for a user</a></li>
+</ul>
+</li>
+<li><a href="#truegenquery-operations">12. GenQuery Operations</a>
+<ul class="sectlevel2">
+<li><a href="#truedescription-21">12.1. Description</a></li>
+<li><a href="#trueexample-non-aggregate-query">12.2. Example Non Aggregate Query</a></li>
+<li><a href="#trueexample-aggregate-query">12.3. Example Aggregate Query</a></li>
+<li><a href="#trueexample-using-code-in-code-clause-with-a-code-value_list-code">12.4. Example Using <code>IN</code> Clause with a <code>value_list</code></a></li>
+</ul>
+</li>
+<li><a href="#trueoperations-on-tickets">13. Operations on Tickets</a>
+<ul class="sectlevel2">
+<li><a href="#truecreate-a-ticket">13.1. Create a Ticket</a></li>
+<li><a href="#truedelete-a-ticket">13.2. Delete a Ticket</a></li>
+<li><a href="#trueupdate-a-ticket">13.3. Update a Ticket</a></li>
+<li><a href="#truelist-ticket-information">13.4. List Ticket Information</a></li>
+<li><a href="#truelist-all-tickets">13.5. List All Tickets</a></li>
 </ul>
 </li>
 </ul>
@@ -2249,8 +2315,9 @@ p {
 <p>Some requests, especially for sub-resources such as AVU metadata, are too complex to be placed into URLs or as parameters.  For example, to add or delete AVU metadata associated with a collection, one uses a <code>POST</code> method and sends the required AVU actions as an XML or JSON request body. This approach for certain operations has the advantage of treating a set of metadata as a document, allowing the update of several attributes within one HTTP request.  These operations that require a request body are documented with each method.</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="trueauthentication"><a class="anchor" href="#trueauthentication"></a>1.2.2. Authentication</h4>
+</div>
+<div class="sect2">
+<h3 id="trueauthentication"><a class="anchor" href="#trueauthentication"></a>1.3. Authentication</h3>
 <div class="paragraph">
 <p>The REST API for iRODS makes use of standard <a href="http://en.wikipedia.org/wiki/Basic_access_authentication">Basic Authentication</a> for HTTP requests.  In this approach, the Authorization HTTP header is populated with username:password information that maps to the underlying iRODS account.</p>
 </div>
@@ -2301,8 +2368,8 @@ p {
 <div class="paragraph">
 <p>Note that STANDARD and PAM auth may also be requested by prepending STANDARD* or PAM* to the user id portion of the Basic Authentication credentials.  This will signal to the REST service to opt for those specified auth methods, even if not configured in the spring xml configuration.</p>
 </div>
-<div class="sect4">
-<h5 id="truecontent-negotiation-for-requests"><a class="anchor" href="#truecontent-negotiation-for-requests"></a>Content Negotiation for Requests</h5>
+<div class="sect3">
+<h4 id="truecontent-negotiation-for-requests"><a class="anchor" href="#truecontent-negotiation-for-requests"></a>1.3.1. Content Negotiation for Requests</h4>
 <div class="paragraph">
 <p>The REST API understands both XML and JSON for Request and Response bodies.</p>
 </div>
@@ -2347,8 +2414,10 @@ p {
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="truecors-support"><a class="anchor" href="#truecors-support"></a>1.3. CORS Support</h3>
+</div>
+<div class="sect1">
+<h2 id="truecors-support"><a class="anchor" href="#truecors-support"></a>2. CORS Support</h2>
+<div class="sectionbody">
 <div class="paragraph">
 <p>CORS is an acronym for Cross-Origin-Resource-Sharing.  Overviews of CORS are out of the scope of this document, but W3C has a good reference here: <a href="http://www.w3.org/TR/cors/" class="bare">http://www.w3.org/TR/cors/</a></p>
 </div>
@@ -2384,8 +2453,10 @@ p {
 <p>If <code>allowCors</code> is set to true, and no corsOrigins are set, it will default to the origin of <code>'*'</code>.  Otherwise, it will be set to the list of origins provided.  Similarly, if corsMethods are not set, it will default to <code>GET</code>, <code>POST</code>, <code>DELETE</code>, <code>PUT</code>, otherwise, it will be set to the provided list.</p>
 </div>
 </div>
-<div class="sect2">
-<h3 id="trueinstallation-and-configuration"><a class="anchor" href="#trueinstallation-and-configuration"></a>1.4. Installation and Configuration</h3>
+</div>
+<div class="sect1">
+<h2 id="trueinstallation-and-configuration"><a class="anchor" href="#trueinstallation-and-configuration"></a>3. Installation and Configuration</h2>
+<div class="sectionbody">
 <div class="paragraph">
 <p>The REST API is available as a .war file as indicated for each release in GitHub.  This .war can be deployed on any standard servlet container, such as Jetty or Tomcat.  Tomcat is the version we test with.  The configuration of the REST API is necessary so it knows what host/port/zone/default resource, and default authentication method is in use.  These presets are combined with the Basic Authentication credentials to connect to the target iRODS grid.  This also prevents any installation of REST from being hijacked to talk to another iRODS grid!</p>
 </div>
@@ -2491,18 +2562,20 @@ Note that as this API develops, we’ll probably add an ability today? configure
 <p>This action should require you to provide the iRODS user name and password in a Basic Authentication dialog before retrieving that information.  This verifies that the service is working!</p>
 </div>
 </div>
+</div>
+<div class="sect1">
+<h2 id="trueoperations-on-collections"><a class="anchor" href="#trueoperations-on-collections"></a>4. Operations on Collections</h2>
+<div class="sectionbody">
 <div class="sect2">
-<h3 id="trueoperations-on-collections"><a class="anchor" href="#trueoperations-on-collections"></a>1.5. Operations on Collections</h3>
+<h3 id="trueget-collection-information"><a class="anchor" href="#trueget-collection-information"></a>4.1. Get Collection Information</h3>
 <div class="sect3">
-<h4 id="trueget-collection-information"><a class="anchor" href="#trueget-collection-information"></a>1.5.1. Get Collection Information</h4>
-<div class="sect4">
-<h5 id="truedescription"><a class="anchor" href="#truedescription"></a>Description</h5>
+<h4 id="truedescription"><a class="anchor" href="#truedescription"></a>4.1.1. Description</h4>
 <div class="paragraph">
 <p>This <code>GET</code> operation will retrieve basic catalog metadata about the iRODS collection.   This method can also optionally provide a pageable listing of the child collections and data objects underneath the given collection.</p>
 </div>
 </div>
-<div class="sect4">
-<h5 id="truerequests"><a class="anchor" href="#truerequests"></a>Requests</h5>
+<div class="sect3">
+<h4 id="truerequests"><a class="anchor" href="#truerequests"></a>4.1.2. Requests</h4>
 <div class="paragraph">
 <p><strong>Syntax</strong></p>
 </div>
@@ -2615,16 +2688,16 @@ Request Parameters</code></p>
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="truecreate-a-new-collection"><a class="anchor" href="#truecreate-a-new-collection"></a>4.2. Create a New Collection</h3>
 <div class="sect3">
-<h4 id="truecreate-a-new-collection"><a class="anchor" href="#truecreate-a-new-collection"></a>1.5.2. Create a New Collection</h4>
-<div class="sect4">
-<h5 id="truedescription-2"><a class="anchor" href="#truedescription-2"></a>Description</h5>
+<h4 id="truedescription-2"><a class="anchor" href="#truedescription-2"></a>4.2.1. Description</h4>
 <div class="paragraph">
 <p>This <code>PUT</code> operation will first create a new collection, and then return back a description of the iRODS catalog entry for the newly created collection.  This is an idempotent method, and if the collection already exists, the data for the existing collection is returned.</p>
 </div>
 </div>
-<div class="sect4">
-<h5 id="truerequests-2"><a class="anchor" href="#truerequests-2"></a>Requests</h5>
+<div class="sect3">
+<h4 id="truerequests-2"><a class="anchor" href="#truerequests-2"></a>4.2.2. Requests</h4>
 <div class="paragraph">
 <p><strong>Syntax</strong></p>
 </div>
@@ -2698,10 +2771,10 @@ Request Parameters</code></p>
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="truedelete-a-collection"><a class="anchor" href="#truedelete-a-collection"></a>4.3. Delete a Collection</h3>
 <div class="sect3">
-<h4 id="truedelete-a-collection"><a class="anchor" href="#truedelete-a-collection"></a>1.5.3. Delete a Collection</h4>
-<div class="sect4">
-<h5 id="truedescription-3"><a class="anchor" href="#truedescription-3"></a>Description</h5>
+<h4 id="truedescription-3"><a class="anchor" href="#truedescription-3"></a>4.3.1. Description</h4>
 <div class="paragraph">
 <p>This <code>DELETE</code> operation will remove the given collection.  A <code>force</code> option is provided with an additional request parameter.  This method will silently ignore deletes of non-existent collections.</p>
 </div>
@@ -2709,8 +2782,8 @@ Request Parameters</code></p>
 <p>Note that <code>DELETE</code> requests do not return a body in HTTP.  This method will instead return a <code>204 No Content</code> response.</p>
 </div>
 </div>
-<div class="sect4">
-<h5 id="truerequests-3"><a class="anchor" href="#truerequests-3"></a>Requests</h5>
+<div class="sect3">
+<h4 id="truerequests-3"><a class="anchor" href="#truerequests-3"></a>4.3.2. Requests</h4>
 <div class="paragraph">
 <p><strong>Syntax</strong></p>
 </div>
@@ -2755,21 +2828,23 @@ Request Parameters</code></p>
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="trueoperations-on-collection-avu-metadata"><a class="anchor" href="#trueoperations-on-collection-avu-metadata"></a>1.6. Operations on Collection AVU Metadata</h3>
+</div>
+<div class="sect1">
+<h2 id="trueoperations-on-collection-avu-metadata"><a class="anchor" href="#trueoperations-on-collection-avu-metadata"></a>5. Operations on Collection AVU Metadata</h2>
+<div class="sectionbody">
 <div class="paragraph">
 <p>The following operations apply to the AVU sub-resource of an iRODS collection, and represents AVU metadata attached to the given collection.</p>
 </div>
+<div class="sect2">
+<h3 id="trueget-collection-avu-metadata"><a class="anchor" href="#trueget-collection-avu-metadata"></a>5.1. Get Collection AVU Metadata</h3>
 <div class="sect3">
-<h4 id="trueget-collection-avu-metadata"><a class="anchor" href="#trueget-collection-avu-metadata"></a>1.6.1. Get Collection AVU Metadata</h4>
-<div class="sect4">
-<h5 id="truedescription-4"><a class="anchor" href="#truedescription-4"></a>Description</h5>
+<h4 id="truedescription-4"><a class="anchor" href="#truedescription-4"></a>5.1.1. Description</h4>
 <div class="paragraph">
 <p>This <code>GET</code> operation will retrieve the AVU metadata associated with an iRODS parent collection</p>
 </div>
 </div>
-<div class="sect4">
-<h5 id="truerequests-4"><a class="anchor" href="#truerequests-4"></a>Requests</h5>
+<div class="sect3">
+<h4 id="truerequests-4"><a class="anchor" href="#truerequests-4"></a>5.1.2. Requests</h4>
 <div class="paragraph">
 <p><strong>Syntax</strong></p>
 </div>
@@ -2836,10 +2911,10 @@ Request Parameters</code></p>
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="trueadd-collection-avu-metadata"><a class="anchor" href="#trueadd-collection-avu-metadata"></a>5.2. Add Collection AVU Metadata</h3>
 <div class="sect3">
-<h4 id="trueadd-collection-avu-metadata"><a class="anchor" href="#trueadd-collection-avu-metadata"></a>1.6.2. Add Collection AVU Metadata</h4>
-<div class="sect4">
-<h5 id="truedescription-5"><a class="anchor" href="#truedescription-5"></a>Description</h5>
+<h4 id="truedescription-5"><a class="anchor" href="#truedescription-5"></a>5.2.1. Description</h4>
 <div class="paragraph">
 <p>This <code>PUT</code> operation will bulk add the provided  AVU metadata associated with an iRODS parent collection.</p>
 </div>
@@ -2850,8 +2925,8 @@ Request Parameters</code></p>
 <p>Note that the response will detail the disposition, and any errors that occurred for individual AVU values.</p>
 </div>
 </div>
-<div class="sect4">
-<h5 id="truerequests-5"><a class="anchor" href="#truerequests-5"></a>Requests</h5>
+<div class="sect3">
+<h4 id="truerequests-5"><a class="anchor" href="#truerequests-5"></a>5.2.2. Requests</h4>
 <div class="paragraph">
 <p><strong>Syntax</strong></p>
 </div>
@@ -2970,10 +3045,10 @@ Request Parameters</code></p>
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="truedelete-collection-avu-metadata"><a class="anchor" href="#truedelete-collection-avu-metadata"></a>5.3. Delete Collection AVU Metadata</h3>
 <div class="sect3">
-<h4 id="truedelete-collection-avu-metadata"><a class="anchor" href="#truedelete-collection-avu-metadata"></a>1.6.3. Delete Collection AVU Metadata</h4>
-<div class="sect4">
-<h5 id="truedescription-6"><a class="anchor" href="#truedescription-6"></a>Description</h5>
+<h4 id="truedescription-6"><a class="anchor" href="#truedescription-6"></a>5.3.1. Description</h4>
 <div class="paragraph">
 <p>This <code>POST</code> operation will bulk delete the provided AVU metadata associated with an iRODS parent collection. <code>POST</code> is used here as an HTTP <code>DELETE</code> action cannot have a body.</p>
 </div>
@@ -2984,8 +3059,8 @@ Request Parameters</code></p>
 <p>Note that the response will detail the disposition, and any errors that occurred for individual AVU values.</p>
 </div>
 </div>
-<div class="sect4">
-<h5 id="truerequests-6"><a class="anchor" href="#truerequests-6"></a>Requests</h5>
+<div class="sect3">
+<h4 id="truerequests-6"><a class="anchor" href="#truerequests-6"></a>5.3.2. Requests</h4>
 <div class="paragraph">
 <p><strong>Syntax</strong></p>
 </div>
@@ -3104,20 +3179,24 @@ Request Parameters</code></p>
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="trueoperations-on-collection-acls-permissions"><a class="anchor" href="#trueoperations-on-collection-acls-permissions"></a>1.6.4. Operations on Collection ACLs (Permissions)</h4>
-<div class="paragraph">
-<p>The following operations apply to the ACL sub-resource of iRODS collections, and can alter access permissions.
-Get Collection Permissions</p>
 </div>
-<div class="sect4">
-<h5 id="truedescription-7"><a class="anchor" href="#truedescription-7"></a>Description</h5>
+</div>
+<div class="sect1">
+<h2 id="trueoperations-on-collection-acls-permissions"><a class="anchor" href="#trueoperations-on-collection-acls-permissions"></a>6. Operations on Collection ACLs (Permissions)</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The following operations apply to the ACL sub-resource of iRODS collections, and can alter access permissions.</p>
+</div>
+<div class="sect2">
+<h3 id="trueget-collection-permissions"><a class="anchor" href="#trueget-collection-permissions"></a>6.1. Get Collection Permissions</h3>
+<div class="sect3">
+<h4 id="truedescription-7"><a class="anchor" href="#truedescription-7"></a>6.1.1. Description</h4>
 <div class="paragraph">
 <p>This <code>GET</code> operation will retrieve the permissions associated with an iRODS collection</p>
 </div>
 </div>
-<div class="sect4">
-<h5 id="truerequests-7"><a class="anchor" href="#truerequests-7"></a>Requests</h5>
+<div class="sect3">
+<h4 id="truerequests-7"><a class="anchor" href="#truerequests-7"></a>6.1.2. Requests</h4>
 <div class="paragraph">
 <p><strong>Syntax</strong></p>
 </div>
@@ -3204,10 +3283,10 @@ Get Collection Permissions</p>
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="trueadd-collection-permission"><a class="anchor" href="#trueadd-collection-permission"></a>6.2. Add Collection Permission</h3>
 <div class="sect3">
-<h4 id="trueadd-collection-permission"><a class="anchor" href="#trueadd-collection-permission"></a>1.6.5. Add Collection Permission</h4>
-<div class="sect4">
-<h5 id="truedescription-8"><a class="anchor" href="#truedescription-8"></a>Description</h5>
+<h4 id="truedescription-8"><a class="anchor" href="#truedescription-8"></a>6.2.1. Description</h4>
 <div class="paragraph">
 <p>This <code>PUT</code> operation will set a collection permission.  Note that this is an idempotent method, and if an existing permission is already stored, the new permission will replace it. This means updating a permission is accomplished using this same method.</p>
 </div>
@@ -3215,8 +3294,8 @@ Get Collection Permissions</p>
 <p>Note that this method returns no body, and a normal operation returns an <code>HTTP 204 response code</code>.</p>
 </div>
 </div>
-<div class="sect4">
-<h5 id="truerequests-8"><a class="anchor" href="#truerequests-8"></a>Requests</h5>
+<div class="sect3">
+<h4 id="truerequests-8"><a class="anchor" href="#truerequests-8"></a>6.2.2. Requests</h4>
 <div class="paragraph">
 <p><strong>Syntax</strong></p>
 </div>
@@ -3277,10 +3356,10 @@ Note on username: iRODS supports a <code>user#zone</code> format to describe use
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="trueremove-collection-permission"><a class="anchor" href="#trueremove-collection-permission"></a>6.3. Remove Collection Permission</h3>
 <div class="sect3">
-<h4 id="trueremove-collection-permission"><a class="anchor" href="#trueremove-collection-permission"></a>1.6.6. Remove Collection Permission</h4>
-<div class="sect4">
-<h5 id="truedescription-9"><a class="anchor" href="#truedescription-9"></a>Description</h5>
+<h4 id="truedescription-9"><a class="anchor" href="#truedescription-9"></a>6.3.1. Description</h4>
 <div class="paragraph">
 <p>This <code>DELETE</code> operation will remove a collection permission.  Note that this is an idempotent method, and if no permission exists, it will silently ignore the request and return a normal response.</p>
 </div>
@@ -3288,8 +3367,8 @@ Note on username: iRODS supports a <code>user#zone</code> format to describe use
 <p>This method returns no body, and a normal operation returns an <code>HTTP 204 response code</code>.</p>
 </div>
 </div>
-<div class="sect4">
-<h5 id="truerequests-9"><a class="anchor" href="#truerequests-9"></a>Requests</h5>
+<div class="sect3">
+<h4 id="truerequests-9"><a class="anchor" href="#truerequests-9"></a>6.3.2. Requests</h4>
 <div class="paragraph">
 <p><strong>Syntax</strong></p>
 </div>
@@ -3345,19 +3424,21 @@ note on username: iRODS supports a <code>user#zone</code> format to describe use
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="trueoperations-on-data-objects"><a class="anchor" href="#trueoperations-on-data-objects"></a>1.6.7. Operations on Data Objects</h4>
+</div>
+</div>
+<div class="sect1">
+<h2 id="trueoperations-on-data-objects"><a class="anchor" href="#trueoperations-on-data-objects"></a>7. Operations on Data Objects</h2>
+<div class="sectionbody">
 <div class="paragraph">
 <p>The following operations concern iRODS Data Objects, which are files, as opposed to directories).</p>
 </div>
-<div class="paragraph">
-<p>Get Data Object Information</p>
-</div>
-<div class="sect4">
-<h5 id="truedescription-10"><a class="anchor" href="#truedescription-10"></a>Description</h5>
+<div class="sect2">
+<h3 id="trueget-data-object-information"><a class="anchor" href="#trueget-data-object-information"></a>7.1. Get Data Object Information</h3>
+<div class="sect3">
+<h4 id="truedescription-10"><a class="anchor" href="#truedescription-10"></a>7.1.1. Description</h4>
 <div class="paragraph">
 <p>This <code>GET</code> operation will retrieve basic catalog metadata about the iRODS Data Object.
-===== Requests</p>
+==== Requests</p>
 </div>
 <div class="paragraph">
 <p><strong>Syntax</strong></p>
@@ -3453,8 +3534,8 @@ note on username: iRODS supports a <code>user#zone</code> format to describe use
 </div>
 </div>
 </div>
-<div class="sect4">
-<h5 id="truerequests-10"><a class="anchor" href="#truerequests-10"></a>Requests</h5>
+<div class="sect3">
+<h4 id="truerequests-10"><a class="anchor" href="#truerequests-10"></a>7.1.2. Requests</h4>
 <div class="paragraph">
 <p><strong>Syntax</strong></p>
 </div>
@@ -3496,10 +3577,10 @@ note on username: iRODS supports a <code>user#zone</code> format to describe use
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="trueget-data-object-file-content-file-download"><a class="anchor" href="#trueget-data-object-file-content-file-download"></a>7.2. Get Data Object File Content (File Download)</h3>
 <div class="sect3">
-<h4 id="trueget-data-object-file-content-file-download"><a class="anchor" href="#trueget-data-object-file-content-file-download"></a>1.6.8. Get Data Object File Content (File Download)</h4>
-<div class="sect4">
-<h5 id="truedescription-11"><a class="anchor" href="#truedescription-11"></a>Description</h5>
+<h4 id="truedescription-11"><a class="anchor" href="#truedescription-11"></a>7.2.1. Description</h4>
 <div class="paragraph">
 <p>This <code>GET</code> operation will retrieve the actual contents of a Data Object in iRODS.  This causes an HTTP file download action.  Note that the service uses a parent resource of ‘fileContents’ as opposed to ‘dataObject’.  This is to preserve the symmetry between upload (POST) and download (GET) while allowing <code>GET</code> for a Data Object to return the catalog metadata instead of the contents.</p>
 </div>
@@ -3537,8 +3618,8 @@ Should we here consider the file contents as a sub-resource instead?  This might
 </div>
 </div>
 </div>
-<div class="sect4">
-<h5 id="truerequests-11"><a class="anchor" href="#truerequests-11"></a>Requests</h5>
+<div class="sect3">
+<h4 id="truerequests-11"><a class="anchor" href="#truerequests-11"></a>7.2.2. Requests</h4>
 <div class="paragraph">
 <p><strong>Syntax</strong></p>
 </div>
@@ -3593,10 +3674,10 @@ TODO: add param to download segments of a file with offset and length
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="truepost-data-object-file-content-file-upload"><a class="anchor" href="#truepost-data-object-file-content-file-upload"></a>7.3. Post Data Object File Content (File Upload)</h3>
 <div class="sect3">
-<h4 id="truepost-data-object-file-content-file-upload"><a class="anchor" href="#truepost-data-object-file-content-file-upload"></a>1.6.9. Post Data Object File Content (File Upload)</h4>
-<div class="sect4">
-<h5 id="truedescription-12"><a class="anchor" href="#truedescription-12"></a>Description</h5>
+<h4 id="truedescription-12"><a class="anchor" href="#truedescription-12"></a>7.3.1. Description</h4>
 <div class="paragraph">
 <p>This <code>POST</code> operation will upload binary data to the actual contents of a Data Object in iRODS.  This causes an HTTP multipart upload action.</p>
 </div>
@@ -3634,8 +3715,8 @@ Should we here consider the file contents as a sub-resource instead?  This might
 <p>Note that the response to this operation is equivalent to the <code>GET</code> of the Data Object catalog metadata, reflecting the file that was uploaded to iRODS.</p>
 </div>
 </div>
-<div class="sect4">
-<h5 id="truerequests-12"><a class="anchor" href="#truerequests-12"></a>Requests</h5>
+<div class="sect3">
+<h4 id="truerequests-12"><a class="anchor" href="#truerequests-12"></a>7.3.2. Requests</h4>
 <div class="paragraph">
 <p><strong>Syntax</strong></p>
 </div>
@@ -3743,22 +3824,24 @@ TODO: add param to upload segments of a file with offset and length
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="trueoperations-on-data-object-avu-metadata"><a class="anchor" href="#trueoperations-on-data-object-avu-metadata"></a>1.6.10. Operations on Data Object AVU Metadata</h4>
+</div>
+</div>
+<div class="sect1">
+<h2 id="trueoperations-on-data-object-avu-metadata"><a class="anchor" href="#trueoperations-on-data-object-avu-metadata"></a>8. Operations on Data Object AVU Metadata</h2>
+<div class="sectionbody">
 <div class="paragraph">
 <p>The following operations apply to the AVU sub-resource of an iRODS data objects, and represents AVU metadata attached to the given data object</p>
 </div>
-<div class="paragraph">
-<p>Get Data Object AVU Metadata</p>
-</div>
-<div class="sect4">
-<h5 id="truedescription-13"><a class="anchor" href="#truedescription-13"></a>Description</h5>
+<div class="sect2">
+<h3 id="trueget-data-object-avu-metadata"><a class="anchor" href="#trueget-data-object-avu-metadata"></a>8.1. Get Data Object AVU Metadata</h3>
+<div class="sect3">
+<h4 id="truedescription-13"><a class="anchor" href="#truedescription-13"></a>8.1.1. Description</h4>
 <div class="paragraph">
 <p>This <code>GET</code> operation will retrieve the AVU metadata associated with an iRODS data object</p>
 </div>
 </div>
-<div class="sect4">
-<h5 id="truerequests-13"><a class="anchor" href="#truerequests-13"></a>Requests</h5>
+<div class="sect3">
+<h4 id="truerequests-13"><a class="anchor" href="#truerequests-13"></a>8.1.2. Requests</h4>
 <div class="paragraph">
 <p><strong>Syntax</strong></p>
 </div>
@@ -3824,10 +3907,10 @@ TODO: add param to upload segments of a file with offset and length
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="trueadd-data-object-avu-metadata"><a class="anchor" href="#trueadd-data-object-avu-metadata"></a>8.2. Add Data Object AVU Metadata</h3>
 <div class="sect3">
-<h4 id="trueadd-data-object-avu-metadata"><a class="anchor" href="#trueadd-data-object-avu-metadata"></a>1.6.11. Add Data Object AVU Metadata</h4>
-<div class="sect4">
-<h5 id="truedescription-14"><a class="anchor" href="#truedescription-14"></a>Description</h5>
+<h4 id="truedescription-14"><a class="anchor" href="#truedescription-14"></a>8.2.1. Description</h4>
 <div class="paragraph">
 <p>This <code>PUT</code> operation will bulk add the provided AVU metadata associated with an iRODS data object.</p>
 </div>
@@ -3838,8 +3921,8 @@ TODO: add param to upload segments of a file with offset and length
 <p>Note that the response will detail the disposition, and any errors that occurred for individual AVU values.</p>
 </div>
 </div>
-<div class="sect4">
-<h5 id="truerequests-14"><a class="anchor" href="#truerequests-14"></a>Requests</h5>
+<div class="sect3">
+<h4 id="truerequests-14"><a class="anchor" href="#truerequests-14"></a>8.2.2. Requests</h4>
 <div class="paragraph">
 <p><strong>Syntax</strong></p>
 </div>
@@ -3946,10 +4029,10 @@ TODO: add param to upload segments of a file with offset and length
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="truedelete-data-object-avu-metadata"><a class="anchor" href="#truedelete-data-object-avu-metadata"></a>8.3. Delete Data Object AVU Metadata</h3>
 <div class="sect3">
-<h4 id="truedelete-data-object-avu-metadata"><a class="anchor" href="#truedelete-data-object-avu-metadata"></a>1.6.12. Delete Data Object AVU Metadata</h4>
-<div class="sect4">
-<h5 id="truedescription-15"><a class="anchor" href="#truedescription-15"></a>Description</h5>
+<h4 id="truedescription-15"><a class="anchor" href="#truedescription-15"></a>8.3.1. Description</h4>
 <div class="paragraph">
 <p>This <code>POST</code> operation will bulk delete the provided AVU metadata associated with an iRODS data object.  <code>POST</code> is used here as an HTTP <code>DELETE</code> action cannot have a body.</p>
 </div>
@@ -3960,8 +4043,8 @@ TODO: add param to upload segments of a file with offset and length
 <p>Note that the response will detail the disposition, and any errors that occurred for individual AVU values.</p>
 </div>
 </div>
-<div class="sect4">
-<h5 id="truerequests-15"><a class="anchor" href="#truerequests-15"></a>Requests</h5>
+<div class="sect3">
+<h4 id="truerequests-15"><a class="anchor" href="#truerequests-15"></a>8.3.2. Requests</h4>
 <div class="paragraph">
 <p><strong>Syntax</strong></p>
 </div>
@@ -4079,20 +4162,24 @@ TODO: add param to upload segments of a file with offset and length
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="trueoperations-on-data-object-acls-permissions"><a class="anchor" href="#trueoperations-on-data-object-acls-permissions"></a>1.6.13. Operations on Data Object ACLs (Permissions)</h4>
-<div class="paragraph">
-<p>The following operations apply to the ACL sub-resource of iRODS data objects, and can alter access permissions.
-Get Data Object Permissions</p>
 </div>
-<div class="sect4">
-<h5 id="truedescription-16"><a class="anchor" href="#truedescription-16"></a>Description</h5>
+</div>
+<div class="sect1">
+<h2 id="trueoperations-on-data-object-acls-permissions"><a class="anchor" href="#trueoperations-on-data-object-acls-permissions"></a>9. Operations on Data Object ACLs (Permissions)</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The following operations apply to the ACL sub-resource of iRODS data objects, and can alter access permissions.</p>
+</div>
+<div class="sect2">
+<h3 id="trueget-data-object-permissions"><a class="anchor" href="#trueget-data-object-permissions"></a>9.1. Get Data Object Permissions</h3>
+<div class="sect3">
+<h4 id="truedescription-16"><a class="anchor" href="#truedescription-16"></a>9.1.1. Description</h4>
 <div class="paragraph">
 <p>This <code>GET</code> operation will retrieve the permissions associated with an iRODS data object</p>
 </div>
 </div>
-<div class="sect4">
-<h5 id="truerequests-16"><a class="anchor" href="#truerequests-16"></a>Requests</h5>
+<div class="sect3">
+<h4 id="truerequests-16"><a class="anchor" href="#truerequests-16"></a>9.1.2. Requests</h4>
 <div class="paragraph">
 <p><strong>Syntax</strong></p>
 </div>
@@ -4178,10 +4265,10 @@ Get Data Object Permissions</p>
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="trueadd-data-object-permission"><a class="anchor" href="#trueadd-data-object-permission"></a>9.2. Add Data Object Permission</h3>
 <div class="sect3">
-<h4 id="trueadd-data-object-permission"><a class="anchor" href="#trueadd-data-object-permission"></a>1.6.14. Add Data Object Permission</h4>
-<div class="sect4">
-<h5 id="truedescription-17"><a class="anchor" href="#truedescription-17"></a>Description</h5>
+<h4 id="truedescription-17"><a class="anchor" href="#truedescription-17"></a>9.2.1. Description</h4>
 <div class="paragraph">
 <p>This <code>PUT</code> operation will set a data object permission.  Note that this is an idempotent method, and if an existing permission is already stored, the new permission will replace it. This means updating a permission is accomplished using this same method.</p>
 </div>
@@ -4189,8 +4276,8 @@ Get Data Object Permissions</p>
 <p>Note that this method returns no body, and a normal operation returns an <code>HTTP 204 response code</code>.</p>
 </div>
 </div>
-<div class="sect4">
-<h5 id="truerequests-17"><a class="anchor" href="#truerequests-17"></a>Requests</h5>
+<div class="sect3">
+<h4 id="truerequests-17"><a class="anchor" href="#truerequests-17"></a>9.2.2. Requests</h4>
 <div class="paragraph">
 <p><strong>Syntax</strong></p>
 </div>
@@ -4251,10 +4338,10 @@ Note on username iRODS supports a <code>user#zone</code> format to describe user
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="trueremove-data-object-permission"><a class="anchor" href="#trueremove-data-object-permission"></a>9.3. Remove Data Object Permission</h3>
 <div class="sect3">
-<h4 id="trueremove-data-object-permission"><a class="anchor" href="#trueremove-data-object-permission"></a>1.6.15. Remove Data Object Permission</h4>
-<div class="sect4">
-<h5 id="truedescription-18"><a class="anchor" href="#truedescription-18"></a>Description</h5>
+<h4 id="truedescription-18"><a class="anchor" href="#truedescription-18"></a>9.3.1. Description</h4>
 <div class="paragraph">
 <p>This <code>DELETE</code> operation will remove a data object permission.  Note that this is an idempotent method, and if no permission exists, it will silently ignore the request and return a normal response.</p>
 </div>
@@ -4262,8 +4349,8 @@ Note on username iRODS supports a <code>user#zone</code> format to describe user
 <p>This method returns no body, and a normal operation returns an <code>HTTP 204 response code</code>.</p>
 </div>
 </div>
-<div class="sect4">
-<h5 id="truerequests-18"><a class="anchor" href="#truerequests-18"></a>Requests</h5>
+<div class="sect3">
+<h4 id="truerequests-18"><a class="anchor" href="#truerequests-18"></a>9.3.2. Requests</h4>
 <div class="paragraph">
 <p><strong>Syntax</strong></p>
 </div>
@@ -4319,13 +4406,15 @@ Note on username: iRODS supports a <code>user#zone</code> format to describe use
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="trueoperations-on-rules"><a class="anchor" href="#trueoperations-on-rules"></a>1.6.16. Operations on Rules</h4>
-<div class="paragraph">
-<p>Execute an iRODS Rule by providing a rule body and any override parameters</p>
 </div>
-<div class="sect4">
-<h5 id="truedescription-19"><a class="anchor" href="#truedescription-19"></a>Description</h5>
+</div>
+<div class="sect1">
+<h2 id="trueoperations-on-rules"><a class="anchor" href="#trueoperations-on-rules"></a>10. Operations on Rules</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="trueexecute-an-irods-rule-by-providing-a-rule-body-and-any-override-parameters"><a class="anchor" href="#trueexecute-an-irods-rule-by-providing-a-rule-body-and-any-override-parameters"></a>10.1. Execute an iRODS Rule by providing a rule body and any override parameters</h3>
+<div class="sect3">
+<h4 id="truedescription-19"><a class="anchor" href="#truedescription-19"></a>10.1.1. Description</h4>
 <div class="paragraph">
 <p>This <code>POST</code> operation will send a client-submitted rule to iRODS for invocation, returning back a document that contains the configured output parameters and log information.</p>
 </div>
@@ -4336,8 +4425,8 @@ Note on username: iRODS supports a <code>user#zone</code> format to describe use
 <p>Note that iRODS rules can either be the <code>old</code> format, pre iRODS 3.2, or they can be in the updated format of the enhanced rule engine.  The rule processing type will be specified in the request body along with the rule string.</p>
 </div>
 </div>
-<div class="sect4">
-<h5 id="truerequests-19"><a class="anchor" href="#truerequests-19"></a>Requests</h5>
+<div class="sect3">
+<h4 id="truerequests-19"><a class="anchor" href="#truerequests-19"></a>10.1.2. Requests</h4>
 <div class="paragraph">
 <p><strong>Syntax</strong></p>
 </div>
@@ -4457,19 +4546,21 @@ the request includes a ‘ruleProcessingType’ element that will be (<code>CLAS
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="trueoperations-on-users"><a class="anchor" href="#trueoperations-on-users"></a>1.6.17. Operations on Users</h4>
-<div class="paragraph">
-<p>Obtain a temporary iRODS password for a user</p>
 </div>
-<div class="sect4">
-<h5 id="truedescription-20"><a class="anchor" href="#truedescription-20"></a>Description</h5>
+</div>
+<div class="sect1">
+<h2 id="trueoperations-on-users"><a class="anchor" href="#trueoperations-on-users"></a>11. Operations on Users</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="trueobtain-a-temporary-irods-password-for-a-user"><a class="anchor" href="#trueobtain-a-temporary-irods-password-for-a-user"></a>11.1. Obtain a temporary iRODS password for a user</h3>
+<div class="sect3">
+<h4 id="truedescription-20"><a class="anchor" href="#truedescription-20"></a>11.1.1. Description</h4>
 <div class="paragraph">
 <p>This <code>PUT</code> operation will obtain a temporary iRODS password for a user.  This may be used by any user to obtain a temporary password for themselves, and may be used in admin mode by a properly authorized user to generate a temporary password for a different user.</p>
 </div>
 </div>
-<div class="sect4">
-<h5 id="truerequests-20"><a class="anchor" href="#truerequests-20"></a>Requests</h5>
+<div class="sect3">
+<h4 id="truerequests-20"><a class="anchor" href="#truerequests-20"></a>11.1.2. Requests</h4>
 <div class="paragraph">
 <p><strong>Syntax</strong></p>
 </div>
@@ -4512,10 +4603,12 @@ the request includes a ‘ruleProcessingType’ element that will be (<code>CLAS
 </div>
 </div>
 </div>
+</div>
+<div class="sect1">
+<h2 id="truegenquery-operations"><a class="anchor" href="#truegenquery-operations"></a>12. GenQuery Operations</h2>
+<div class="sectionbody">
 <div class="sect2">
-<h3 id="truegenquery-operations"><a class="anchor" href="#truegenquery-operations"></a>1.7. GenQuery Operations</h3>
-<div class="sect4">
-<h5 id="truedescription-21"><a class="anchor" href="#truedescription-21"></a>Description</h5>
+<h3 id="truedescription-21"><a class="anchor" href="#truedescription-21"></a>12.1. Description</h3>
 <div class="paragraph">
 <p>This <code>POST</code> operation performs GenQuery queries.  The query&#8217;s request body consists of one or more of the following fields:</p>
 </div>
@@ -4562,8 +4655,8 @@ the request includes a ‘ruleProcessingType’ element that will be (<code>CLAS
 </ul>
 </div>
 </div>
-<div class="sect3">
-<h4 id="trueexample-non-aggregate-query"><a class="anchor" href="#trueexample-non-aggregate-query"></a>1.7.2. Example Non Aggregate Query</h4>
+<div class="sect2">
+<h3 id="trueexample-non-aggregate-query"><a class="anchor" href="#trueexample-non-aggregate-query"></a>12.2. Example Non Aggregate Query</h3>
 <div class="paragraph">
 <p>The XML and JSON queries listed below are the equivalent of the following query.</p>
 </div>
@@ -4574,8 +4667,8 @@ where  COLL_NAME = '/tempZone/home/rods' and DATA_NAME like '%.dat'
 order by DATA_SIZE DESC</code></pre>
 </div>
 </div>
-<div class="sect4">
-<h5 id="truerequests-21"><a class="anchor" href="#truerequests-21"></a>Requests</h5>
+<div class="sect3">
+<h4 id="truerequests-21"><a class="anchor" href="#truerequests-21"></a>12.2.1. Requests</h4>
 <div class="paragraph">
 <p><strong>Syntax</strong></p>
 </div>
@@ -4772,8 +4865,8 @@ order by DATA_SIZE DESC</code></pre>
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="trueexample-aggregate-query"><a class="anchor" href="#trueexample-aggregate-query"></a>1.7.3. Example Aggregate Query</h4>
+<div class="sect2">
+<h3 id="trueexample-aggregate-query"><a class="anchor" href="#trueexample-aggregate-query"></a>12.3. Example Aggregate Query</h3>
 <div class="paragraph">
 <p>The XML and JSON queries listed below are the equivalent of the following query:</p>
 </div>
@@ -4783,8 +4876,8 @@ order by DATA_SIZE DESC</code></pre>
 where COLL_NAME = '/tempZone/home/rods' and DATA_NAME like '%.dat'</code></pre>
 </div>
 </div>
-<div class="sect4">
-<h5 id="truerequests-22"><a class="anchor" href="#truerequests-22"></a>Requests</h5>
+<div class="sect3">
+<h4 id="truerequests-22"><a class="anchor" href="#truerequests-22"></a>12.3.1. Requests</h4>
 <div class="paragraph">
 <p><strong>Syntax</strong></p>
 </div>
@@ -4891,9 +4984,10 @@ where COLL_NAME = '/tempZone/home/rods' and DATA_NAME like '%.dat'</code></pre>
 }</code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>Example Using <code>IN</code> Clause with a <code>value_list</code></p>
 </div>
+</div>
+<div class="sect2">
+<h3 id="trueexample-using-code-in-code-clause-with-a-code-value_list-code"><a class="anchor" href="#trueexample-using-code-in-code-clause-with-a-code-value_list-code"></a>12.4. Example Using <code>IN</code> Clause with a <code>value_list</code></h3>
 <div class="paragraph">
 <p>The XML and JSON queries listed below are the equivalent of the following query:</p>
 </div>
@@ -4903,9 +4997,8 @@ where COLL_NAME = '/tempZone/home/rods' and DATA_NAME like '%.dat'</code></pre>
 where COLL_NAME = '/tempZone/home/rods/dir/GenQueryTestDirectory' and DATA_NAME in ('test_file1.dat', 'test_file2.dat')</code></pre>
 </div>
 </div>
-</div>
-<div class="sect4">
-<h5 id="truerequests-23"><a class="anchor" href="#truerequests-23"></a>Requests</h5>
+<div class="sect3">
+<h4 id="truerequests-23"><a class="anchor" href="#truerequests-23"></a>12.4.1. Requests</h4>
 <div class="paragraph">
 <p><strong>Syntax</strong></p>
 </div>
@@ -5047,12 +5140,14 @@ where COLL_NAME = '/tempZone/home/rods/dir/GenQueryTestDirectory' and DATA_NAME 
 </div>
 </div>
 </div>
+</div>
+<div class="sect1">
+<h2 id="trueoperations-on-tickets"><a class="anchor" href="#trueoperations-on-tickets"></a>13. Operations on Tickets</h2>
+<div class="sectionbody">
 <div class="sect2">
-<h3 id="trueoperations-on-tickets"><a class="anchor" href="#trueoperations-on-tickets"></a>1.8. Operations on Tickets</h3>
+<h3 id="truecreate-a-ticket"><a class="anchor" href="#truecreate-a-ticket"></a>13.1. Create a Ticket</h3>
 <div class="sect3">
-<h4 id="truecreate-a-ticket"><a class="anchor" href="#truecreate-a-ticket"></a>1.8.1. Create a Ticket</h4>
-<div class="sect4">
-<h5 id="truedescription-22"><a class="anchor" href="#truedescription-22"></a>Description</h5>
+<h4 id="truedescription-22"><a class="anchor" href="#truedescription-22"></a>13.1.1. Description</h4>
 <div class="paragraph">
 <p>This <code>POST</code> operation will create an iRODS ticket.</p>
 </div>
@@ -5073,8 +5168,8 @@ where COLL_NAME = '/tempZone/home/rods/dir/GenQueryTestDirectory' and DATA_NAME 
 </ul>
 </div>
 </div>
-<div class="sect4">
-<h5 id="truerequests-24"><a class="anchor" href="#truerequests-24"></a>Requests</h5>
+<div class="sect3">
+<h4 id="truerequests-24"><a class="anchor" href="#truerequests-24"></a>13.1.2. Requests</h4>
 <div class="paragraph">
 <p><strong>Syntax</strong></p>
 </div>
@@ -5149,16 +5244,16 @@ where COLL_NAME = '/tempZone/home/rods/dir/GenQueryTestDirectory' and DATA_NAME 
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="truedelete-a-ticket"><a class="anchor" href="#truedelete-a-ticket"></a>13.2. Delete a Ticket</h3>
 <div class="sect3">
-<h4 id="truedelete-a-ticket"><a class="anchor" href="#truedelete-a-ticket"></a>1.8.2. Delete a Ticket</h4>
-<div class="sect4">
-<h5 id="truedescription-23"><a class="anchor" href="#truedescription-23"></a>Description</h5>
+<h4 id="truedescription-23"><a class="anchor" href="#truedescription-23"></a>13.2.1. Description</h4>
 <div class="paragraph">
 <p>This <code>DELETE</code> operation will delete an iRODS ticket.</p>
 </div>
 </div>
-<div class="sect4">
-<h5 id="truerequests-25"><a class="anchor" href="#truerequests-25"></a>Requests</h5>
+<div class="sect3">
+<h4 id="truerequests-25"><a class="anchor" href="#truerequests-25"></a>13.2.2. Requests</h4>
 <div class="paragraph">
 <p><strong>Syntax</strong></p>
 </div>
@@ -5188,10 +5283,10 @@ where COLL_NAME = '/tempZone/home/rods/dir/GenQueryTestDirectory' and DATA_NAME 
 </table>
 </div>
 </div>
+<div class="sect2">
+<h3 id="trueupdate-a-ticket"><a class="anchor" href="#trueupdate-a-ticket"></a>13.3. Update a Ticket</h3>
 <div class="sect3">
-<h4 id="trueupdate-a-ticket"><a class="anchor" href="#trueupdate-a-ticket"></a>1.8.3. Update a Ticket</h4>
-<div class="sect4">
-<h5 id="truedescription-24"><a class="anchor" href="#truedescription-24"></a>Description</h5>
+<h4 id="truedescription-24"><a class="anchor" href="#truedescription-24"></a>13.3.1. Description</h4>
 <div class="paragraph">
 <p>This <code>PUT</code> operation will update an iRODS ticket.</p>
 </div>
@@ -5257,8 +5352,8 @@ where COLL_NAME = '/tempZone/home/rods/dir/GenQueryTestDirectory' and DATA_NAME 
 </tbody>
 </table>
 </div>
-<div class="sect4">
-<h5 id="truerequests-26"><a class="anchor" href="#truerequests-26"></a>Requests</h5>
+<div class="sect3">
+<h4 id="truerequests-26"><a class="anchor" href="#truerequests-26"></a>13.3.2. Requests</h4>
 <div class="paragraph">
 <p><strong>Syntax</strong></p>
 </div>
@@ -5289,10 +5384,10 @@ where COLL_NAME = '/tempZone/home/rods/dir/GenQueryTestDirectory' and DATA_NAME 
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="truelist-ticket-information"><a class="anchor" href="#truelist-ticket-information"></a>13.4. List Ticket Information</h3>
 <div class="sect3">
-<h4 id="truelist-ticket-information"><a class="anchor" href="#truelist-ticket-information"></a>1.8.4. List Ticket Information</h4>
-<div class="sect4">
-<h5 id="truedescription-25"><a class="anchor" href="#truedescription-25"></a>Description</h5>
+<h4 id="truedescription-25"><a class="anchor" href="#truedescription-25"></a>13.4.1. Description</h4>
 <div class="paragraph">
 <p>This <code>GET</code> operation will list the information for the selected ticket.</p>
 </div>
@@ -5384,10 +5479,10 @@ where COLL_NAME = '/tempZone/home/rods/dir/GenQueryTestDirectory' and DATA_NAME 
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="truelist-all-tickets"><a class="anchor" href="#truelist-all-tickets"></a>13.5. List All Tickets</h3>
 <div class="sect3">
-<h4 id="truelist-all-tickets"><a class="anchor" href="#truelist-all-tickets"></a>1.8.5. List All Tickets</h4>
-<div class="sect4">
-<h5 id="truedescription-26"><a class="anchor" href="#truedescription-26"></a>Description</h5>
+<h4 id="truedescription-26"><a class="anchor" href="#truedescription-26"></a>13.5.1. Description</h4>
 <div class="paragraph">
 <p>This <code>GET</code> operation will list the information for all tickets.</p>
 </div>
@@ -5527,10 +5622,6 @@ where COLL_NAME = '/tempZone/home/rods/dir/GenQueryTestDirectory' and DATA_NAME 
 }</code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>notes….nice json formatter <a href="http://jsonformatter.curiousconcept.com/" class="bare">http://jsonformatter.curiousconcept.com/</a></p>
-</div>
-</div>
 </div>
 </div>
 </div>
@@ -5538,7 +5629,7 @@ where COLL_NAME = '/tempZone/home/rods/dir/GenQueryTestDirectory' and DATA_NAME 
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-06-16 19:49:40 CEST
+Last updated 2016-06-17 17:01:06 CEST
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">

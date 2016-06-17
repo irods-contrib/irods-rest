@@ -66,7 +66,7 @@ The approach of this API is that HTTP parameters can be added to any requests in
 
 Some requests, especially for sub-resources such as AVU metadata, are too complex to be placed into URLs or as parameters.  For example, to add or delete AVU metadata associated with a collection, one uses a `POST` method and sends the required AVU actions as an XML or JSON request body. This approach for certain operations has the advantage of treating a set of metadata as a document, allowing the update of several attributes within one HTTP request.  These operations that require a request body are documented with each method.
 
-==== Authentication
+=== Authentication
 
 The REST API for iRODS makes use of standard http://en.wikipedia.org/wiki/Basic_access_authentication[Basic Authentication] for HTTP requests.  In this approach, the Authorization HTTP header is populated with username:password information that maps to the underlying iRODS account.  
 
@@ -114,7 +114,7 @@ In the following example, using the jargon-beans.xml file in src/main/resources 
 
 Note that STANDARD and PAM auth may also be requested by prepending STANDARD* or PAM* to the user id portion of the Basic Authentication credentials.  This will signal to the REST service to opt for those specified auth methods, even if not configured in the spring xml configuration.
 
-===== Content Negotiation for Requests 
+==== Content Negotiation for Requests 
 
 The REST API understands both XML and JSON for Request and Response bodies.  
 
@@ -137,7 +137,7 @@ To send JSON in a request, set the Content-type header as follows:
 
 _"Content-Type", "application/json"_
 
-=== CORS Support
+== CORS Support
 
 CORS is an acronym for Cross-Origin-Resource-Sharing.  Overviews of CORS are out of the scope of this document, but W3C has a good reference here: http://www.w3.org/TR/cors/
 
@@ -169,7 +169,7 @@ Note that `allowCors` is a global setting, and if set to false no header process
 
 If `allowCors` is set to true, and no corsOrigins are set, it will default to the origin of `'*'`.  Otherwise, it will be set to the list of origins provided.  Similarly, if corsMethods are not set, it will default to `GET`, `POST`, `DELETE`, `PUT`, otherwise, it will be set to the provided list.
 
-=== Installation and Configuration
+== Installation and Configuration
 
 The REST API is available as a .war file as indicated for each release in GitHub.  This .war can be deployed on any standard servlet container, such as Jetty or Tomcat.  Tomcat is the version we test with.  The configuration of the REST API is necessary so it knows what host/port/zone/default resource, and default authentication method is in use.  These presets are combined with the Basic Authentication credentials to connect to the target iRODS grid.  This also prevents any installation of REST from being hijacked to talk to another iRODS grid!  
 
@@ -243,15 +243,15 @@ Which is a `GET` service that will ping the server and return some basic server 
 
 This action should require you to provide the iRODS user name and password in a Basic Authentication dialog before retrieving that information.  This verifies that the service is working!
 
-=== Operations on Collections
+== Operations on Collections
 
-==== Get Collection Information
+=== Get Collection Information
 
-===== Description
+==== Description
 
 This `GET` operation will retrieve basic catalog metadata about the iRODS collection.   This method can also optionally provide a pageable listing of the child collections and data objects underneath the given collection.
 
-===== Requests
+==== Requests
 
 *Syntax*
 
@@ -344,13 +344,13 @@ Default = `both`
 }
 ----
 
-==== Create a New Collection
+=== Create a New Collection
 
-===== Description
+==== Description
 
 This `PUT` operation will first create a new collection, and then return back a description of the iRODS catalog entry for the newly created collection.  This is an idempotent method, and if the collection already exists, the data for the existing collection is returned.
 
-===== Requests
+==== Requests
 
 *Syntax*
 
@@ -408,15 +408,15 @@ Request Parameters`
  }
 ----
 
-==== Delete a Collection
+=== Delete a Collection
 
-===== Description
+==== Description
 
 This `DELETE` operation will remove the given collection.  A `force` option is provided with an additional request parameter.  This method will silently ignore deletes of non-existent collections.
 
 Note that `DELETE` requests do not return a body in HTTP.  This method will instead return a `204 No Content` response.
 
-===== Requests
+==== Requests
 
 *Syntax*
 
@@ -443,17 +443,17 @@ n/a
 n/a
 
 
-=== Operations on Collection AVU Metadata
+== Operations on Collection AVU Metadata
 
 The following operations apply to the AVU sub-resource of an iRODS collection, and represents AVU metadata attached to the given collection.
 
-==== Get Collection AVU Metadata
+=== Get Collection AVU Metadata
 
-===== Description
+==== Description
 
 This `GET` operation will retrieve the AVU metadata associated with an iRODS parent collection
 
-===== Requests
+==== Requests
 
 *Syntax*
 
@@ -504,9 +504,9 @@ This `GET` operation will retrieve the AVU metadata associated with an iRODS par
 }
 ----
 
-==== Add Collection AVU Metadata
+=== Add Collection AVU Metadata
 
-===== Description
+==== Description
 
 This `PUT` operation will bulk add the provided  AVU metadata associated with an iRODS parent collection.
 
@@ -514,7 +514,7 @@ This bulk operation requires a request body in XML or JSON, as AVU metadata is t
 
 Note that the response will detail the disposition, and any errors that occurred for individual AVU values.
 
-===== Requests
+==== Requests
 
 *Syntax*
 
@@ -614,9 +614,9 @@ Note that the response will detail the disposition, and any errors that occurred
 ]
 ----
 
-==== Delete Collection AVU Metadata
+=== Delete Collection AVU Metadata
 
-===== Description
+==== Description
 
 This `POST` operation will bulk delete the provided AVU metadata associated with an iRODS parent collection. `POST` is used here as an HTTP `DELETE` action cannot have a body.
 
@@ -624,7 +624,7 @@ This bulk operation requires a request body in XML or JSON, as AVU metadata is t
 
 Note that the response will detail the disposition, and any errors that occurred for individual AVU values.
 
-===== Requests
+==== Requests
 
 *Syntax*
 
@@ -723,16 +723,17 @@ Note that the response will detail the disposition, and any errors that occurred
 ]
 ----
 
-==== Operations on Collection ACLs (Permissions)
+== Operations on Collection ACLs (Permissions)
 
 The following operations apply to the ACL sub-resource of iRODS collections, and can alter access permissions.
-Get Collection Permissions
 
-===== Description
+=== Get Collection Permissions
+
+==== Description
 
 This `GET` operation will retrieve the permissions associated with an iRODS collection
 
-===== Requests
+==== Requests
 
 *Syntax*
 
@@ -748,6 +749,7 @@ This `GET` operation will retrieve the permissions associated with an iRODS coll
 |====================
 
 *Responses - XML*
+
 [source,xml]
 ----
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -801,15 +803,15 @@ This `GET` operation will retrieve the permissions associated with an iRODS coll
 }
 ----
 
-==== Add Collection Permission
+=== Add Collection Permission
 
-===== Description
+==== Description
 
 This `PUT` operation will set a collection permission.  Note that this is an idempotent method, and if an existing permission is already stored, the new permission will replace it. This means updating a permission is accomplished using this same method.
 
 Note that this method returns no body, and a normal operation returns an `HTTP 204 response code`.
 
-===== Requests
+==== Requests
 
 *Syntax*
 
@@ -840,15 +842,15 @@ n/a
 
 n/a 
 
-==== Remove Collection Permission
+=== Remove Collection Permission
 
-===== Description
+==== Description
 
 This `DELETE` operation will remove a collection permission.  Note that this is an idempotent method, and if no permission exists, it will silently ignore the request and return a normal response.
 
 This method returns no body, and a normal operation returns an `HTTP 204 response code`.
 
-===== Requests
+==== Requests
 
 *Syntax*
 
@@ -875,16 +877,16 @@ n/a
 
 n/a 
 
-==== Operations on Data Objects
+== Operations on Data Objects
 
 The following operations concern iRODS Data Objects, which are files, as opposed to directories).  
 
-Get Data Object Information
+=== Get Data Object Information
 
-===== Description
+==== Description
 
 This `GET` operation will retrieve basic catalog metadata about the iRODS Data Object.  
-===== Requests
+==== Requests
 
 *Syntax*
 
@@ -962,7 +964,7 @@ This `GET` operation will retrieve basic catalog metadata about the iRODS Data O
 }
 ----
 
-===== Requests
+==== Requests
 
 *Syntax*
 
@@ -984,9 +986,9 @@ n/a
 
 n/a
 
-==== Get Data Object File Content (File Download)
+=== Get Data Object File Content (File Download)
 
-===== Description
+==== Description
 
 This `GET` operation will retrieve the actual contents of a Data Object in iRODS.  This causes an HTTP file download action.  Note that the service uses a parent resource of ‘fileContents’ as opposed to ‘dataObject’.  This is to preserve the symmetry between upload (POST) and download (GET) while allowing `GET` for a Data Object to return the catalog metadata instead of the contents.
 
@@ -1013,7 +1015,7 @@ The response to this request will be an application/octet-stream with the binary
 ----
 
 
-===== Requests
+==== Requests
 
 *Syntax*
 
@@ -1040,9 +1042,9 @@ n/a
 n/a
 
 
-==== Post Data Object File Content (File Upload)
+=== Post Data Object File Content (File Upload)
 
-===== Description
+==== Description
 
 This `POST` operation will upload binary data to the actual contents of a Data Object in iRODS.  This causes an HTTP multipart upload action. 
 
@@ -1067,7 +1069,7 @@ The request should be a `POST` of multipart form data, with the attached file se
 
 Note that the response to this operation is equivalent to the `GET` of the Data Object catalog metadata, reflecting the file that was uploaded to iRODS.
 
-===== Requests
+==== Requests
 
 *Syntax*
 
@@ -1086,6 +1088,7 @@ NOTE: TODO: add param to upload segments of a file with offset and length
 
 
 *Responses - XML*
+
 [source,xml]
 ----
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -1149,17 +1152,17 @@ NOTE: TODO: add param to upload segments of a file with offset and length
 ----
 
 
-==== Operations on Data Object AVU Metadata
+== Operations on Data Object AVU Metadata
 
 The following operations apply to the AVU sub-resource of an iRODS data objects, and represents AVU metadata attached to the given data object
 
-Get Data Object AVU Metadata
+=== Get Data Object AVU Metadata
 
-===== Description
+==== Description
 
 This `GET` operation will retrieve the AVU metadata associated with an iRODS data object
 
-===== Requests
+==== Requests
 
 *Syntax*
 
@@ -1211,9 +1214,9 @@ This `GET` operation will retrieve the AVU metadata associated with an iRODS dat
 ----
 
 
-==== Add Data Object AVU Metadata
+=== Add Data Object AVU Metadata
 
-===== Description
+==== Description
 
 This `PUT` operation will bulk add the provided AVU metadata associated with an iRODS data object.
 
@@ -1221,7 +1224,7 @@ This bulk operation requires a request body in XML or JSON, as AVU metadata is t
 
 Note that the response will detail the disposition, and any errors that occurred for individual AVU values.
 
-===== Requests
+==== Requests
 
 *Syntax*
 
@@ -1312,9 +1315,9 @@ Note that the response will detail the disposition, and any errors that occurred
 ]
 ----
 
-==== Delete Data Object AVU Metadata
+=== Delete Data Object AVU Metadata
 
-===== Description
+==== Description
 
 This `POST` operation will bulk delete the provided AVU metadata associated with an iRODS data object.  `POST` is used here as an HTTP `DELETE` action cannot have a body.
 
@@ -1322,7 +1325,7 @@ This bulk operation requires a request body in XML or JSON, as AVU metadata is t
 
 Note that the response will detail the disposition, and any errors that occurred for individual AVU values.
 
-===== Requests
+==== Requests
 
 *Syntax*
 
@@ -1423,16 +1426,17 @@ Note that the response will detail the disposition, and any errors that occurred
 ----
 
 
-==== Operations on Data Object ACLs (Permissions)
+== Operations on Data Object ACLs (Permissions)
 
 The following operations apply to the ACL sub-resource of iRODS data objects, and can alter access permissions.
-Get Data Object Permissions
 
-===== Description
+=== Get Data Object Permissions
+
+==== Description
 
 This `GET` operation will retrieve the permissions associated with an iRODS data object
 
-===== Requests
+==== Requests
 
 *Syntax*
 
@@ -1503,15 +1507,15 @@ This `GET` operation will retrieve the permissions associated with an iRODS data
 ----
 
 
-==== Add Data Object Permission
+=== Add Data Object Permission
 
-===== Description
+==== Description
 
 This `PUT` operation will set a data object permission.  Note that this is an idempotent method, and if an existing permission is already stored, the new permission will replace it. This means updating a permission is accomplished using this same method.
 
 Note that this method returns no body, and a normal operation returns an `HTTP 204 response code`.
 
-===== Requests
+==== Requests
 
 *Syntax*
 
@@ -1545,15 +1549,15 @@ n/a
 n/a 
 
 
-==== Remove Data Object Permission
+=== Remove Data Object Permission
 
-===== Description
+==== Description
 
 This `DELETE` operation will remove a data object permission.  Note that this is an idempotent method, and if no permission exists, it will silently ignore the request and return a normal response.
 
 This method returns no body, and a normal operation returns an `HTTP 204 response code`.
 
-===== Requests
+==== Requests
 
 *Syntax*
 
@@ -1563,7 +1567,6 @@ NOTE: Note on username: iRODS supports a `user#zone` format to describe user nam
 
 
 *Request Parameters*
-
 
 .Data object permission deletion
 [width="100%",options="header"]
@@ -1585,12 +1588,11 @@ n/a
 n/a 
 
 
-==== Operations on Rules
+== Operations on Rules
 
-Execute an iRODS Rule by providing a rule body and any override parameters
+=== Execute an iRODS Rule by providing a rule body and any override parameters
 
-
-===== Description
+==== Description
 
 This `POST` operation will send a client-submitted rule to iRODS for invocation, returning back a document that contains the configured output parameters and log information.
 
@@ -1599,7 +1601,7 @@ In this case, the rule is provided in the request, and optional override paramet
 Note that iRODS rules can either be the `old` format, pre iRODS 3.2, or they can be in the updated format of the enhanced rule engine.  The rule processing type will be specified in the request body along with the rule string.
 
 
-===== Requests
+==== Requests
 
 *Syntax*
 
@@ -1696,17 +1698,16 @@ Add user and group operations currently undocumented!
 ====
 
 
-==== Operations on Users
+== Operations on Users
 
-Obtain a temporary iRODS password for a user
+=== Obtain a temporary iRODS password for a user
 
-
-===== Description
+==== Description
 
 This `PUT` operation will obtain a temporary iRODS password for a user.  This may be used by any user to obtain a temporary password for themselves, and may be used in admin mode by a properly authorized user to generate a temporary password for a different user.
 
 
-===== Requests
+==== Requests
 
 
 *Syntax*
@@ -1735,9 +1736,9 @@ This `PUT` operation will obtain a temporary iRODS password for a user.  This ma
 ----
 
 
-=== GenQuery Operations
+== GenQuery Operations
 
-===== Description
+=== Description
 
 This `POST` operation performs GenQuery queries.  The query's request body consists of one or more of the following fields:
 
@@ -1753,10 +1754,9 @@ This `POST` operation performs GenQuery queries.  The query's request body consi
 ** `order_condition` – The order condition.  This must match one of the enums in `org.irods.jargon.core.query.OrderByType`.
 
 
-==== Example Non Aggregate Query
+=== Example Non Aggregate Query
 
 The XML and JSON queries listed below are the equivalent of the following query.
-
 
 [source,sql]
 ----
@@ -1766,7 +1766,7 @@ order by DATA_SIZE DESC
 ----
 
 
-===== Requests
+==== Requests
 
 *Syntax*
 
@@ -1947,7 +1947,7 @@ order by DATA_SIZE DESC
 ----
 
 
-==== Example Aggregate Query
+=== Example Aggregate Query
 
 The XML and JSON queries listed below are the equivalent of the following query:
 
@@ -1958,7 +1958,7 @@ where COLL_NAME = '/tempZone/home/rods' and DATA_NAME like '%.dat'
 ----
 
 
-===== Requests
+==== Requests
 
 *Syntax*
 
@@ -2052,7 +2052,7 @@ where COLL_NAME = '/tempZone/home/rods' and DATA_NAME like '%.dat'
 }
 ----
 
-Example Using `IN` Clause with a `value_list`
+=== Example Using `IN` Clause with a `value_list`
 
 The XML and JSON queries listed below are the equivalent of the following query:
 
@@ -2063,7 +2063,7 @@ where COLL_NAME = '/tempZone/home/rods/dir/GenQueryTestDirectory' and DATA_NAME 
 ----
 
 
-===== Requests
+==== Requests
 
 *Syntax*
 
@@ -2190,11 +2190,11 @@ where COLL_NAME = '/tempZone/home/rods/dir/GenQueryTestDirectory' and DATA_NAME 
 ----
 
 
-=== Operations on Tickets
+== Operations on Tickets
 
-==== Create a Ticket
+=== Create a Ticket
 
-===== Description
+==== Description
 
 This `POST` operation will create an iRODS ticket.
 
@@ -2205,7 +2205,7 @@ The input fields are:
 * `ticket_string` – the ticket's string.  This is optional.  If it is not provided the string will be generated by the system.
 
 
-===== Requests
+==== Requests
 
 *Syntax*
 
@@ -2266,14 +2266,14 @@ The input fields are:
 ----
 
 
-==== Delete a Ticket
+=== Delete a Ticket
 
-===== Description
+==== Description
 
 This `DELETE` operation will delete an iRODS ticket.
 
 
-===== Requests
+==== Requests
 
 *Syntax*
 
@@ -2289,9 +2289,9 @@ This `DELETE` operation will delete an iRODS ticket.
 |====================
 
 
-==== Update a Ticket
+=== Update a Ticket
 
-===== Description
+==== Description
 
 This `PUT` operation will update an iRODS ticket.
 
@@ -2316,7 +2316,7 @@ The following are the valid restriction types and values:
 |====================
 
 
-===== Requests
+==== Requests
 
 *Syntax*
 
@@ -2343,9 +2343,9 @@ The following are the valid restriction types and values:
 ----
 
 
-==== List Ticket Information
+=== List Ticket Information
 
-===== Description
+==== Description
 
 This `GET` operation will list the information for the selected ticket.
 
@@ -2423,9 +2423,9 @@ This `GET` operation will list the information for the selected ticket.
 ----
 
 
-==== List All Tickets
+=== List All Tickets
 
-===== Description
+==== Description
 
 This `GET` operation will list the information for all tickets.
 
@@ -2550,4 +2550,8 @@ This `GET` operation will list the information for all tickets.
 }
 ----
 
-notes….nice json formatter http://jsonformatter.curiousconcept.com/
+////
+Notes:
+* nice json formatter:  http://jsonformatter.curiousconcept.com/
+* must have asciidoc editor (direct rendering + allows to convert to PDF/EBOOK/HTML/DOCBOOK/ODT): http://asciidocfx.com/
+////
