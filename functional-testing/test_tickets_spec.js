@@ -45,10 +45,10 @@ frisby.create("delete a ticket on your collection").delete(testProps.urlPrefix("
     .toss();
 
 
-frisby.create("add a ticket on your collection").post(testProps.urlPrefix("ticket"), {
+frisby.create("add a ticket on your collection").post(testProps.urlPrefix("ticket"), { 'irods-rest.createTicketRequestData': {
         mode: 'write',
         object_path: ticketFolder,
-        ticket_string: ticketString1}
+        ticket_string: ticketString1}}
     , {json: true},{ headers: { "Content-Type": "application/json"}}).auth(testProps.user1, testProps.password1).expectStatus(200).inspectRequest().inspectBody()
     .expectHeaderContains('Content-Type', 'application/json').inspectJSON()
     .toss();
@@ -58,6 +58,7 @@ var form = new FormData();
 form.append('uploadFile',fs.createReadStream(testProps.testfile1Path()), {
     knownLength: fs.statSync(testProps.testfile1Path()).size         // we need to set the knownLength so we can call  form.getLengthSync()
 });
+
 
 var uploadFileName = "upload1.txt";
 
@@ -70,4 +71,5 @@ frisby.create('file upload with ticket, anonymous')
     })
     .expectStatus(200).inspectBody()
     .toss();
+    
 

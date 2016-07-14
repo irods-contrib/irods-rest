@@ -63,9 +63,8 @@ public class TicketService extends AbstractIrodsService {
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = RestConfiguration.NS, jsonName = RestConfiguration.JSON_NAME) })
 	public CreateTicketResponseData createTicket(
 			@HeaderParam("Authorization") final String authorization,
-			@Mapped(namespaceMap = { @XmlNsMap(namespace = RestConfiguration.NS, jsonName = RestConfiguration.JSON_NAME) }) final CreateTicketRequestData requestData)
-			throws JargonException, GenQueryBuilderException,
-			JargonQueryException {
+			final CreateTicketRequestData requestData) throws JargonException,
+			GenQueryBuilderException, JargonQueryException {
 
 		log.info("createTicket()");
 		if (authorization == null || authorization.isEmpty()) {

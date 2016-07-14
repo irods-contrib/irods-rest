@@ -16,7 +16,7 @@ import org.jboss.resteasy.annotations.providers.jaxb.json.XmlNsMap;
  * @author jjames
  * 
  */
-@XmlRootElement(name = "createTicketRequestData", namespace = RestConfiguration.NS)
+@XmlRootElement(name = "createTicketRequestData")
 @Mapped(namespaceMap = { @XmlNsMap(namespace = RestConfiguration.NS, jsonName = RestConfiguration.JSON_NAME) })
 public class CreateTicketRequestData {
 

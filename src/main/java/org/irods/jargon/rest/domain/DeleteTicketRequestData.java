@@ -6,8 +6,6 @@ package org.irods.jargon.rest.domain;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-
-
 /**
  * <pre>
  * Value object to hold request ticket information.  
@@ -24,20 +22,18 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author jjames
  * 
  */
-@XmlRootElement(name = "ticket")
+@XmlRootElement(name = "deleteTicketRequest")
 public class DeleteTicketRequestData {
 
-	
 	/** The object. */
 	private String ticketString = "";
-	
 
 	/**
 	 * Gets the ticket string.
 	 *
 	 * @return the ticket string
 	 */
-	@XmlElement(name = "ticket_string", required=true)
+	@XmlElement(name = "ticket_string", required = true)
 	public String getTicketString() {
 		return ticketString;
 	}
@@ -45,7 +41,8 @@ public class DeleteTicketRequestData {
 	/**
 	 * Sets the ticket string.
 	 *
-	 * @param ticketString the new ticket string
+	 * @param ticketString
+	 *            the new ticket string
 	 */
 	public void setTicketString(String ticketString) {
 		this.ticketString = ticketString;
