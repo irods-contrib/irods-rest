@@ -71,5 +71,5 @@ frisby.create('file upload with ticket, anonymous')
     })
     .expectStatus(200).inspectBody()
     .toss();
-    
+
 

@@ -130,9 +130,11 @@ public class FileContentsService extends AbstractIrodsService {
 		 * only one
 		 */
 
-		String decodedPathString = DataUtils.buildDecodedPathFromURLPathInfo(
-				path, retrieveEncoding());
+		// String decodedPathString = DataUtils.buildDecodedPathFromURLPathInfo(
+		// path, retrieveEncoding());
 
+		String decodedPathString = path;
+		log.info("decodedPathString:{}", decodedPathString);
 		try {
 
 			IRODSFile dataFile = getIrodsAccessObjectFactory()
@@ -227,6 +229,9 @@ public class FileContentsService extends AbstractIrodsService {
 
 		String decodedPathString = DataUtils.buildDecodedPathFromURLPathInfo(
 				path, retrieveEncoding());
+		log.info("decodedPathString:{}", decodedPathString);
+		// DataUtils.buildDecodedPathFromURLPathInfo(
+		// path, retrieveEncoding());
 
 		log.info("decoded path:{}", decodedPathString);
 

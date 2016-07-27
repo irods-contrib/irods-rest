@@ -4,10 +4,11 @@
 package org.irods.jargon.rest.utils;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 
 import org.irods.jargon.core.exception.JargonException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * General utilities for manipulating parameters and paths coming in from
@@ -17,6 +18,8 @@ import org.irods.jargon.core.exception.JargonException;
  * 
  */
 public class DataUtils {
+
+	private static final Logger log = LoggerFactory.getLogger(DataUtils.class);
 
 	/**
 	 * 
@@ -39,6 +42,8 @@ public class DataUtils {
 	public static String buildDecodedPathFromURLPathInfo(final String pathInfo,
 			final String encoding) throws JargonException {
 
+		log.info("buildDecodedPathFromURLPathInfo()");
+
 		if (pathInfo == null) {
 			throw new IllegalArgumentException("null pathInfo");
 		}
@@ -46,6 +51,9 @@ public class DataUtils {
 		if (encoding == null || encoding.isEmpty()) {
 			throw new IllegalArgumentException("null or empty encoding");
 		}
+
+		log.info("pathInfo:{}", pathInfo);
+		String decodedString = pathInfo;
 
 		/*
 		 * If the url extra path info for the collection has been encoded
@@ -56,13 +64,15 @@ public class DataUtils {
 		 * is truncated during the URL mapping process in the framework.
 		 */
 
-		String decodedString;
-
-		try {
-			decodedString = URLDecoder.decode(pathInfo, encoding);
-		} catch (UnsupportedEncodingException e1) {
-			throw new JargonException("unsupported encoding", e1);
-		}
+		/*
+		 * MCC - took out unnecessary decoding, left in the slash handling
+		 * String decodedString;
+		 * 
+		 * try { decodedString = URLDecoder.decode(pathInfo, encoding);
+		 * log.info("decodedString:{}", decodedString); } catch
+		 * (UnsupportedEncodingException e1) { throw new
+		 * JargonException("unsupported encoding", e1); }
+		 */
 
 		StringBuilder sb = new StringBuilder();
 
