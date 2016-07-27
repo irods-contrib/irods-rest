@@ -53,3 +53,6 @@ See the docs/ section for installation and configuration instructions, as well a
 
 REST API now supports the use of iRODS tickets, allowing anonymous, token based access to iRODS REST resources
 
+#### Files cannot be downloaded from within a collection whose name contains the % character #52
+
+Fixed unnecessary URL decode of extra path info to support % as a collection name
