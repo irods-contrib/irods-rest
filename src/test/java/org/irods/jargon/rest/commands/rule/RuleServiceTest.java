@@ -398,4 +398,106 @@ public class RuleServiceTest implements ApplicationContextAware {
 		}
 
 	}
+
+	@Test
+	public void testExecuteNewFormatRuleXmlBug54() throws Exception {
+
+		String ruleFile = "/rules/rulemsiDataObjChksum.r";
+		String ruleString = LocalFileUtils
+				.getClasspathResourceFileAsString(ruleFile);
+
+		// place a test file to checksum
+
+		String testFileName = "testExecuteNewFormatRuleWithOverride.txt";
+
+		String absPath = scratchFileUtils
+				.createAndReturnAbsoluteScratchPath(IRODS_TEST_SUBDIR_PATH);
+		String localFileName = FileGenerator
+				.generateFileOfFixedLengthGivenName(absPath, testFileName, 3);
+
+		String targetIrodsFile = testingPropertiesHelper
+				.buildIRODSCollectionAbsolutePathFromTestProperties(
+						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
+								+ testFileName);
+		File localFile = new File(localFileName);
+
+		IRODSAccount irodsAccount = testingPropertiesHelper
+				.buildIRODSAccountFromTestProperties(testingProperties);
+
+		IRODSFileFactory irodsFileFactory = irodsFileSystem
+				.getIRODSFileFactory(irodsAccount);
+		IRODSFile destFile = irodsFileFactory
+				.instanceIRODSFile(targetIrodsFile);
+		DataTransferOperations dataTransferOperationsAO = irodsFileSystem
+				.getIRODSAccessObjectFactory().getDataTransferOperations(
+						irodsAccount);
+
+		dataTransferOperationsAO.putOperation(localFile, destFile, null, null);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("http://localhost:");
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
+				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append("/rule");
+
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
+				.httpClientSetup(irodsAccount, testingProperties);
+		try {
+
+			HttpPost httpPost = new HttpPost(sb.toString());
+			httpPost.addHeader("accept", "application/xml");
+			httpPost.addHeader("Content-Type", "application/xml");
+
+			RuleWrapper ruleWrapper = new RuleWrapper();
+			ruleWrapper.setRuleAsOriginalText(ruleString);
+			ruleWrapper.setRuleProcessingType(RuleProcessingType.INTERNAL);
+
+			List<RuleParameterWrapper> inputOverrides = new ArrayList<RuleParameterWrapper>();
+			RuleParameterWrapper overrideParameterWrapper = new RuleParameterWrapper();
+			overrideParameterWrapper.setName("*dataObject");
+			overrideParameterWrapper
+					.setValue('"' + destFile.getAbsolutePath() + '"');
+			/*
+			 * "*dataObject", URLEncoder.encode( '"' +
+			 * destFile.getAbsolutePath() + '"',
+			 * irodsFileSystem.getIRODSAccessObjectFactory()
+			 * .getJargonProperties().getEncoding()));
+			 */
+			inputOverrides.add(overrideParameterWrapper);
+
+			ruleWrapper.setIrodsRuleInputParameters(inputOverrides);
+
+			final JAXBContext context = JAXBContext
+					.newInstance(RuleWrapper.class);
+
+			final Marshaller marshaller = context.createMarshaller();
+
+			final StringWriter stringWriter = new StringWriter();
+			marshaller.marshal(ruleWrapper, stringWriter);
+
+			String body = stringWriter.toString();
+
+			System.out.println(body);
+
+			httpPost.setEntity(new StringEntity(body));
+
+			HttpResponse response = clientAndContext.getHttpClient().execute(
+					httpPost, clientAndContext.getHttpContext());
+			HttpEntity entity = response.getEntity();
+			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+			Assert.assertNotNull(entity);
+			String entityData = EntityUtils.toString(entity);
+			EntityUtils.consume(entity);
+			System.out.println("XML response>>>");
+			System.out.println(entityData);
+
+		} finally {
+			// When HttpClient instance is no longer needed,
+			// shut down the connection manager to ensure
+			// immediate deallocation of all system resources
+			clientAndContext.getHttpClient().getConnectionManager().shutdown();
+		}
+
+	}
+
 }
