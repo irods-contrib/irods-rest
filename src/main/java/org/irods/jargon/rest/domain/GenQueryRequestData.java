@@ -4,15 +4,14 @@
 package org.irods.jargon.rest.domain;
 
 import java.util.ArrayList;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-
-
 /**
- * Value object to hold return value from a GenQuery call.  The request
- * includes an optional count parameter, and optional zone hint, a list 
- * of select fields, a list of conditionals, and a list of order by clauses.
+ * Value object to hold request value from a GenQuery call. The request includes
+ * an optional count parameter, and optional zone hint, a list of select fields,
+ * a list of conditionals, and a list of order by clauses.
  * 
  * @author jjames
  * 
@@ -21,20 +20,20 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class GenQueryRequestData {
 
 	/** The count. */
-	private int count = 100;
-	
+	private int count = 1000;
+
 	/** The zone. */
 	private String zone = "";
-	
+
 	/** The select field list. */
 	private ArrayList<GenQuerySelect> selectFieldList = new ArrayList<GenQuerySelect>();
-	
+
 	/** The query condition list. */
 	private ArrayList<GenQueryCondition> queryConditionList = new ArrayList<GenQueryCondition>();
-	
+
 	/** The order by list. */
 	private ArrayList<GenQueryOrderBy> orderByList = new ArrayList<GenQueryOrderBy>();
-	
+
 	/**
 	 * Gets the count.
 	 *
@@ -48,7 +47,8 @@ public class GenQueryRequestData {
 	/**
 	 * Sets the count.
 	 *
-	 * @param count the new count
+	 * @param count
+	 *            the new count
 	 */
 	public void setCount(int count) {
 		this.count = count;
@@ -67,7 +67,8 @@ public class GenQueryRequestData {
 	/**
 	 * Sets the zone.
 	 *
-	 * @param zone the new zone
+	 * @param zone
+	 *            the new zone
 	 */
 	public void setZone(String zone) {
 		this.zone = zone;
@@ -86,7 +87,8 @@ public class GenQueryRequestData {
 	/**
 	 * Sets the select field list.
 	 *
-	 * @param selectFieldList the new select field list
+	 * @param selectFieldList
+	 *            the new select field list
 	 */
 	public void setSelectFieldList(ArrayList<GenQuerySelect> selectFieldList) {
 		this.selectFieldList = selectFieldList;
@@ -105,9 +107,11 @@ public class GenQueryRequestData {
 	/**
 	 * Sets the query condition list.
 	 *
-	 * @param queryConditionList the new query condition list
+	 * @param queryConditionList
+	 *            the new query condition list
 	 */
-	public void setQueryConditionList(ArrayList<GenQueryCondition> queryConditionList) {
+	public void setQueryConditionList(
+			ArrayList<GenQueryCondition> queryConditionList) {
 		this.queryConditionList = queryConditionList;
 	}
 
@@ -124,11 +128,11 @@ public class GenQueryRequestData {
 	/**
 	 * Sets the order by list.
 	 *
-	 * @param orderByList the new order by list
+	 * @param orderByList
+	 *            the new order by list
 	 */
 	public void setOrderByList(ArrayList<GenQueryOrderBy> orderByList) {
 		this.orderByList = orderByList;
 	}
 
-	
 }
