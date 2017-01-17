@@ -108,7 +108,8 @@ public class ServerEnvironmentService {
 			serverInfo.setIcatEnabled(irodsServerProperties.getIcatEnabled());
 			serverInfo.setInitializeDate(irodsServerProperties
 					.getInitializeDate());
-			serverInfo.setRelVersion(irodsServerProperties.getRelVersion());
+			serverInfo.setRelVersion(irodsServerProperties.getIrodsVersion()
+					.toString());
 			serverInfo.setRodsZone(irodsServerProperties.getRodsZone());
 			serverInfo.setServerBootTime(irodsServerProperties
 					.getServerBootTime());
