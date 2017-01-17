@@ -12,6 +12,7 @@ Justin Kyle James, Raphaël Flores
 This is the official REST API for iRODS, and provides a simple, common API that can support diverse client use cases.  
 
 The iRODS REST API is designed to be:
+
 * 'Proper' REST, with a resource orientation and sensible mapping of HTTP verbs to iRODS actions
 * Compliant, with a JAX-RS compliant framework, and supporting content negotiation for requests and responses in both XML and JSON
 * Flexible, by running in standard frameworks on commodity application servers, isolating the iRODS grid and running in a Java sandbox, requiring only an open 1247 port between the REST service layer and the iRODS data grid
