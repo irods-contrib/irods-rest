@@ -52,3 +52,7 @@ See the docs/ section for installation and configuration instructions, as well a
 
 REST API now supports the use of iRODS tickets, allowing anonymous, token based access to iRODS REST resources
 
+#### Line endings in rules are stripped #54
+
+Added tests for reported rule error (stripping line endings in rule text)
+

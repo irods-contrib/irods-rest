@@ -257,7 +257,7 @@ public class FileContentsService extends AbstractIrodsService {
 			response.setContentType("application/octet-stream");
 			response.setContentLength(contentLength);
 			response.setHeader("Content-disposition", "attachment; filename=\""
-					+ decodedPathString + "\"");
+					+ irodsFile.getName() + "\"");
 
 			// test hack of origin for cors download
 

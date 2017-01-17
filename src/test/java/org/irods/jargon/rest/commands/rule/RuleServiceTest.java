@@ -408,7 +408,7 @@ public class RuleServiceTest implements ApplicationContextAware {
 
 		// place a test file to checksum
 
-		String testFileName = "testExecuteNewFormatRuleWithOverride.txt";
+		String testFileName = "testExecuteNewFormatRuleXmlBug54.txt";
 
 		String absPath = scratchFileUtils
 				.createAndReturnAbsoluteScratchPath(IRODS_TEST_SUBDIR_PATH);
