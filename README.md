@@ -56,3 +56,7 @@ REST API now supports the use of iRODS tickets, allowing anonymous, token based 
 
 Added tests for reported rule error (stripping line endings in rule text)
 
+#### Downloaded files include parameters in name #48
+
+Made sure file name is flattened in content disposition header per user request
+
