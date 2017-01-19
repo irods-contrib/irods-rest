@@ -21,7 +21,9 @@ RestVersion.java
 .DS_Store
 docs/.~lock.iRODSRESTAPIDocumentation.odt#
 **/test-irods-rest.properties
+.idea
 
+**/node-modules
 
 # External tool builders
 .externalToolBuilders/
