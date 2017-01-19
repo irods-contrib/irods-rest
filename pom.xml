@@ -4,18 +4,18 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.irods</groupId>
 	<artifactId>irods-rest</artifactId>
-	<version>4.0.2.6-RC1</version>
+	<version>4.1.10.0-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<name>irods-rest</name>
 	<description>REST API for iRODS based on Jargon</description>
 	<url>https://github.com/DICE-UNC/irods-rest</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<jargon.version>4.0.2.6-RC1</jargon.version>
+		<jargon.version>4.1.10.0-SNAPSHOT</jargon.version>
 		<resteasy.version>3.0.12.Final</resteasy.version>
 		<spring.core.version>3.1.0.RELEASE</spring.core.version>
 		<spring.security.version>3.1.0.RELEASE</spring.security.version>
-		<java.version>1.7</java.version>
+		<java.version>1.8</java.version>
 	</properties>
 	<issueManagement>
 		<system>GitHub</system>
@@ -43,10 +43,6 @@
 		</developer>
 	</developers>
 	<repositories>
-		<!-- <repository> <id>ibiblio.repository</id> <name>ibiblio.repository</name> 
-			<url>http://mirrors.ibiblio.org/pub/mirrors/maven2</url> <releases> <enabled>true</enabled> 
-			</releases> <snapshots> <enabled>true</enabled> <updatePolicy>never</updatePolicy> 
-			<checksumPolicy>fail</checksumPolicy> </snapshots> </repository> -->
 		<repository>
 			<id>dice.repository snaps</id>
 			<name>dice.repository.snapshots</name>
