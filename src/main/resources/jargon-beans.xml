@@ -63,11 +63,18 @@
 				<beans:value>x-requested-by</beans:value>
 			</util:list>
 		</beans:property>
+		<beans:property name="sslNegotiationPolicy" value="${ssl.negotiation.policy}" />
+		<beans:property name="computeChecksum" value="${compute.checksum}" />
 
 	</beans:bean>
 	
 	<beans:bean id="springFilter" class="org.irods.jargon.rest.auth.BasicAuthFilter">
          <beans:property name="irodsAccessObjectFactory" ref="irodsAccessObjectFactory" />
+         <beans:property name="restConfiguration" ref="restConfiguration" />
+    </beans:bean>
+    
+    <beans:bean id="startupConfigurator" class="org.irods.jargon.rest.configuration.StartupConfigurator" init-method="init">
+    	<beans:property name="irodsSession" ref="irodsSession" />
          <beans:property name="restConfiguration" ref="restConfiguration" />
     </beans:bean>
 

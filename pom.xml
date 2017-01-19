@@ -517,6 +517,9 @@
 									default.storage.resource=
 									web.interface.url=
 									cors.allow=true
+									ssl.negotiation.policy=CS_NEG_DONT_CARE
+									compute.checksum=true
+									
 								</echo>
 							</tasks>
 						</configuration>

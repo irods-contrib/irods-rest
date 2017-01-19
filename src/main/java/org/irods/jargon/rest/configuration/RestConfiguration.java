@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.irods.jargon.core.connection.AuthScheme;
+import org.irods.jargon.core.connection.ClientServerNegotiationPolicy;
 
 /**
  * Pojo containing configuration information
@@ -58,6 +59,17 @@ public class RestConfiguration {
 	 * idrop-web installation pointing to the same grid)
 	 */
 	private String webInterfaceURL = "";
+
+	/**
+	 * sets ssl negotiation policy in jargon
+	 */
+	private String sslNegotiationPolicy = ClientServerNegotiationPolicy.SslNegotiationPolicy.CS_NEG_DONT_CARE
+			.toString();
+
+	/**
+	 * requests, if true, that a checksum be computed on upload
+	 */
+	private boolean computeChecksum = false;
 
 	/**
 	 * @return the irodsHost
@@ -209,65 +221,56 @@ public class RestConfiguration {
 	 */
 	@Override
 	public String toString() {
+		final int maxLen = 100;
 		StringBuilder builder = new StringBuilder();
 		builder.append("RestConfiguration [");
 		if (irodsHost != null) {
-			builder.append("irodsHost=");
-			builder.append(irodsHost);
-			builder.append(", ");
+			builder.append("irodsHost=").append(irodsHost).append(", ");
 		}
-		builder.append("irodsPort=");
-		builder.append(irodsPort);
-		builder.append(", ");
+		builder.append("irodsPort=").append(irodsPort).append(", ");
 		if (irodsZone != null) {
-			builder.append("irodsZone=");
-			builder.append(irodsZone);
-			builder.append(", ");
+			builder.append("irodsZone=").append(irodsZone).append(", ");
 		}
 		if (defaultStorageResource != null) {
-			builder.append("defaultStorageResource=");
-			builder.append(defaultStorageResource);
-			builder.append(", ");
+			builder.append("defaultStorageResource=")
+					.append(defaultStorageResource).append(", ");
 		}
 		if (realm != null) {
-			builder.append("realm=");
-			builder.append(realm);
-			builder.append(", ");
+			builder.append("realm=").append(realm).append(", ");
 		}
-		builder.append("utilizePackingStreams=");
-		builder.append(utilizePackingStreams);
-		builder.append(", ");
+		builder.append("utilizePackingStreams=").append(utilizePackingStreams)
+				.append(", ");
 		if (authType != null) {
-			builder.append("authType=");
-			builder.append(authType);
-			builder.append(", ");
+			builder.append("authType=").append(authType).append(", ");
 		}
-		builder.append("allowCors=");
-		builder.append(allowCors);
-		builder.append(", ");
+		builder.append("allowCors=").append(allowCors).append(", ");
 		if (corsOrigins != null) {
-			builder.append("corsOrigins=");
-			builder.append(corsOrigins);
-			builder.append(", ");
+			builder.append("corsOrigins=")
+					.append(corsOrigins.subList(0,
+							Math.min(corsOrigins.size(), maxLen))).append(", ");
 		}
 		if (corsMethods != null) {
-			builder.append("corsMethods=");
-			builder.append(corsMethods);
-			builder.append(", ");
+			builder.append("corsMethods=")
+					.append(corsMethods.subList(0,
+							Math.min(corsMethods.size(), maxLen))).append(", ");
 		}
-		builder.append("corsAllowCredentials=");
-		builder.append(corsAllowCredentials);
-		builder.append(", ");
+		builder.append("corsAllowCredentials=").append(corsAllowCredentials)
+				.append(", ");
 		if (corsAllowedHeaders != null) {
-			builder.append("corsAllowedHeaders=");
-			builder.append(corsAllowedHeaders);
-			builder.append(", ");
+			builder.append("corsAllowedHeaders=")
+					.append(corsAllowedHeaders.subList(0,
+							Math.min(corsAllowedHeaders.size(), maxLen)))
+					.append(", ");
 		}
 		if (webInterfaceURL != null) {
-			builder.append("webInterfaceURL=");
-			builder.append(webInterfaceURL);
+			builder.append("webInterfaceURL=").append(webInterfaceURL)
+					.append(", ");
 		}
-		builder.append("]");
+		if (sslNegotiationPolicy != null) {
+			builder.append("sslNegotiationPolicy=")
+					.append(sslNegotiationPolicy).append(", ");
+		}
+		builder.append("computeChecksum=").append(computeChecksum).append("]");
 		return builder.toString();
 	}
 
@@ -307,6 +310,36 @@ public class RestConfiguration {
 	 */
 	public void setUtilizePackingStreams(boolean utilizePackingStreams) {
 		this.utilizePackingStreams = utilizePackingStreams;
+	}
+
+	/**
+	 * @return the sslNegotiationPolicy
+	 */
+	public String getSslNegotiationPolicy() {
+		return sslNegotiationPolicy;
+	}
+
+	/**
+	 * @param sslNegotiationPolicy
+	 *            the sslNegotiationPolicy to set
+	 */
+	public void setSslNegotiationPolicy(String sslNegotiationPolicy) {
+		this.sslNegotiationPolicy = sslNegotiationPolicy;
+	}
+
+	/**
+	 * @return the computeChecksum
+	 */
+	public boolean isComputeChecksum() {
+		return computeChecksum;
+	}
+
+	/**
+	 * @param computeChecksum
+	 *            the computeChecksum to set
+	 */
+	public void setComputeChecksum(boolean computeChecksum) {
+		this.computeChecksum = computeChecksum;
 	}
 
 }

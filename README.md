@@ -60,3 +60,16 @@ Added tests for reported rule error (stripping line endings in rule text)
 
 Made sure file name is flattened in content disposition header per user request
 
+#### Add SSL support for connection to resource server #40
+
+Updated to jargon 4.1.10.0 with SSL support.  This necessitates the addition of two new properties in the /etc/irods-ext/irods-rest-properties
+
+```
+# NO_NEGOTIATION, CS_NEG_REFUSE, CS_NEG_REQUIRE, CS_NEG_DONT_CARE
+ssl.negotiation.policy=CS_NEG_DONT_CARE
+# jargon now supports checksum calculation for streaming uploads.  This does not currently verify, but does store if set to true
+compute.checksum=false
+
+```
+
+So those need to be updated on your installation.  The compute checksum allows a checksum to be computed on the iRODS server after a file is uploaded, the ssl negotiation policy is used to configure the underlying jargon configuration for ssl negotiation in the same manner that it is set in the irods_environment.json file for icommands.
