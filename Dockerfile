@@ -8,8 +8,7 @@ LABEL description="iRODS Core REST API."
 #ADD server.crt /tmp
 #RUN echo yes | keytool -keystore JAVA_CACERTS -storepass changeit -importcert -alias myca -file /tmp/server.crt
 ADD target/irods-rest.war /usr/local/tomcat/webapps/
-CMD ["catalina.sh", "run"]
-#ENTRYPOINT ["sh"] 
+CMD ["/runit.sh"]
 
 
 
