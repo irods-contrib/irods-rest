@@ -75,6 +75,7 @@
     
     <beans:bean id="startupConfigurator" class="org.irods.jargon.rest.configuration.StartupConfigurator" init-method="init">
     	<beans:property name="irodsSession" ref="irodsSession" />
+    	<beans:property name="irodsAccessObjectFactory" ref="irodsAccessObjectFactory" />
          <beans:property name="restConfiguration" ref="restConfiguration" />
     </beans:bean>
 

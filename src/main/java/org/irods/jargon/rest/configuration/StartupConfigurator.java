@@ -4,8 +4,10 @@
 package org.irods.jargon.rest.configuration;
 
 import org.irods.jargon.core.connection.ClientServerNegotiationPolicy;
+import org.irods.jargon.core.connection.ClientServerNegotiationPolicy.SslNegotiationPolicy;
 import org.irods.jargon.core.connection.IRODSSession;
 import org.irods.jargon.core.connection.SettableJargonProperties;
+import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +21,7 @@ public class StartupConfigurator {
 
 	private RestConfiguration restConfiguration;
 	private IRODSSession irodsSession;
+	private IRODSAccessObjectFactory irodsAccessObjectFactory;
 
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -83,14 +86,34 @@ public class StartupConfigurator {
 		log.info("set checksum policy to:{}",
 				restConfiguration.isComputeChecksum());
 
-		props.setNegotiationPolicy(ClientServerNegotiationPolicy
+		SslNegotiationPolicy policyToSet = ClientServerNegotiationPolicy
 				.findSslNegotiationPolicyFromString(restConfiguration
-						.getSslNegotiationPolicy()));
+						.getSslNegotiationPolicy());
+
+		log.info("policyToSet:{}", policyToSet);
+
+		props.setNegotiationPolicy(policyToSet);
 		log.info("negotiation policy set to:{}", props.getNegotiationPolicy());
 
 		getIrodsSession().setJargonProperties(props);
 		log.info("config of jargon props complete");
 
+	}
+
+	/**
+	 * @return the irodsAccessObjectFactory
+	 */
+	public IRODSAccessObjectFactory getIrodsAccessObjectFactory() {
+		return irodsAccessObjectFactory;
+	}
+
+	/**
+	 * @param irodsAccessObjectFactory
+	 *            the irodsAccessObjectFactory to set
+	 */
+	public void setIrodsAccessObjectFactory(
+			IRODSAccessObjectFactory irodsAccessObjectFactory) {
+		this.irodsAccessObjectFactory = irodsAccessObjectFactory;
 	}
 
 }
