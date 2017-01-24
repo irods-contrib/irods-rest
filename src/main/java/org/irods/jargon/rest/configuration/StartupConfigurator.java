@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * 
  * @author Mike Conway Wired-in class that takes configuration and core jargon
  *         components and injects appropriate configuration into the underlying
  *         jargon properties system
