@@ -73,3 +73,10 @@ compute.checksum=false
 ```
 
 So those need to be updated on your installation.  The compute checksum allows a checksum to be computed on the iRODS server after a file is uploaded, the ssl negotiation policy is used to configure the underlying jargon configuration for ssl negotiation in the same manner that it is set in the irods_environment.json file for icommands.
+
+#### Docker deploy #60
+
+A currently 'experimental' Docker deploy option was added.  This involves a Dockerfile added to the project, along with a 'runit.sh' as the endpoint.  The Docker image is alpine:tomcat8. The image mounts the /etc/irods-ext/irods-rest.properties from the host system, as well as an optional cert directory that will cause the import of an SSL cert if you are working with self signed certs.  See the Docker.md file for Docker instructions.  Please give that a whirl and report results and thoughts.  
+
+
+
