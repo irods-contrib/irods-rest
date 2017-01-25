@@ -1,7 +1,7 @@
 # Project: iRODS Rest API
-## Date: 
-## Release Version: 4.1.10-0-SNAPSHOT
-## Git tag: 4.1.10.0-SNAPSHOT
+## Date: 1/25/2017
+## Release Version: 4.1.10-0-RC1
+## Git tag: 4.1.10.0-RC1
 
 Release candidate for REST API including Ticket support
 

@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.irods</groupId>
 	<artifactId>irods-rest</artifactId>
-	<version>4.1.10.0-SNAPSHOT</version>
+	<version>4.1.10.0-RC1</version>
 	<packaging>war</packaging>
 	<name>irods-rest</name>
 	<description>REST API for iRODS based on Jargon</description>
