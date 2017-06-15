@@ -11,8 +11,6 @@ import java.util.Properties;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
-import junit.framework.Assert;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpDelete;
@@ -39,7 +37,6 @@ import org.irods.jargon.rest.domain.MetadataEntry;
 import org.irods.jargon.rest.domain.MetadataListing;
 import org.irods.jargon.rest.domain.MetadataOperation;
 import org.irods.jargon.rest.domain.MetadataOperationResultEntry;
-import org.irods.jargon.rest.domain.MetadataQueryResultEntry;
 import org.irods.jargon.rest.domain.PermissionListing;
 import org.irods.jargon.rest.utils.DataUtils;
 import org.irods.jargon.rest.utils.RestTestingProperties;
@@ -64,16 +61,16 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 
+import junit.framework.Assert;
+
 /**
  * @author Mike Conway - DICE (www.irods.org)
  * 
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "classpath:jargon-beans.xml",
-		"classpath:rest-servlet.xml" })
-@TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
-		DirtiesContextTestExecutionListener.class })
+@ContextConfiguration(locations = { "classpath:jargon-beans.xml", "classpath:rest-servlet.xml" })
+@TestExecutionListeners({ DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class })
 public class CollectionServiceTest implements ApplicationContextAware {
 
 	private static TJWSEmbeddedJaxrsServer server;
@@ -86,8 +83,7 @@ public class CollectionServiceTest implements ApplicationContextAware {
 	public static final String IRODS_TEST_SUBDIR_PATH = "RestCollectionServiceTest";
 
 	@Override
-	public void setApplicationContext(final ApplicationContext context)
-			throws BeansException {
+	public void setApplicationContext(final ApplicationContext context) throws BeansException {
 		applicationContext = context;
 	}
 
@@ -113,21 +109,19 @@ public class CollectionServiceTest implements ApplicationContextAware {
 			return;
 		}
 
-		int port = testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY);
+		int port = testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY);
 		server = new TJWSEmbeddedJaxrsServer();
 		server.setPort(port);
 		ResteasyDeployment deployment = server.getDeployment();
 
 		server.start();
 		Dispatcher dispatcher = deployment.getDispatcher();
-		SpringBeanProcessor processor = new SpringBeanProcessor(dispatcher,
-				deployment.getRegistry(), deployment.getProviderFactory());
-		((ConfigurableApplicationContext) applicationContext)
-				.addBeanFactoryPostProcessor(processor);
+		SpringBeanProcessor processor = new SpringBeanProcessor(dispatcher, deployment.getRegistry(),
+				deployment.getProviderFactory());
+		((ConfigurableApplicationContext) applicationContext).addBeanFactoryPostProcessor(processor);
 
-		SpringResourceFactory noDefaults = new SpringResourceFactory(
-				"collectionService", applicationContext,
+		SpringResourceFactory noDefaults = new SpringResourceFactory("collectionService", applicationContext,
 				CollectionService.class);
 		dispatcher.getRegistry().addResourceFactory(noDefaults);
 
@@ -137,39 +131,33 @@ public class CollectionServiceTest implements ApplicationContextAware {
 	public void testGetCollectionJsonNoListingNoOffset() throws Exception {
 		String testDirName = "findByAbsolutePath";
 
-		String targetIrodsCollection = testingPropertiesHelper
-				.buildIRODSCollectionAbsolutePathFromTestProperties(
-						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
-								+ testDirName);
+		String targetIrodsCollection = testingPropertiesHelper.buildIRODSCollectionAbsolutePathFromTestProperties(
+				testingProperties, IRODS_TEST_SUBDIR_PATH + '/' + testDirName);
 
-		IRODSAccount irodsAccount = testingPropertiesHelper
-				.buildIRODSAccountFromTestProperties(testingProperties);
-		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
-				.getIRODSAccessObjectFactory();
-		CollectionAO collectionAO = accessObjectFactory
-				.getCollectionAO(irodsAccount);
+		IRODSAccount irodsAccount = testingPropertiesHelper.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem.getIRODSAccessObjectFactory();
+		CollectionAO collectionAO = accessObjectFactory.getCollectionAO(irodsAccount);
 
-		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(
-				irodsAccount).instanceIRODSFile(targetIrodsCollection);
+		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(irodsAccount)
+				.instanceIRODSFile(targetIrodsCollection);
 		collFile.mkdirs();
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
-		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY));
 		sb.append("/collection/");
 		sb.append(DataUtils.encodeIrodsAbsolutePath(collFile.getAbsolutePath(),
 				accessObjectFactory.getJargonProperties().getEncoding()));
 
-		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
-				.httpClientSetup(irodsAccount, testingProperties);
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils.httpClientSetup(irodsAccount, testingProperties);
 		try {
 
 			HttpGet httpget = new HttpGet(sb.toString());
 			httpget.addHeader("accept", "application/json");
 
-			HttpResponse response = clientAndContext.getHttpClient().execute(
-					httpget, clientAndContext.getHttpContext());
+			HttpResponse response = clientAndContext.getHttpClient().execute(httpget,
+					clientAndContext.getHttpContext());
 			HttpEntity entity = response.getEntity();
 			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
 			Assert.assertNotNull(entity);
@@ -178,37 +166,24 @@ public class CollectionServiceTest implements ApplicationContextAware {
 			System.out.println("JSON>>>");
 			System.out.println(entityData);
 			ObjectMapper objectMapper = new ObjectMapper();
-			CollectionData actual = objectMapper.readValue(entityData,
-					CollectionData.class);
+			CollectionData actual = objectMapper.readValue(entityData, CollectionData.class);
 
-			Collection collection = collectionAO
-					.findByAbsolutePath(targetIrodsCollection);
+			Collection collection = collectionAO.findByAbsolutePath(targetIrodsCollection);
 
-			Assert.assertEquals(collection.getCollectionId(),
-					actual.getCollectionId());
-			Assert.assertEquals(collection.getCollectionInheritance(),
-					actual.getCollectionInheritance());
-			Assert.assertEquals(collection.getCollectionMapId(),
-					actual.getCollectionMapId());
-			Assert.assertEquals(collection.getCollectionName(),
-					actual.getCollectionName());
-			Assert.assertEquals(collection.getCollectionOwnerName(),
-					actual.getCollectionOwnerName());
-			Assert.assertEquals(collection.getCollectionOwnerZone(),
-					actual.getCollectionOwnerZone());
-			Assert.assertEquals(collection.getCollectionParentName(),
-					actual.getCollectionParentName());
+			Assert.assertEquals(collection.getCollectionId(), actual.getCollectionId());
+			Assert.assertEquals(collection.getCollectionInheritance(), actual.getCollectionInheritance());
+			Assert.assertEquals(collection.getCollectionMapId(), actual.getCollectionMapId());
+			Assert.assertEquals(collection.getCollectionName(), actual.getCollectionName());
+			Assert.assertEquals(collection.getCollectionOwnerName(), actual.getCollectionOwnerName());
+			Assert.assertEquals(collection.getCollectionOwnerZone(), actual.getCollectionOwnerZone());
+			Assert.assertEquals(collection.getCollectionParentName(), actual.getCollectionParentName());
 			Assert.assertEquals(collection.getComments(), actual.getComments());
 			Assert.assertEquals(collection.getInfo1(), actual.getInfo1());
 			Assert.assertEquals(collection.getInfo2(), actual.getInfo2());
-			Assert.assertEquals(collection.getObjectPath(),
-					actual.getObjectPath());
-			Assert.assertEquals(collection.getCreatedAt(),
-					actual.getCreatedAt());
-			Assert.assertEquals(collection.getModifiedAt(),
-					actual.getModifiedAt());
-			Assert.assertEquals(collection.getSpecColType(),
-					actual.getSpecColType());
+			Assert.assertEquals(collection.getObjectPath(), actual.getObjectPath());
+			Assert.assertEquals(collection.getCreatedAt(), actual.getCreatedAt());
+			Assert.assertEquals(collection.getModifiedAt(), actual.getModifiedAt());
+			Assert.assertEquals(collection.getSpecColType(), actual.getSpecColType());
 
 		} finally {
 			// When HttpClient instance is no longer needed,
@@ -222,39 +197,33 @@ public class CollectionServiceTest implements ApplicationContextAware {
 	public void testAddNewCollection() throws Exception {
 		String testDirName = "testAddNewCollection";
 
-		String targetIrodsCollection = testingPropertiesHelper
-				.buildIRODSCollectionAbsolutePathFromTestProperties(
-						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
-								+ testDirName);
+		String targetIrodsCollection = testingPropertiesHelper.buildIRODSCollectionAbsolutePathFromTestProperties(
+				testingProperties, IRODS_TEST_SUBDIR_PATH + '/' + testDirName);
 
-		IRODSAccount irodsAccount = testingPropertiesHelper
-				.buildIRODSAccountFromTestProperties(testingProperties);
-		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
-				.getIRODSAccessObjectFactory();
-		CollectionAO collectionAO = accessObjectFactory
-				.getCollectionAO(irodsAccount);
+		IRODSAccount irodsAccount = testingPropertiesHelper.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem.getIRODSAccessObjectFactory();
+		CollectionAO collectionAO = accessObjectFactory.getCollectionAO(irodsAccount);
 
-		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(
-				irodsAccount).instanceIRODSFile(targetIrodsCollection);
+		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(irodsAccount)
+				.instanceIRODSFile(targetIrodsCollection);
 		collFile.mkdirs();
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
-		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY));
 		sb.append("/collection/");
 		sb.append(DataUtils.encodeIrodsAbsolutePath(collFile.getAbsolutePath(),
 				accessObjectFactory.getJargonProperties().getEncoding()));
 
-		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
-				.httpClientSetup(irodsAccount, testingProperties);
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils.httpClientSetup(irodsAccount, testingProperties);
 		try {
 
 			HttpPut httpPut = new HttpPut(sb.toString());
 			httpPut.addHeader("accept", "application/json");
 
-			HttpResponse response = clientAndContext.getHttpClient().execute(
-					httpPut, clientAndContext.getHttpContext());
+			HttpResponse response = clientAndContext.getHttpClient().execute(httpPut,
+					clientAndContext.getHttpContext());
 
 			HttpEntity entity = response.getEntity();
 			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
@@ -264,8 +233,7 @@ public class CollectionServiceTest implements ApplicationContextAware {
 
 			// test a second put for idempotency
 
-			response = clientAndContext.getHttpClient().execute(httpPut,
-					clientAndContext.getHttpContext());
+			response = clientAndContext.getHttpClient().execute(httpPut, clientAndContext.getHttpContext());
 
 			entity = response.getEntity();
 			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
@@ -276,37 +244,24 @@ public class CollectionServiceTest implements ApplicationContextAware {
 			System.out.println("JSON>>>");
 			System.out.println(entityData);
 			ObjectMapper objectMapper = new ObjectMapper();
-			CollectionData actual = objectMapper.readValue(entityData,
-					CollectionData.class);
+			CollectionData actual = objectMapper.readValue(entityData, CollectionData.class);
 
-			Collection collection = collectionAO
-					.findByAbsolutePath(targetIrodsCollection);
+			Collection collection = collectionAO.findByAbsolutePath(targetIrodsCollection);
 
-			Assert.assertEquals(collection.getCollectionId(),
-					actual.getCollectionId());
-			Assert.assertEquals(collection.getCollectionInheritance(),
-					actual.getCollectionInheritance());
-			Assert.assertEquals(collection.getCollectionMapId(),
-					actual.getCollectionMapId());
-			Assert.assertEquals(collection.getCollectionName(),
-					actual.getCollectionName());
-			Assert.assertEquals(collection.getCollectionOwnerName(),
-					actual.getCollectionOwnerName());
-			Assert.assertEquals(collection.getCollectionOwnerZone(),
-					actual.getCollectionOwnerZone());
-			Assert.assertEquals(collection.getCollectionParentName(),
-					actual.getCollectionParentName());
+			Assert.assertEquals(collection.getCollectionId(), actual.getCollectionId());
+			Assert.assertEquals(collection.getCollectionInheritance(), actual.getCollectionInheritance());
+			Assert.assertEquals(collection.getCollectionMapId(), actual.getCollectionMapId());
+			Assert.assertEquals(collection.getCollectionName(), actual.getCollectionName());
+			Assert.assertEquals(collection.getCollectionOwnerName(), actual.getCollectionOwnerName());
+			Assert.assertEquals(collection.getCollectionOwnerZone(), actual.getCollectionOwnerZone());
+			Assert.assertEquals(collection.getCollectionParentName(), actual.getCollectionParentName());
 			Assert.assertEquals(collection.getComments(), actual.getComments());
 			Assert.assertEquals(collection.getInfo1(), actual.getInfo1());
 			Assert.assertEquals(collection.getInfo2(), actual.getInfo2());
-			Assert.assertEquals(collection.getObjectPath(),
-					actual.getObjectPath());
-			Assert.assertEquals(collection.getCreatedAt(),
-					actual.getCreatedAt());
-			Assert.assertEquals(collection.getModifiedAt(),
-					actual.getModifiedAt());
-			Assert.assertEquals(collection.getSpecColType(),
-					actual.getSpecColType());
+			Assert.assertEquals(collection.getObjectPath(), actual.getObjectPath());
+			Assert.assertEquals(collection.getCreatedAt(), actual.getCreatedAt());
+			Assert.assertEquals(collection.getModifiedAt(), actual.getModifiedAt());
+			Assert.assertEquals(collection.getSpecColType(), actual.getSpecColType());
 
 		} finally {
 			// When HttpClient instance is no longer needed,
@@ -317,45 +272,38 @@ public class CollectionServiceTest implements ApplicationContextAware {
 	}
 
 	@Test
-	public void testGetCollectionJsonNoListingQMarkInNameAndSpaces()
-			throws Exception {
+	public void testGetCollectionJsonNoListingQMarkInNameAndSpaces() throws Exception {
 		String testDirName = "how about this!!!!(/$that/&=testGetCollectionJsonNoListingQMarkInNameAndSpaces";
 
-		String targetIrodsCollection = testingPropertiesHelper
-				.buildIRODSCollectionAbsolutePathFromTestProperties(
-						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
-								+ testDirName);
+		String targetIrodsCollection = testingPropertiesHelper.buildIRODSCollectionAbsolutePathFromTestProperties(
+				testingProperties, IRODS_TEST_SUBDIR_PATH + '/' + testDirName);
 
 		// targetIrodsCollection = URLEncoder.encode(targetIrodsCollection);
 
-		IRODSAccount irodsAccount = testingPropertiesHelper
-				.buildIRODSAccountFromTestProperties(testingProperties);
-		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
-				.getIRODSAccessObjectFactory();
-		CollectionAO collectionAO = accessObjectFactory
-				.getCollectionAO(irodsAccount);
+		IRODSAccount irodsAccount = testingPropertiesHelper.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem.getIRODSAccessObjectFactory();
+		CollectionAO collectionAO = accessObjectFactory.getCollectionAO(irodsAccount);
 
-		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(
-				irodsAccount).instanceIRODSFile(targetIrodsCollection);
+		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(irodsAccount)
+				.instanceIRODSFile(targetIrodsCollection);
 		collFile.mkdirs();
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
-		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY));
 		sb.append("/collection/");
 		sb.append(DataUtils.encodeIrodsAbsolutePath(collFile.getAbsolutePath(),
 				accessObjectFactory.getJargonProperties().getEncoding()));
 
-		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
-				.httpClientSetup(irodsAccount, testingProperties);
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils.httpClientSetup(irodsAccount, testingProperties);
 		try {
 
 			HttpGet httpget = new HttpGet(sb.toString());
 			httpget.addHeader("accept", "application/json");
 
-			HttpResponse response = clientAndContext.getHttpClient().execute(
-					httpget, clientAndContext.getHttpContext());
+			HttpResponse response = clientAndContext.getHttpClient().execute(httpget,
+					clientAndContext.getHttpContext());
 			HttpEntity entity = response.getEntity();
 			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
 			Assert.assertNotNull(entity);
@@ -364,37 +312,24 @@ public class CollectionServiceTest implements ApplicationContextAware {
 			System.out.println("JSON>>>");
 			System.out.println(entityData);
 			ObjectMapper objectMapper = new ObjectMapper();
-			CollectionData actual = objectMapper.readValue(entityData,
-					CollectionData.class);
+			CollectionData actual = objectMapper.readValue(entityData, CollectionData.class);
 
-			Collection collection = collectionAO
-					.findByAbsolutePath(targetIrodsCollection);
+			Collection collection = collectionAO.findByAbsolutePath(targetIrodsCollection);
 
-			Assert.assertEquals(collection.getCollectionId(),
-					actual.getCollectionId());
-			Assert.assertEquals(collection.getCollectionInheritance(),
-					actual.getCollectionInheritance());
-			Assert.assertEquals(collection.getCollectionMapId(),
-					actual.getCollectionMapId());
-			Assert.assertEquals(collection.getCollectionName(),
-					actual.getCollectionName());
-			Assert.assertEquals(collection.getCollectionOwnerName(),
-					actual.getCollectionOwnerName());
-			Assert.assertEquals(collection.getCollectionOwnerZone(),
-					actual.getCollectionOwnerZone());
-			Assert.assertEquals(collection.getCollectionParentName(),
-					actual.getCollectionParentName());
+			Assert.assertEquals(collection.getCollectionId(), actual.getCollectionId());
+			Assert.assertEquals(collection.getCollectionInheritance(), actual.getCollectionInheritance());
+			Assert.assertEquals(collection.getCollectionMapId(), actual.getCollectionMapId());
+			Assert.assertEquals(collection.getCollectionName(), actual.getCollectionName());
+			Assert.assertEquals(collection.getCollectionOwnerName(), actual.getCollectionOwnerName());
+			Assert.assertEquals(collection.getCollectionOwnerZone(), actual.getCollectionOwnerZone());
+			Assert.assertEquals(collection.getCollectionParentName(), actual.getCollectionParentName());
 			Assert.assertEquals(collection.getComments(), actual.getComments());
 			Assert.assertEquals(collection.getInfo1(), actual.getInfo1());
 			Assert.assertEquals(collection.getInfo2(), actual.getInfo2());
-			Assert.assertEquals(collection.getObjectPath(),
-					actual.getObjectPath());
-			Assert.assertEquals(collection.getCreatedAt(),
-					actual.getCreatedAt());
-			Assert.assertEquals(collection.getModifiedAt(),
-					actual.getModifiedAt());
-			Assert.assertEquals(collection.getSpecColType(),
-					actual.getSpecColType());
+			Assert.assertEquals(collection.getObjectPath(), actual.getObjectPath());
+			Assert.assertEquals(collection.getCreatedAt(), actual.getCreatedAt());
+			Assert.assertEquals(collection.getModifiedAt(), actual.getModifiedAt());
+			Assert.assertEquals(collection.getSpecColType(), actual.getSpecColType());
 
 		} finally {
 			// When HttpClient instance is no longer needed,
@@ -410,52 +345,44 @@ public class CollectionServiceTest implements ApplicationContextAware {
 		int count = 10;
 		String subdirPrefix = "subdir";
 
-		String targetIrodsCollection = testingPropertiesHelper
-				.buildIRODSCollectionAbsolutePathFromTestProperties(
-						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
-								+ testDirName);
+		String targetIrodsCollection = testingPropertiesHelper.buildIRODSCollectionAbsolutePathFromTestProperties(
+				testingProperties, IRODS_TEST_SUBDIR_PATH + '/' + testDirName);
 
-		IRODSAccount irodsAccount = testingPropertiesHelper
-				.buildIRODSAccountFromTestProperties(testingProperties);
-		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
-				.getIRODSAccessObjectFactory();
-		CollectionAO collectionAO = accessObjectFactory
-				.getCollectionAO(irodsAccount);
+		IRODSAccount irodsAccount = testingPropertiesHelper.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem.getIRODSAccessObjectFactory();
+		CollectionAO collectionAO = accessObjectFactory.getCollectionAO(irodsAccount);
 
-		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(
-				irodsAccount).instanceIRODSFile(targetIrodsCollection);
+		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(irodsAccount)
+				.instanceIRODSFile(targetIrodsCollection);
 		collFile.mkdirs();
 
 		String myTarget = "";
 		IRODSFile irodsFile;
 
 		for (int i = 0; i < count; i++) {
-			myTarget = targetIrodsCollection + "/c" + (10000 + i)
-					+ subdirPrefix;
-			irodsFile = irodsFileSystem.getIRODSFileFactory(irodsAccount)
-					.instanceIRODSFile(myTarget);
+			myTarget = targetIrodsCollection + "/c" + (10000 + i) + subdirPrefix;
+			irodsFile = irodsFileSystem.getIRODSFileFactory(irodsAccount).instanceIRODSFile(myTarget);
 			irodsFile.mkdirs();
 			irodsFile.close();
 		}
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
-		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY));
 		sb.append("/collection/");
 		sb.append(collFile.getAbsolutePath());
 		sb.append("?listing=true");
 		sb.append("&offset=0");
 
-		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
-				.httpClientSetup(irodsAccount, testingProperties);
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils.httpClientSetup(irodsAccount, testingProperties);
 		try {
 
 			HttpGet httpget = new HttpGet(sb.toString());
 			httpget.addHeader("accept", "application/json");
 
-			HttpResponse response = clientAndContext.getHttpClient().execute(
-					httpget, clientAndContext.getHttpContext());
+			HttpResponse response = clientAndContext.getHttpClient().execute(httpget,
+					clientAndContext.getHttpContext());
 			HttpEntity entity = response.getEntity();
 			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
 			Assert.assertNotNull(entity);
@@ -464,40 +391,26 @@ public class CollectionServiceTest implements ApplicationContextAware {
 			System.out.println("JSON>>>");
 			System.out.println(entityData);
 			ObjectMapper objectMapper = new ObjectMapper();
-			CollectionData actual = objectMapper.readValue(entityData,
-					CollectionData.class);
+			CollectionData actual = objectMapper.readValue(entityData, CollectionData.class);
 
-			Collection collection = collectionAO
-					.findByAbsolutePath(targetIrodsCollection);
+			Collection collection = collectionAO.findByAbsolutePath(targetIrodsCollection);
 
-			Assert.assertEquals(collection.getCollectionId(),
-					actual.getCollectionId());
-			Assert.assertEquals(collection.getCollectionInheritance(),
-					actual.getCollectionInheritance());
-			Assert.assertEquals(collection.getCollectionMapId(),
-					actual.getCollectionMapId());
-			Assert.assertEquals(collection.getCollectionName(),
-					actual.getCollectionName());
-			Assert.assertEquals(collection.getCollectionOwnerName(),
-					actual.getCollectionOwnerName());
-			Assert.assertEquals(collection.getCollectionOwnerZone(),
-					actual.getCollectionOwnerZone());
-			Assert.assertEquals(collection.getCollectionParentName(),
-					actual.getCollectionParentName());
+			Assert.assertEquals(collection.getCollectionId(), actual.getCollectionId());
+			Assert.assertEquals(collection.getCollectionInheritance(), actual.getCollectionInheritance());
+			Assert.assertEquals(collection.getCollectionMapId(), actual.getCollectionMapId());
+			Assert.assertEquals(collection.getCollectionName(), actual.getCollectionName());
+			Assert.assertEquals(collection.getCollectionOwnerName(), actual.getCollectionOwnerName());
+			Assert.assertEquals(collection.getCollectionOwnerZone(), actual.getCollectionOwnerZone());
+			Assert.assertEquals(collection.getCollectionParentName(), actual.getCollectionParentName());
 			Assert.assertEquals(collection.getComments(), actual.getComments());
 			Assert.assertEquals(collection.getInfo1(), actual.getInfo1());
 			Assert.assertEquals(collection.getInfo2(), actual.getInfo2());
-			Assert.assertEquals(collection.getObjectPath(),
-					actual.getObjectPath());
-			Assert.assertEquals(collection.getCreatedAt(),
-					actual.getCreatedAt());
-			Assert.assertEquals(collection.getModifiedAt(),
-					actual.getModifiedAt());
-			Assert.assertEquals(collection.getSpecColType(),
-					actual.getSpecColType());
+			Assert.assertEquals(collection.getObjectPath(), actual.getObjectPath());
+			Assert.assertEquals(collection.getCreatedAt(), actual.getCreatedAt());
+			Assert.assertEquals(collection.getModifiedAt(), actual.getModifiedAt());
+			Assert.assertEquals(collection.getSpecColType(), actual.getSpecColType());
 
-			Assert.assertFalse("no children listed", actual.getChildren()
-					.isEmpty());
+			Assert.assertFalse("no children listed", actual.getChildren().isEmpty());
 
 		} finally {
 			// When HttpClient instance is no longer needed,
@@ -514,36 +427,30 @@ public class CollectionServiceTest implements ApplicationContextAware {
 		int count = 1000;
 		String subdirPrefix = "subdir";
 
-		String targetIrodsCollection = testingPropertiesHelper
-				.buildIRODSCollectionAbsolutePathFromTestProperties(
-						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
-								+ testDirName);
+		String targetIrodsCollection = testingPropertiesHelper.buildIRODSCollectionAbsolutePathFromTestProperties(
+				testingProperties, IRODS_TEST_SUBDIR_PATH + '/' + testDirName);
 
-		IRODSAccount irodsAccount = testingPropertiesHelper
-				.buildIRODSAccountFromTestProperties(testingProperties);
-		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
-				.getIRODSAccessObjectFactory();
+		IRODSAccount irodsAccount = testingPropertiesHelper.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem.getIRODSAccessObjectFactory();
 
-		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(
-				irodsAccount).instanceIRODSFile(targetIrodsCollection);
+		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(irodsAccount)
+				.instanceIRODSFile(targetIrodsCollection);
 		collFile.mkdirs();
 
 		String myTarget = "";
 		IRODSFile irodsFile;
 
 		for (int i = 0; i < count; i++) {
-			myTarget = targetIrodsCollection + "/c" + (10000 + i)
-					+ subdirPrefix;
-			irodsFile = irodsFileSystem.getIRODSFileFactory(irodsAccount)
-					.instanceIRODSFile(myTarget);
+			myTarget = targetIrodsCollection + "/c" + (10000 + i) + subdirPrefix;
+			irodsFile = irodsFileSystem.getIRODSFileFactory(irodsAccount).instanceIRODSFile(myTarget);
 			irodsFile.mkdirs();
 			irodsFile.close();
 		}
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
-		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY));
 		sb.append("/collection/");
 		sb.append(DataUtils.encodeIrodsAbsolutePath(collFile.getAbsolutePath(),
 				accessObjectFactory.getJargonProperties().getEncoding()));
@@ -551,15 +458,14 @@ public class CollectionServiceTest implements ApplicationContextAware {
 		sb.append("&listing=true");
 		sb.append("&offset=0");
 
-		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
-				.httpClientSetup(irodsAccount, testingProperties);
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils.httpClientSetup(irodsAccount, testingProperties);
 		try {
 
 			HttpGet httpget = new HttpGet(sb.toString());
 			httpget.addHeader("accept", "application/xml");
 
-			HttpResponse response = clientAndContext.getHttpClient().execute(
-					httpget, clientAndContext.getHttpContext());
+			HttpResponse response = clientAndContext.getHttpClient().execute(httpget,
+					clientAndContext.getHttpContext());
 			HttpEntity entity = response.getEntity();
 			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
 			Assert.assertNotNull(entity);
@@ -568,10 +474,8 @@ public class CollectionServiceTest implements ApplicationContextAware {
 			System.out.println("XML>>>");
 			System.out.println(entityData);
 			Assert.assertNotNull("null xml returned", entity);
-			Assert.assertTrue(
-					"did not get expected xml stuff",
-					entityData
-							.indexOf("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><ns2:collection xmlns:ns2=\"http://irods.org/irods-rest\" ") > -1);
+			Assert.assertTrue("did not get expected xml stuff", entityData.indexOf(
+					"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><ns2:collection xmlns:ns2=\"http://irods.org/irods-rest\" ") > -1);
 
 		} finally {
 			// When HttpClient instance is no longer needed,
@@ -586,50 +490,43 @@ public class CollectionServiceTest implements ApplicationContextAware {
 	public void testGetCollectionMetadataListingJson() throws Exception {
 		String testDirName = "testGetCollectionMetadataListingJson";
 
-		String targetIrodsCollection = testingPropertiesHelper
-				.buildIRODSCollectionAbsolutePathFromTestProperties(
-						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
-								+ testDirName);
+		String targetIrodsCollection = testingPropertiesHelper.buildIRODSCollectionAbsolutePathFromTestProperties(
+				testingProperties, IRODS_TEST_SUBDIR_PATH + '/' + testDirName);
 
-		IRODSAccount irodsAccount = testingPropertiesHelper
-				.buildIRODSAccountFromTestProperties(testingProperties);
-		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
-				.getIRODSAccessObjectFactory();
-		CollectionAO collectionAO = accessObjectFactory
-				.getCollectionAO(irodsAccount);
+		IRODSAccount irodsAccount = testingPropertiesHelper.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem.getIRODSAccessObjectFactory();
+		CollectionAO collectionAO = accessObjectFactory.getCollectionAO(irodsAccount);
 
-		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(
-				irodsAccount).instanceIRODSFile(targetIrodsCollection);
+		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(irodsAccount)
+				.instanceIRODSFile(targetIrodsCollection);
 		collFile.mkdirs();
 
 		// initialize the AVU data
 		String expectedAttribName = "testmdattrib1".toUpperCase();
 		String expectedAttribValue = "testmdvalue1";
 		String expectedAttribUnits = "test1mdunits";
-		AvuData avuData = AvuData.instance(expectedAttribName,
-				expectedAttribValue, expectedAttribUnits);
+		AvuData avuData = AvuData.instance(expectedAttribName, expectedAttribValue, expectedAttribUnits);
 		collectionAO.deleteAVUMetadata(targetIrodsCollection, avuData);
 
 		collectionAO.addAVUMetadata(targetIrodsCollection, avuData);
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
-		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY));
 		sb.append("/collection");
 		sb.append(collFile.getAbsolutePath());
 		sb.append("/metadata");
 		sb.append("?contentType=application/json");
 
-		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
-				.httpClientSetup(irodsAccount, testingProperties);
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils.httpClientSetup(irodsAccount, testingProperties);
 		try {
 
 			HttpGet httpget = new HttpGet(sb.toString());
 			httpget.addHeader("accept", "application/json");
 
-			HttpResponse response = clientAndContext.getHttpClient().execute(
-					httpget, clientAndContext.getHttpContext());
+			HttpResponse response = clientAndContext.getHttpClient().execute(httpget,
+					clientAndContext.getHttpContext());
 			HttpEntity entity = response.getEntity();
 			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
 			Assert.assertNotNull(entity);
@@ -638,8 +535,7 @@ public class CollectionServiceTest implements ApplicationContextAware {
 			System.out.println("JSON>>>");
 			System.out.println(entityData);
 			ObjectMapper objectMapper = new ObjectMapper();
-			MetadataListing actual = objectMapper.readValue(entityData,
-					MetadataListing.class);
+			MetadataListing actual = objectMapper.readValue(entityData, MetadataListing.class);
 
 			Assert.assertNotNull("null metadata listing found", actual);
 
@@ -652,54 +548,46 @@ public class CollectionServiceTest implements ApplicationContextAware {
 	}
 
 	@Test
-	public void testGetCollectionMetadataListingJsonWithMetadataInFileName()
-			throws Exception {
+	public void testGetCollectionMetadataListingJsonWithMetadataInFileName() throws Exception {
 		String testDirName = "blah/metadata/blahblah/metadata/testGetCollectionMetadataListingJsonWithMetadataInFileName";
 
-		String targetIrodsCollection = testingPropertiesHelper
-				.buildIRODSCollectionAbsolutePathFromTestProperties(
-						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
-								+ testDirName);
+		String targetIrodsCollection = testingPropertiesHelper.buildIRODSCollectionAbsolutePathFromTestProperties(
+				testingProperties, IRODS_TEST_SUBDIR_PATH + '/' + testDirName);
 
-		IRODSAccount irodsAccount = testingPropertiesHelper
-				.buildIRODSAccountFromTestProperties(testingProperties);
-		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
-				.getIRODSAccessObjectFactory();
-		CollectionAO collectionAO = accessObjectFactory
-				.getCollectionAO(irodsAccount);
+		IRODSAccount irodsAccount = testingPropertiesHelper.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem.getIRODSAccessObjectFactory();
+		CollectionAO collectionAO = accessObjectFactory.getCollectionAO(irodsAccount);
 
-		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(
-				irodsAccount).instanceIRODSFile(targetIrodsCollection);
+		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(irodsAccount)
+				.instanceIRODSFile(targetIrodsCollection);
 		collFile.mkdirs();
 
 		// initialize the AVU data
 		String expectedAttribName = "testmdattrib1".toUpperCase();
 		String expectedAttribValue = "testmdvalue1";
 		String expectedAttribUnits = "test1mdunits";
-		AvuData avuData = AvuData.instance(expectedAttribName,
-				expectedAttribValue, expectedAttribUnits);
+		AvuData avuData = AvuData.instance(expectedAttribName, expectedAttribValue, expectedAttribUnits);
 		collectionAO.deleteAVUMetadata(targetIrodsCollection, avuData);
 
 		collectionAO.addAVUMetadata(targetIrodsCollection, avuData);
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
-		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY));
 		sb.append("/collection");
 		sb.append(collFile.getAbsolutePath());
 		sb.append("/metadata");
 		sb.append("?contentType=application/json");
 
-		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
-				.httpClientSetup(irodsAccount, testingProperties);
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils.httpClientSetup(irodsAccount, testingProperties);
 		try {
 
 			HttpGet httpget = new HttpGet(sb.toString());
 			httpget.addHeader("accept", "application/json");
 
-			HttpResponse response = clientAndContext.getHttpClient().execute(
-					httpget, clientAndContext.getHttpContext());
+			HttpResponse response = clientAndContext.getHttpClient().execute(httpget,
+					clientAndContext.getHttpContext());
 			HttpEntity entity = response.getEntity();
 			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
 			Assert.assertNotNull(entity);
@@ -708,8 +596,7 @@ public class CollectionServiceTest implements ApplicationContextAware {
 			System.out.println("JSON>>>");
 			System.out.println(entityData);
 			ObjectMapper objectMapper = new ObjectMapper();
-			MetadataListing actual = objectMapper.readValue(entityData,
-					MetadataListing.class);
+			MetadataListing actual = objectMapper.readValue(entityData, MetadataListing.class);
 
 			Assert.assertNotNull("null metadata listing found", actual);
 
@@ -725,49 +612,42 @@ public class CollectionServiceTest implements ApplicationContextAware {
 	public void testGetCollectionMetadataListingXML() throws Exception {
 		String testDirName = "testGetCollectionMetadataListingXML";
 
-		String targetIrodsCollection = testingPropertiesHelper
-				.buildIRODSCollectionAbsolutePathFromTestProperties(
-						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
-								+ testDirName);
+		String targetIrodsCollection = testingPropertiesHelper.buildIRODSCollectionAbsolutePathFromTestProperties(
+				testingProperties, IRODS_TEST_SUBDIR_PATH + '/' + testDirName);
 
-		IRODSAccount irodsAccount = testingPropertiesHelper
-				.buildIRODSAccountFromTestProperties(testingProperties);
-		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
-				.getIRODSAccessObjectFactory();
-		CollectionAO collectionAO = accessObjectFactory
-				.getCollectionAO(irodsAccount);
+		IRODSAccount irodsAccount = testingPropertiesHelper.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem.getIRODSAccessObjectFactory();
+		CollectionAO collectionAO = accessObjectFactory.getCollectionAO(irodsAccount);
 
-		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(
-				irodsAccount).instanceIRODSFile(targetIrodsCollection);
+		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(irodsAccount)
+				.instanceIRODSFile(targetIrodsCollection);
 		collFile.mkdirs();
 
 		// initialize the AVU data
 		String expectedAttribName = "testmdattrib1".toUpperCase();
 		String expectedAttribValue = "testmdvalue1";
 		String expectedAttribUnits = "test1mdunits";
-		AvuData avuData = AvuData.instance(expectedAttribName,
-				expectedAttribValue, expectedAttribUnits);
+		AvuData avuData = AvuData.instance(expectedAttribName, expectedAttribValue, expectedAttribUnits);
 		collectionAO.deleteAVUMetadata(targetIrodsCollection, avuData);
 
 		collectionAO.addAVUMetadata(targetIrodsCollection, avuData);
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
-		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY));
 		sb.append("/collection");
 		sb.append(collFile.getAbsolutePath());
 		sb.append("/metadata");
 
-		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
-				.httpClientSetup(irodsAccount, testingProperties);
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils.httpClientSetup(irodsAccount, testingProperties);
 		try {
 
 			HttpGet httpget = new HttpGet(sb.toString());
 			httpget.addHeader("accept", "application/xml");
 
-			HttpResponse response = clientAndContext.getHttpClient().execute(
-					httpget, clientAndContext.getHttpContext());
+			HttpResponse response = clientAndContext.getHttpClient().execute(httpget,
+					clientAndContext.getHttpContext());
 			HttpEntity entity = response.getEntity();
 			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
 			Assert.assertNotNull(entity);
@@ -776,8 +656,7 @@ public class CollectionServiceTest implements ApplicationContextAware {
 			System.out.println("XML>>>");
 			System.out.println(entityData);
 			Assert.assertNotNull("null xml returned", entity);
-			Assert.assertTrue("did not get expected xml stuff",
-					entityData.indexOf("<?xml version=\"1.0\"") > -1);
+			Assert.assertTrue("did not get expected xml stuff", entityData.indexOf("<?xml version=\"1.0\"") > -1);
 
 		} finally {
 			// When HttpClient instance is no longer needed,
@@ -791,10 +670,8 @@ public class CollectionServiceTest implements ApplicationContextAware {
 	public void testBulkAddCollectionAVUSendJson() throws Exception {
 		String testDirName = "testBulkAddCollectionAVUJson";
 
-		String targetIrodsCollection = testingPropertiesHelper
-				.buildIRODSCollectionAbsolutePathFromTestProperties(
-						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
-								+ testDirName);
+		String targetIrodsCollection = testingPropertiesHelper.buildIRODSCollectionAbsolutePathFromTestProperties(
+				testingProperties, IRODS_TEST_SUBDIR_PATH + '/' + testDirName);
 
 		String testAvuAttrib1 = "testBulkAddCollectionAVUJsonAttr1";
 		String testAvuValue1 = "testBulkAddCollectionAVUJsonValue1";
@@ -818,25 +695,22 @@ public class CollectionServiceTest implements ApplicationContextAware {
 		metadataEntry.setUnit(testAvuUnit2);
 		metadataOperation.getMetadataEntries().add(metadataEntry);
 
-		IRODSAccount irodsAccount = testingPropertiesHelper
-				.buildIRODSAccountFromTestProperties(testingProperties);
-		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
-				.getIRODSAccessObjectFactory();
+		IRODSAccount irodsAccount = testingPropertiesHelper.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem.getIRODSAccessObjectFactory();
 
-		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(
-				irodsAccount).instanceIRODSFile(targetIrodsCollection);
+		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(irodsAccount)
+				.instanceIRODSFile(targetIrodsCollection);
 		collFile.mkdirs();
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
-		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY));
 		sb.append("/collection");
 		sb.append(collFile.getAbsolutePath());
 		sb.append("/metadata");
 
-		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
-				.httpClientSetup(irodsAccount, testingProperties);
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils.httpClientSetup(irodsAccount, testingProperties);
 
 		try {
 
@@ -852,21 +726,19 @@ public class CollectionServiceTest implements ApplicationContextAware {
 
 			httpPut.setEntity(new StringEntity(body));
 
-			HttpResponse response = clientAndContext.getHttpClient().execute(
-					httpPut, clientAndContext.getHttpContext());
+			HttpResponse response = clientAndContext.getHttpClient().execute(httpPut,
+					clientAndContext.getHttpContext());
 			HttpEntity entity = response.getEntity();
 			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
 			String entityData = EntityUtils.toString(entity);
 
 			System.out.println(entityData);
 
-			MetadataOperationResultEntry[] actual = mapper.readValue(
-					entityData, MetadataOperationResultEntry[].class);
+			MetadataOperationResultEntry[] actual = mapper.readValue(entityData, MetadataOperationResultEntry[].class);
 
 			Assert.assertNotNull("no response body found", actual);
 
-			Assert.assertEquals("did not get two response entries", 2,
-					actual.length);
+			Assert.assertEquals("did not get two response entries", 2, actual.length);
 
 		} finally {
 			// When HttpClient instance is no longer needed,
@@ -881,10 +753,8 @@ public class CollectionServiceTest implements ApplicationContextAware {
 	public void testBulkDeleteCollectionAVUSendJson() throws Exception {
 		String testDirName = "testBulkDeleteCollectionAVUSendJson";
 
-		String targetIrodsCollection = testingPropertiesHelper
-				.buildIRODSCollectionAbsolutePathFromTestProperties(
-						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
-								+ testDirName);
+		String targetIrodsCollection = testingPropertiesHelper.buildIRODSCollectionAbsolutePathFromTestProperties(
+				testingProperties, IRODS_TEST_SUBDIR_PATH + '/' + testDirName);
 
 		String testAvuAttrib1 = "testBulkAddCollectionAVUJsonAttr1";
 		String testAvuValue1 = "testBulkAddCollectionAVUJsonValue1";
@@ -893,24 +763,18 @@ public class CollectionServiceTest implements ApplicationContextAware {
 		String testAvuAttrib2 = "testBulkAddCollectionAVUJsonAttr2";
 		String testAvuValue2 = "testBulkAddCollectionAVUJsonValue2";
 		String testAvuUnit2 = "testBulkAddCollectionAVUJsonUnit2";
-		IRODSAccount irodsAccount = testingPropertiesHelper
-				.buildIRODSAccountFromTestProperties(testingProperties);
-		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
-				.getIRODSAccessObjectFactory();
+		IRODSAccount irodsAccount = testingPropertiesHelper.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem.getIRODSAccessObjectFactory();
 
-		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(
-				irodsAccount).instanceIRODSFile(targetIrodsCollection);
+		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(irodsAccount)
+				.instanceIRODSFile(targetIrodsCollection);
 		collFile.mkdirs();
 
-		CollectionAO collectionAO = accessObjectFactory
-				.getCollectionAO(irodsAccount);
-		List<AvuData> avuDatas = new ArrayList<AvuData>();
-		avuDatas.add(AvuData.instance(testAvuAttrib1, testAvuValue1,
-				testAvuUnit1));
-		avuDatas.add(AvuData.instance(testAvuAttrib2, testAvuValue2,
-				testAvuUnit2));
-		collectionAO.addBulkAVUMetadataToCollection(targetIrodsCollection,
-				avuDatas);
+		CollectionAO collectionAO = accessObjectFactory.getCollectionAO(irodsAccount);
+		List<AvuData> avuDatas = new ArrayList<>();
+		avuDatas.add(AvuData.instance(testAvuAttrib1, testAvuValue1, testAvuUnit1));
+		avuDatas.add(AvuData.instance(testAvuAttrib2, testAvuValue2, testAvuUnit2));
+		collectionAO.addBulkAVUMetadataToCollection(targetIrodsCollection, avuDatas);
 
 		MetadataOperation metadataOperation = new MetadataOperation();
 
@@ -928,14 +792,13 @@ public class CollectionServiceTest implements ApplicationContextAware {
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
-		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY));
 		sb.append("/collection");
 		sb.append(collFile.getAbsolutePath());
 		sb.append("/metadata");
 
-		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
-				.httpClientSetup(irodsAccount, testingProperties);
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils.httpClientSetup(irodsAccount, testingProperties);
 
 		try {
 
@@ -951,27 +814,24 @@ public class CollectionServiceTest implements ApplicationContextAware {
 
 			httpPost.setEntity(new StringEntity(body));
 
-			HttpResponse response = clientAndContext.getHttpClient().execute(
-					httpPost, clientAndContext.getHttpContext());
+			HttpResponse response = clientAndContext.getHttpClient().execute(httpPost,
+					clientAndContext.getHttpContext());
 			HttpEntity entity = response.getEntity();
 			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
 			String entityData = EntityUtils.toString(entity);
 
 			System.out.println(entityData);
 
-			MetadataOperationResultEntry[] actual = mapper.readValue(
-					entityData, MetadataOperationResultEntry[].class);
+			MetadataOperationResultEntry[] actual = mapper.readValue(entityData, MetadataOperationResultEntry[].class);
 
 			Assert.assertNotNull("no response body found", actual);
 
-			Assert.assertEquals("did not get two response entries", 2,
-					actual.length);
+			Assert.assertEquals("did not get two response entries", 2, actual.length);
 
 			// see if metadata is deleted
 			List<MetaDataAndDomainData> datas = collectionAO
 					.findMetadataValuesForCollection(collFile.getAbsolutePath());
-			Assert.assertTrue("did not seem to delete metadata",
-					datas.isEmpty());
+			Assert.assertTrue("did not seem to delete metadata", datas.isEmpty());
 
 		} finally {
 			// When HttpClient instance is no longer needed,
@@ -986,10 +846,8 @@ public class CollectionServiceTest implements ApplicationContextAware {
 	public void testBulkAddCollectionAVUSendXML() throws Exception {
 		String testDirName = "testBulkAddCollectionAVUSendXML";
 
-		String targetIrodsCollection = testingPropertiesHelper
-				.buildIRODSCollectionAbsolutePathFromTestProperties(
-						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
-								+ testDirName);
+		String targetIrodsCollection = testingPropertiesHelper.buildIRODSCollectionAbsolutePathFromTestProperties(
+				testingProperties, IRODS_TEST_SUBDIR_PATH + '/' + testDirName);
 
 		String testAvuAttrib1 = "testBulkAddCollectionAVUSendXMLAttr1";
 		String testAvuValue1 = "testBulkAddCollectionAVUSendXMLValue1";
@@ -1001,37 +859,34 @@ public class CollectionServiceTest implements ApplicationContextAware {
 
 		MetadataOperation metadataOperation = new MetadataOperation();
 
-		MetadataQueryResultEntry metadataEntry = new MetadataQueryResultEntry();
+		MetadataEntry metadataEntry = new MetadataEntry();
 		metadataEntry.setAttribute(testAvuAttrib1);
 		metadataEntry.setValue(testAvuValue1);
 		metadataEntry.setUnit(testAvuUnit1);
 		metadataOperation.getMetadataEntries().add(metadataEntry);
 
-		metadataEntry = new MetadataQueryResultEntry();
+		metadataEntry = new MetadataEntry();
 		metadataEntry.setAttribute(testAvuAttrib2);
 		metadataEntry.setValue(testAvuValue2);
 		metadataEntry.setUnit(testAvuUnit2);
 		metadataOperation.getMetadataEntries().add(metadataEntry);
 
-		IRODSAccount irodsAccount = testingPropertiesHelper
-				.buildIRODSAccountFromTestProperties(testingProperties);
-		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
-				.getIRODSAccessObjectFactory();
+		IRODSAccount irodsAccount = testingPropertiesHelper.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem.getIRODSAccessObjectFactory();
 
-		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(
-				irodsAccount).instanceIRODSFile(targetIrodsCollection);
+		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(irodsAccount)
+				.instanceIRODSFile(targetIrodsCollection);
 		collFile.mkdirs();
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
-		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY));
 		sb.append("/collection");
 		sb.append(collFile.getAbsolutePath());
 		sb.append("/metadata");
 
-		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
-				.httpClientSetup(irodsAccount, testingProperties);
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils.httpClientSetup(irodsAccount, testingProperties);
 
 		try {
 
@@ -1039,8 +894,7 @@ public class CollectionServiceTest implements ApplicationContextAware {
 			httpPut.addHeader("accept", "application/xml");
 			httpPut.addHeader("Content-Type", "application/xml");
 
-			final JAXBContext context = JAXBContext
-					.newInstance(MetadataOperation.class);
+			final JAXBContext context = JAXBContext.newInstance(MetadataOperation.class);
 
 			final Marshaller marshaller = context.createMarshaller();
 
@@ -1052,8 +906,8 @@ public class CollectionServiceTest implements ApplicationContextAware {
 
 			httpPut.setEntity(new StringEntity(body));
 
-			HttpResponse response = clientAndContext.getHttpClient().execute(
-					httpPut, clientAndContext.getHttpContext());
+			HttpResponse response = clientAndContext.getHttpClient().execute(httpPut,
+					clientAndContext.getHttpContext());
 			HttpEntity entity = response.getEntity();
 			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
 			String entityData = EntityUtils.toString(entity);
@@ -1075,49 +929,42 @@ public class CollectionServiceTest implements ApplicationContextAware {
 	public void testDeleteCollection() throws Exception {
 		String testDirName = "testDeleteCollection";
 
-		String targetIrodsCollection = testingPropertiesHelper
-				.buildIRODSCollectionAbsolutePathFromTestProperties(
-						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
-								+ testDirName);
+		String targetIrodsCollection = testingPropertiesHelper.buildIRODSCollectionAbsolutePathFromTestProperties(
+				testingProperties, IRODS_TEST_SUBDIR_PATH + '/' + testDirName);
 
-		IRODSAccount irodsAccount = testingPropertiesHelper
-				.buildIRODSAccountFromTestProperties(testingProperties);
-		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
-				.getIRODSAccessObjectFactory();
+		IRODSAccount irodsAccount = testingPropertiesHelper.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem.getIRODSAccessObjectFactory();
 
-		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(
-				irodsAccount).instanceIRODSFile(targetIrodsCollection);
+		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(irodsAccount)
+				.instanceIRODSFile(targetIrodsCollection);
 		collFile.mkdirs();
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
-		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY));
 		sb.append("/collection");
 		sb.append(collFile.getAbsolutePath());
 
-		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
-				.httpClientSetup(irodsAccount, testingProperties);
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils.httpClientSetup(irodsAccount, testingProperties);
 		try {
 
 			HttpDelete httpDelete = new HttpDelete(sb.toString());
 
-			HttpResponse response = clientAndContext.getHttpClient().execute(
-					httpDelete, clientAndContext.getHttpContext());
+			HttpResponse response = clientAndContext.getHttpClient().execute(httpDelete,
+					clientAndContext.getHttpContext());
 			HttpEntity entity = response.getEntity();
 			Assert.assertEquals(204, response.getStatusLine().getStatusCode());
 			EntityUtils.consume(entity);
 			System.out.println("JSON>>>");
 
 			collFile.reset();
-			Assert.assertFalse("expected collection to be gone",
-					collFile.exists());
+			Assert.assertFalse("expected collection to be gone", collFile.exists());
 
 			// check for idempotency
 			httpDelete = new HttpDelete(sb.toString());
 
-			response = clientAndContext.getHttpClient().execute(httpDelete,
-					clientAndContext.getHttpContext());
+			response = clientAndContext.getHttpClient().execute(httpDelete, clientAndContext.getHttpContext());
 			entity = response.getEntity();
 			Assert.assertEquals(204, response.getStatusLine().getStatusCode());
 
@@ -1135,37 +982,32 @@ public class CollectionServiceTest implements ApplicationContextAware {
 	public void testGetCollectionAclJson() throws Exception {
 		String testDirName = "testGetCollectionAclJson";
 
-		String targetIrodsCollection = testingPropertiesHelper
-				.buildIRODSCollectionAbsolutePathFromTestProperties(
-						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
-								+ testDirName);
+		String targetIrodsCollection = testingPropertiesHelper.buildIRODSCollectionAbsolutePathFromTestProperties(
+				testingProperties, IRODS_TEST_SUBDIR_PATH + '/' + testDirName);
 
-		IRODSAccount irodsAccount = testingPropertiesHelper
-				.buildIRODSAccountFromTestProperties(testingProperties);
-		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
-				.getIRODSAccessObjectFactory();
+		IRODSAccount irodsAccount = testingPropertiesHelper.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem.getIRODSAccessObjectFactory();
 
-		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(
-				irodsAccount).instanceIRODSFile(targetIrodsCollection);
+		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(irodsAccount)
+				.instanceIRODSFile(targetIrodsCollection);
 		collFile.mkdirs();
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
-		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY));
 		sb.append("/collection");
 		sb.append(collFile.getAbsolutePath());
 		sb.append("/acl");
 
-		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
-				.httpClientSetup(irodsAccount, testingProperties);
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils.httpClientSetup(irodsAccount, testingProperties);
 		try {
 
 			HttpGet httpget = new HttpGet(sb.toString());
 			httpget.addHeader("accept", "application/json");
 
-			HttpResponse response = clientAndContext.getHttpClient().execute(
-					httpget, clientAndContext.getHttpContext());
+			HttpResponse response = clientAndContext.getHttpClient().execute(httpget,
+					clientAndContext.getHttpContext());
 			HttpEntity entity = response.getEntity();
 			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
 			Assert.assertNotNull(entity);
@@ -1174,8 +1016,7 @@ public class CollectionServiceTest implements ApplicationContextAware {
 			System.out.println("JSON>>>");
 			System.out.println(entityData);
 			ObjectMapper objectMapper = new ObjectMapper();
-			PermissionListing actual = objectMapper.readValue(entityData,
-					PermissionListing.class);
+			PermissionListing actual = objectMapper.readValue(entityData, PermissionListing.class);
 
 			Assert.assertNotNull("no permission listing returned", actual);
 		} finally {
@@ -1191,37 +1032,32 @@ public class CollectionServiceTest implements ApplicationContextAware {
 	public void testGetCollectionAclXML() throws Exception {
 		String testDirName = "testGetCollectionAclXML";
 
-		String targetIrodsCollection = testingPropertiesHelper
-				.buildIRODSCollectionAbsolutePathFromTestProperties(
-						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
-								+ testDirName);
+		String targetIrodsCollection = testingPropertiesHelper.buildIRODSCollectionAbsolutePathFromTestProperties(
+				testingProperties, IRODS_TEST_SUBDIR_PATH + '/' + testDirName);
 
-		IRODSAccount irodsAccount = testingPropertiesHelper
-				.buildIRODSAccountFromTestProperties(testingProperties);
-		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
-				.getIRODSAccessObjectFactory();
+		IRODSAccount irodsAccount = testingPropertiesHelper.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem.getIRODSAccessObjectFactory();
 
-		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(
-				irodsAccount).instanceIRODSFile(targetIrodsCollection);
+		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(irodsAccount)
+				.instanceIRODSFile(targetIrodsCollection);
 		collFile.mkdirs();
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
-		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY));
 		sb.append("/collection");
 		sb.append(collFile.getAbsolutePath());
 		sb.append("/acl");
 
-		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
-				.httpClientSetup(irodsAccount, testingProperties);
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils.httpClientSetup(irodsAccount, testingProperties);
 		try {
 
 			HttpGet httpget = new HttpGet(sb.toString());
 			httpget.addHeader("accept", "application/xml");
 
-			HttpResponse response = clientAndContext.getHttpClient().execute(
-					httpget, clientAndContext.getHttpContext());
+			HttpResponse response = clientAndContext.getHttpClient().execute(httpget,
+					clientAndContext.getHttpContext());
 			HttpEntity entity = response.getEntity();
 			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
 			Assert.assertNotNull(entity);
@@ -1244,33 +1080,28 @@ public class CollectionServiceTest implements ApplicationContextAware {
 	public void testAddPermission() throws Exception {
 		String testDirName = "testAddPermission";
 
-		String targetIrodsCollection = testingPropertiesHelper
-				.buildIRODSCollectionAbsolutePathFromTestProperties(
-						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
-								+ testDirName);
+		String targetIrodsCollection = testingPropertiesHelper.buildIRODSCollectionAbsolutePathFromTestProperties(
+				testingProperties, IRODS_TEST_SUBDIR_PATH + '/' + testDirName);
 
-		IRODSAccount irodsAccount = testingPropertiesHelper
-				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccount irodsAccount = testingPropertiesHelper.buildIRODSAccountFromTestProperties(testingProperties);
 		IRODSAccount secondaryAccount = testingPropertiesHelper
 				.buildIRODSAccountFromSecondaryTestProperties(testingProperties);
-		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
-				.getIRODSAccessObjectFactory();
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem.getIRODSAccessObjectFactory();
 
-		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(
-				irodsAccount).instanceIRODSFile(targetIrodsCollection);
+		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(irodsAccount)
+				.instanceIRODSFile(targetIrodsCollection);
 		collFile.mkdirs();
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
-		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY));
 		sb.append("/collection");
 		sb.append(collFile.getAbsolutePath());
 		sb.append("/acl/");
 		sb.append(secondaryAccount.getUserName());
 
-		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
-				.httpClientSetup(irodsAccount, testingProperties);
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils.httpClientSetup(irodsAccount, testingProperties);
 		try {
 
 			HttpPut httpPut = new HttpPut(sb.toString());
@@ -1278,17 +1109,14 @@ public class CollectionServiceTest implements ApplicationContextAware {
 			httpPut.getParams().setBooleanParameter("recursive", false);
 			httpPut.getParams().setParameter("permission", "READ");
 
-			HttpResponse response = clientAndContext.getHttpClient().execute(
-					httpPut, clientAndContext.getHttpContext());
+			HttpResponse response = clientAndContext.getHttpClient().execute(httpPut,
+					clientAndContext.getHttpContext());
 			Assert.assertEquals(204, response.getStatusLine().getStatusCode());
 
-			CollectionAO collectionAO = accessObjectFactory
-					.getCollectionAO(irodsAccount);
-			UserFilePermission actualFilePermission = collectionAO
-					.getPermissionForUserName(targetIrodsCollection,
-							secondaryAccount.getUserName());
-			Assert.assertEquals("file permission not set to read",
-					FilePermissionEnum.READ,
+			CollectionAO collectionAO = accessObjectFactory.getCollectionAO(irodsAccount);
+			UserFilePermission actualFilePermission = collectionAO.getPermissionForUserName(targetIrodsCollection,
+					secondaryAccount.getUserName());
+			Assert.assertEquals("file permission not set to read", FilePermissionEnum.READ,
 					actualFilePermission.getFilePermissionEnum());
 
 		} finally {
@@ -1304,52 +1132,42 @@ public class CollectionServiceTest implements ApplicationContextAware {
 	public void testDeletePermission() throws Exception {
 		String testDirName = "testDeletePermission";
 
-		String targetIrodsCollection = testingPropertiesHelper
-				.buildIRODSCollectionAbsolutePathFromTestProperties(
-						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
-								+ testDirName);
+		String targetIrodsCollection = testingPropertiesHelper.buildIRODSCollectionAbsolutePathFromTestProperties(
+				testingProperties, IRODS_TEST_SUBDIR_PATH + '/' + testDirName);
 
-		IRODSAccount irodsAccount = testingPropertiesHelper
-				.buildIRODSAccountFromTestProperties(testingProperties);
-		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
-				.getIRODSAccessObjectFactory();
-		String secondaryUserName = testingProperties
-				.getProperty(TestingPropertiesHelper.IRODS_SECONDARY_USER_KEY);
-		CollectionAO collectionAO = irodsFileSystem
-				.getIRODSAccessObjectFactory().getCollectionAO(irodsAccount);
+		IRODSAccount irodsAccount = testingPropertiesHelper.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem.getIRODSAccessObjectFactory();
+		String secondaryUserName = testingProperties.getProperty(TestingPropertiesHelper.IRODS_SECONDARY_USER_KEY);
+		CollectionAO collectionAO = irodsFileSystem.getIRODSAccessObjectFactory().getCollectionAO(irodsAccount);
 
-		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(
-				irodsAccount).instanceIRODSFile(targetIrodsCollection);
+		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(irodsAccount)
+				.instanceIRODSFile(targetIrodsCollection);
 		collFile.mkdirs();
 
-		collectionAO.setAccessPermissionRead("", targetIrodsCollection,
-				secondaryUserName, true);
+		collectionAO.setAccessPermissionRead("", targetIrodsCollection, secondaryUserName, true);
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
-		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY));
 		sb.append("/collection");
 		sb.append(collFile.getAbsolutePath());
 		sb.append("/acl/");
 		sb.append(secondaryUserName);
 
-		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
-				.httpClientSetup(irodsAccount, testingProperties);
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils.httpClientSetup(irodsAccount, testingProperties);
 		try {
 
 			HttpDelete httpDelete = new HttpDelete(sb.toString());
 			httpDelete.addHeader("accept", "application/json");
 
-			HttpResponse response = clientAndContext.getHttpClient().execute(
-					httpDelete, clientAndContext.getHttpContext());
+			HttpResponse response = clientAndContext.getHttpClient().execute(httpDelete,
+					clientAndContext.getHttpContext());
 			Assert.assertEquals(204, response.getStatusLine().getStatusCode());
 
-			UserFilePermission userFilePermission = collectionAO
-					.getPermissionForUserName(targetIrodsCollection,
-							secondaryUserName);
-			Assert.assertTrue("should have deleted permission",
-					userFilePermission == null);
+			UserFilePermission userFilePermission = collectionAO.getPermissionForUserName(targetIrodsCollection,
+					secondaryUserName);
+			Assert.assertTrue("should have deleted permission", userFilePermission == null);
 
 		} finally {
 			// When HttpClient instance is no longer needed,
@@ -1364,36 +1182,30 @@ public class CollectionServiceTest implements ApplicationContextAware {
 	public void testAddPermissionWithZone() throws Exception {
 		String testDirName = "testAddPermissionWithZone";
 
-		String targetIrodsCollection = testingPropertiesHelper
-				.buildIRODSCollectionAbsolutePathFromTestProperties(
-						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
-								+ testDirName);
+		String targetIrodsCollection = testingPropertiesHelper.buildIRODSCollectionAbsolutePathFromTestProperties(
+				testingProperties, IRODS_TEST_SUBDIR_PATH + '/' + testDirName);
 
-		IRODSAccount irodsAccount = testingPropertiesHelper
-				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccount irodsAccount = testingPropertiesHelper.buildIRODSAccountFromTestProperties(testingProperties);
 		IRODSAccount secondaryAccount = testingPropertiesHelper
 				.buildIRODSAccountFromSecondaryTestProperties(testingProperties);
-		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
-				.getIRODSAccessObjectFactory();
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem.getIRODSAccessObjectFactory();
 
-		String secondaryUserNameString = secondaryAccount.getUserName() + ","
-				+ secondaryAccount.getZone();
+		String secondaryUserNameString = secondaryAccount.getUserName() + "," + secondaryAccount.getZone();
 
-		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(
-				irodsAccount).instanceIRODSFile(targetIrodsCollection);
+		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(irodsAccount)
+				.instanceIRODSFile(targetIrodsCollection);
 		collFile.mkdirs();
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
-		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY));
 		sb.append("/collection");
 		sb.append(collFile.getAbsolutePath());
 		sb.append("/acl/");
 		sb.append(secondaryUserNameString);
 
-		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
-				.httpClientSetup(irodsAccount, testingProperties);
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils.httpClientSetup(irodsAccount, testingProperties);
 		try {
 
 			HttpPut httpPut = new HttpPut(sb.toString());
@@ -1401,17 +1213,14 @@ public class CollectionServiceTest implements ApplicationContextAware {
 			httpPut.getParams().setBooleanParameter("recursive", false);
 			httpPut.getParams().setParameter("permission", "READ");
 
-			HttpResponse response = clientAndContext.getHttpClient().execute(
-					httpPut, clientAndContext.getHttpContext());
+			HttpResponse response = clientAndContext.getHttpClient().execute(httpPut,
+					clientAndContext.getHttpContext());
 			Assert.assertEquals(204, response.getStatusLine().getStatusCode());
 
-			CollectionAO collectionAO = accessObjectFactory
-					.getCollectionAO(irodsAccount);
-			UserFilePermission actualFilePermission = collectionAO
-					.getPermissionForUserName(targetIrodsCollection,
-							secondaryAccount.getUserName());
-			Assert.assertEquals("file permission not set to read",
-					FilePermissionEnum.READ,
+			CollectionAO collectionAO = accessObjectFactory.getCollectionAO(irodsAccount);
+			UserFilePermission actualFilePermission = collectionAO.getPermissionForUserName(targetIrodsCollection,
+					secondaryAccount.getUserName());
+			Assert.assertEquals("file permission not set to read", FilePermissionEnum.READ,
 					actualFilePermission.getFilePermissionEnum());
 
 		} finally {
@@ -1426,33 +1235,28 @@ public class CollectionServiceTest implements ApplicationContextAware {
 	public void testAddPermissionBogusUser() throws Exception {
 		String testDirName = "testAddPermissionWithZone";
 
-		String targetIrodsCollection = testingPropertiesHelper
-				.buildIRODSCollectionAbsolutePathFromTestProperties(
-						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
-								+ testDirName);
+		String targetIrodsCollection = testingPropertiesHelper.buildIRODSCollectionAbsolutePathFromTestProperties(
+				testingProperties, IRODS_TEST_SUBDIR_PATH + '/' + testDirName);
 
-		IRODSAccount irodsAccount = testingPropertiesHelper
-				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccount irodsAccount = testingPropertiesHelper.buildIRODSAccountFromTestProperties(testingProperties);
 
 		String bogusUserString = "bogususerbogusbogusbogus";
-		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
-				.getIRODSAccessObjectFactory();
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem.getIRODSAccessObjectFactory();
 
-		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(
-				irodsAccount).instanceIRODSFile(targetIrodsCollection);
+		IRODSFile collFile = accessObjectFactory.getIRODSFileFactory(irodsAccount)
+				.instanceIRODSFile(targetIrodsCollection);
 		collFile.mkdirs();
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
-		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY));
 		sb.append("/collection");
 		sb.append(collFile.getAbsolutePath());
 		sb.append("/acl/");
 		sb.append(bogusUserString);
 
-		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
-				.httpClientSetup(irodsAccount, testingProperties);
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils.httpClientSetup(irodsAccount, testingProperties);
 		try {
 
 			HttpPut httpPut = new HttpPut(sb.toString());
@@ -1460,8 +1264,8 @@ public class CollectionServiceTest implements ApplicationContextAware {
 			httpPut.getParams().setBooleanParameter("recursive", false);
 			httpPut.getParams().setParameter("permission", "READ");
 
-			HttpResponse response = clientAndContext.getHttpClient().execute(
-					httpPut, clientAndContext.getHttpContext());
+			HttpResponse response = clientAndContext.getHttpClient().execute(httpPut,
+					clientAndContext.getHttpContext());
 			Assert.assertEquals(500, response.getStatusLine().getStatusCode());
 
 		} finally {

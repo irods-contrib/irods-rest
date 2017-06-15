@@ -1,6 +1,9 @@
 package org.irods.jargon.rest.domain;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement(name = "metadataEntry")
 
 public class MetadataEntry {
 

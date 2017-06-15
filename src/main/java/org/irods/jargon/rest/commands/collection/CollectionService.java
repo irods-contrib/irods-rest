@@ -87,13 +87,10 @@ public class CollectionService extends AbstractIrodsService {
 	@Path("{path:.*}")
 	@Produces({ "application/xml", "application/json" })
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
-	public CollectionData getCollectionData(
-			@HeaderParam("Authorization") final String authorization,
-			@PathParam("path") final String path,
-			@QueryParam("offset") @DefaultValue("0") final int offset,
+	public CollectionData getCollectionData(@HeaderParam("Authorization") final String authorization,
+			@PathParam("path") final String path, @QueryParam("offset") @DefaultValue("0") final int offset,
 			@QueryParam("listing") @DefaultValue("false") final boolean isListing,
-			@QueryParam("listType") @DefaultValue("both") final String listingType)
-			throws JargonException {
+			@QueryParam("listType") @DefaultValue("both") final String listingType) throws JargonException {
 
 		log.info("getCollectionData()");
 
@@ -107,29 +104,22 @@ public class CollectionService extends AbstractIrodsService {
 
 		try {
 			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
-			CollectionAO collectionAO = getIrodsAccessObjectFactory()
-					.getCollectionAO(irodsAccount);
+			CollectionAO collectionAO = getIrodsAccessObjectFactory().getCollectionAO(irodsAccount);
 			// log.info("looking up collection with URI:{}", uri);
 
-			String decodedPathString = DataUtils
-					.buildDecodedPathFromURLPathInfo(path, retrieveEncoding());
+			String decodedPathString = DataUtils.buildDecodedPathFromURLPathInfo(path, retrieveEncoding());
 			log.info("decoded path:{}", decodedPathString);
-			Collection collection = collectionAO
-					.findByAbsolutePath(decodedPathString);
+			Collection collection = collectionAO.findByAbsolutePath(decodedPathString);
 
 			log.info("found collection, marshall the data:{}", collection);
 			CollectionData collectionData = new CollectionData();
 			collectionData.setCollectionId(collection.getCollectionId());
-			collectionData.setCollectionInheritance(collection
-					.getCollectionInheritance());
+			collectionData.setCollectionInheritance(collection.getCollectionInheritance());
 			collectionData.setCollectionMapId(collection.getCollectionMapId());
 			collectionData.setCollectionName(collection.getCollectionName());
-			collectionData.setCollectionOwnerName(collection
-					.getCollectionOwnerName());
-			collectionData.setCollectionOwnerZone(collection
-					.getCollectionOwnerZone());
-			collectionData.setCollectionParentName(collection
-					.getCollectionParentName());
+			collectionData.setCollectionOwnerName(collection.getCollectionOwnerName());
+			collectionData.setCollectionOwnerZone(collection.getCollectionOwnerZone());
+			collectionData.setCollectionParentName(collection.getCollectionParentName());
 			collectionData.setComments(collection.getComments());
 			collectionData.setCreatedAt(collection.getCreatedAt());
 			collectionData.setInfo1(collection.getInfo1());
@@ -150,22 +140,18 @@ public class CollectionService extends AbstractIrodsService {
 				if (listingType.equals("both")) {
 					log.info("listing colls and data objects");
 					entries = collectionAndDataObjectListAndSearchAO
-							.listDataObjectsAndCollectionsUnderPath(collection
-									.getAbsolutePath());
+							.listDataObjectsAndCollectionsUnderPath(collection.getAbsolutePath());
 				} else if (listingType.equals("data")) {
 					log.info("listing data objects");
 					entries = collectionAndDataObjectListAndSearchAO
-							.listDataObjectsUnderPath(
-									collection.getAbsolutePath(), offset);
+							.listDataObjectsUnderPath(collection.getAbsolutePath(), offset);
 				} else if (listingType.equals("collections")) {
 					log.info("listing collections");
 					entries = collectionAndDataObjectListAndSearchAO
-							.listCollectionsUnderPath(
-									collection.getAbsolutePath(), offset);
+							.listCollectionsUnderPath(collection.getAbsolutePath(), offset);
 
 				} else {
-					throw new IllegalArgumentException(
-							"invalid listing type, should be both, collections, data");
+					throw new IllegalArgumentException("invalid listing type, should be both, collections, data");
 				}
 
 				for (CollectionAndDataObjectListingEntry entry : entries) {
@@ -183,8 +169,7 @@ public class CollectionService extends AbstractIrodsService {
 					fileListingEntry.setParentPath(entry.getParentPath());
 					fileListingEntry.setPathOrName(entry.getPathOrName());
 					fileListingEntry.setSpecColType(entry.getSpecColType());
-					fileListingEntry.setSpecialObjectPath(entry
-							.getSpecialObjectPath());
+					fileListingEntry.setSpecialObjectPath(entry.getSpecialObjectPath());
 					fileListingEntry.setTotalRecords(entry.getTotalRecords());
 					collectionData.getChildren().add(fileListingEntry);
 
@@ -219,8 +204,7 @@ public class CollectionService extends AbstractIrodsService {
 	@Path("{path:.*}")
 	@Produces({ "application/xml", "application/json" })
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
-	public CollectionData addCollection(
-			@HeaderParam("Authorization") final String authorization,
+	public CollectionData addCollection(@HeaderParam("Authorization") final String authorization,
 			@PathParam("path") final String path) throws JargonException {
 
 		log.info("addCollection()");
@@ -235,38 +219,29 @@ public class CollectionService extends AbstractIrodsService {
 
 		try {
 			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
-			CollectionAO collectionAO = getIrodsAccessObjectFactory()
-					.getCollectionAO(irodsAccount);
+			CollectionAO collectionAO = getIrodsAccessObjectFactory().getCollectionAO(irodsAccount);
 
-			String decodedPath = DataUtils.buildDecodedPathFromURLPathInfo(
-					path, retrieveEncoding());
+			String decodedPath = DataUtils.buildDecodedPathFromURLPathInfo(path, retrieveEncoding());
 
-			IRODSFile collectionFile = getIrodsAccessObjectFactory()
-					.getIRODSFileFactory(irodsAccount).instanceIRODSFile(
-							decodedPath);
+			IRODSFile collectionFile = getIrodsAccessObjectFactory().getIRODSFileFactory(irodsAccount)
+					.instanceIRODSFile(decodedPath);
 
-			log.info("making directory at path:{}",
-					collectionFile.getAbsolutePath());
+			log.info("making directory at path:{}", collectionFile.getAbsolutePath());
 			collectionFile.mkdirs();
 
 			log.info("dirs created, get data about collection for response...");
 
-			Collection collection = collectionAO
-					.findByAbsolutePath(decodedPath);
+			Collection collection = collectionAO.findByAbsolutePath(decodedPath);
 
 			log.info("found collection, marshall the data:{}", collection);
 			CollectionData collectionData = new CollectionData();
 			collectionData.setCollectionId(collection.getCollectionId());
-			collectionData.setCollectionInheritance(collection
-					.getCollectionInheritance());
+			collectionData.setCollectionInheritance(collection.getCollectionInheritance());
 			collectionData.setCollectionMapId(collection.getCollectionMapId());
 			collectionData.setCollectionName(collection.getCollectionName());
-			collectionData.setCollectionOwnerName(collection
-					.getCollectionOwnerName());
-			collectionData.setCollectionOwnerZone(collection
-					.getCollectionOwnerZone());
-			collectionData.setCollectionParentName(collection
-					.getCollectionParentName());
+			collectionData.setCollectionOwnerName(collection.getCollectionOwnerName());
+			collectionData.setCollectionOwnerZone(collection.getCollectionOwnerZone());
+			collectionData.setCollectionParentName(collection.getCollectionParentName());
 			collectionData.setComments(collection.getComments());
 			collectionData.setCreatedAt(collection.getCreatedAt());
 			collectionData.setInfo1(collection.getInfo1());
@@ -294,9 +269,9 @@ public class CollectionService extends AbstractIrodsService {
 	@GET
 	@Path("{path:.*}/metadata")
 	@Produces({ "application/xml", "application/json" })
-	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
-	public MetadataListing getCollectionMetadata(
-			@HeaderParam("Authorization") final String authorization,
+	// @Mapped(namespaceMap = { @XmlNsMap(namespace =
+	// "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	public MetadataListing getCollectionMetadata(@HeaderParam("Authorization") final String authorization,
 			@PathParam("path") final String path) throws JargonException {
 
 		log.info("getCollectionMetadata()");
@@ -309,17 +284,15 @@ public class CollectionService extends AbstractIrodsService {
 			throw new IllegalArgumentException("null or empty path");
 		}
 
-		String decodedPathString = DataUtils.buildDecodedPathFromURLPathInfo(
-				path, retrieveEncoding());
+		String decodedPathString = DataUtils.buildDecodedPathFromURLPathInfo(path, retrieveEncoding());
 
 		try {
 			log.error("decoded path:{}", decodedPathString);
 			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
-			CollectionAO collectionAO = getIrodsAccessObjectFactory()
-					.getCollectionAO(irodsAccount);
+			CollectionAO collectionAO = getIrodsAccessObjectFactory().getCollectionAO(irodsAccount);
 
 			log.info("listing metadata");
-			List<MetadataQueryResultEntry> metadataEntries = new ArrayList<MetadataQueryResultEntry>();
+			List<MetadataQueryResultEntry> metadataEntries = new ArrayList<>();
 			try {
 				List<MetaDataAndDomainData> metadataList = collectionAO
 						.findMetadataValuesForCollection(decodedPathString);
@@ -393,8 +366,7 @@ public class CollectionService extends AbstractIrodsService {
 	@Produces({ "application/xml", "application/json" })
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
 	public List<MetadataOperationResultEntry> deleteCollectionMetadata(
-			@HeaderParam("Authorization") final String authorization,
-			@PathParam("path") final String path,
+			@HeaderParam("Authorization") final String authorization, @PathParam("path") final String path,
 			final MetadataOperation metadataOperation) throws JargonException {
 
 		log.info("deleteCollectionMetadata()");
@@ -411,36 +383,31 @@ public class CollectionService extends AbstractIrodsService {
 			throw new IllegalArgumentException("null metadataOperation");
 		}
 
-		String decodedPathString = DataUtils.buildDecodedPathFromURLPathInfo(
-				path, retrieveEncoding());
+		String decodedPathString = DataUtils.buildDecodedPathFromURLPathInfo(path, retrieveEncoding());
 
 		try {
 			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
-			CollectionAO collectionAO = getIrodsAccessObjectFactory()
-					.getCollectionAO(irodsAccount);
+			CollectionAO collectionAO = getIrodsAccessObjectFactory().getCollectionAO(irodsAccount);
 
 			log.info("marshalling into AvuData...");
-			List<AvuData> avuDatas = new ArrayList<AvuData>();
-			List<MetadataOperationResultEntry> metadataOperationResultEntries = new ArrayList<MetadataOperationResultEntry>();
+			List<AvuData> avuDatas = new ArrayList<>();
+			List<MetadataOperationResultEntry> metadataOperationResultEntries = new ArrayList<>();
 
-			for (MetadataEntry metadataEntry : metadataOperation
-					.getMetadataEntries()) {
-				avuDatas.add(AvuData.instance(metadataEntry.getAttribute(),
-						metadataEntry.getValue(), metadataEntry.getUnit()));
+			for (MetadataEntry metadataEntry : metadataOperation.getMetadataEntries()) {
+				avuDatas.add(AvuData.instance(metadataEntry.getAttribute(), metadataEntry.getValue(),
+						metadataEntry.getUnit()));
 			}
 
 			log.info("doing bulk delete operation");
 			List<BulkAVUOperationResponse> bulkAVUOperationResponses = collectionAO
-					.deleteBulkAVUMetadataFromCollection(decodedPathString,
-							avuDatas);
+					.deleteBulkAVUMetadataFromCollection(decodedPathString, avuDatas);
 			log.info("responses:{}", bulkAVUOperationResponses);
 
 			log.info("marshalling response into rest domain...");
 			MetadataOperationResultEntry resultEntry;
 			for (BulkAVUOperationResponse response : bulkAVUOperationResponses) {
 				resultEntry = new MetadataOperationResultEntry();
-				resultEntry.setAttributeString(response.getAvuData()
-						.getAttribute());
+				resultEntry.setAttributeString(response.getAvuData().getAttribute());
 				resultEntry.setMessage(response.getMessage());
 				resultEntry.setResultStatus(response.getResultStatus());
 				resultEntry.setUnit(response.getAvuData().getUnit());
@@ -483,8 +450,7 @@ public class CollectionService extends AbstractIrodsService {
 	@Produces({ "application/xml", "application/json" })
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
 	public List<MetadataOperationResultEntry> addCollectionMetadata(
-			@HeaderParam("Authorization") final String authorization,
-			@PathParam("path") final String path,
+			@HeaderParam("Authorization") final String authorization, @PathParam("path") final String path,
 			final MetadataOperation metadataOperation) throws JargonException {
 
 		log.info("addCollectionMetadata()");
@@ -501,22 +467,19 @@ public class CollectionService extends AbstractIrodsService {
 			throw new IllegalArgumentException("null metadataOperation");
 		}
 
-		String decodedPathString = DataUtils.buildDecodedPathFromURLPathInfo(
-				path, retrieveEncoding());
+		String decodedPathString = DataUtils.buildDecodedPathFromURLPathInfo(path, retrieveEncoding());
 
 		try {
 			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
-			CollectionAO collectionAO = getIrodsAccessObjectFactory()
-					.getCollectionAO(irodsAccount);
+			CollectionAO collectionAO = getIrodsAccessObjectFactory().getCollectionAO(irodsAccount);
 
 			log.info("marshalling into AvuData...");
-			List<AvuData> avuDatas = new ArrayList<AvuData>();
-			List<MetadataOperationResultEntry> metadataOperationResultEntries = new ArrayList<MetadataOperationResultEntry>();
+			List<AvuData> avuDatas = new ArrayList<>();
+			List<MetadataOperationResultEntry> metadataOperationResultEntries = new ArrayList<>();
 
-			for (MetadataEntry metadataEntry : metadataOperation
-					.getMetadataEntries()) {
-				avuDatas.add(AvuData.instance(metadataEntry.getAttribute(),
-						metadataEntry.getValue(), metadataEntry.getUnit()));
+			for (MetadataEntry metadataEntry : metadataOperation.getMetadataEntries()) {
+				avuDatas.add(AvuData.instance(metadataEntry.getAttribute(), metadataEntry.getValue(),
+						metadataEntry.getUnit()));
 			}
 
 			log.info("doing bulk add operation");
@@ -528,8 +491,7 @@ public class CollectionService extends AbstractIrodsService {
 			MetadataOperationResultEntry resultEntry;
 			for (BulkAVUOperationResponse response : bulkAVUOperationResponses) {
 				resultEntry = new MetadataOperationResultEntry();
-				resultEntry.setAttributeString(response.getAvuData()
-						.getAttribute());
+				resultEntry.setAttributeString(response.getAvuData().getAttribute());
 				resultEntry.setMessage(response.getMessage());
 				resultEntry.setResultStatus(response.getResultStatus());
 				resultEntry.setUnit(response.getAvuData().getUnit());
@@ -568,10 +530,8 @@ public class CollectionService extends AbstractIrodsService {
 	@DELETE
 	@Path("{path:.*}")
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
-	public void removeCollection(
-			@HeaderParam("Authorization") final String authorization,
-			@PathParam("path") final String path,
-			@QueryParam("force") @DefaultValue("false") final boolean force)
+	public void removeCollection(@HeaderParam("Authorization") final String authorization,
+			@PathParam("path") final String path, @QueryParam("force") @DefaultValue("false") final boolean force)
 			throws JargonException {
 
 		log.info("removeCollection()");
@@ -587,15 +547,12 @@ public class CollectionService extends AbstractIrodsService {
 		try {
 			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
 
-			String decodedPathString = DataUtils
-					.buildDecodedPathFromURLPathInfo(path, retrieveEncoding());
+			String decodedPathString = DataUtils.buildDecodedPathFromURLPathInfo(path, retrieveEncoding());
 
-			IRODSFile collectionFile = getIrodsAccessObjectFactory()
-					.getIRODSFileFactory(irodsAccount).instanceIRODSFile(
-							decodedPathString);
+			IRODSFile collectionFile = getIrodsAccessObjectFactory().getIRODSFileFactory(irodsAccount)
+					.instanceIRODSFile(decodedPathString);
 
-			log.info("removing directory at path:{}",
-					collectionFile.getAbsolutePath());
+			log.info("removing directory at path:{}", collectionFile.getAbsolutePath());
 
 			if (force) {
 				log.info("using force option...");
@@ -627,10 +584,8 @@ public class CollectionService extends AbstractIrodsService {
 	@Path("{path:.*}/acl")
 	@Produces({ "application/xml", "application/json" })
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
-	public PermissionListing getCollectionAcl(
-			@HeaderParam("Authorization") final String authorization,
-			@PathParam("path") final String path) throws FileNotFoundException,
-			JargonException {
+	public PermissionListing getCollectionAcl(@HeaderParam("Authorization") final String authorization,
+			@PathParam("path") final String path) throws FileNotFoundException, JargonException {
 
 		log.info("getCollectionAcl()");
 
@@ -643,8 +598,7 @@ public class CollectionService extends AbstractIrodsService {
 		}
 
 		try {
-			String decodedPathString = DataUtils
-					.buildDecodedPathFromURLPathInfo(path, retrieveEncoding());
+			String decodedPathString = DataUtils.buildDecodedPathFromURLPathInfo(path, retrieveEncoding());
 			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
 
 			CollectionAclFunctions collectionAclFunctions = getServiceFunctionFactory()
@@ -688,10 +642,8 @@ public class CollectionService extends AbstractIrodsService {
 	@Path("{path:.*}/acl/{userName}")
 	@Produces({ "application/xml", "application/json" })
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
-	public void addCollectionAcl(
-			@HeaderParam("Authorization") final String authorization,
-			@PathParam("path") final String path,
-			@PathParam("userName") final String userName,
+	public void addCollectionAcl(@HeaderParam("Authorization") final String authorization,
+			@PathParam("path") final String path, @PathParam("userName") final String userName,
 			@QueryParam("recursive") @DefaultValue("false") final boolean recursive,
 			@QueryParam("permission") @DefaultValue("READ") final String permission)
 			throws InvalidUserException, FileNotFoundException, JargonException {
@@ -725,8 +677,7 @@ public class CollectionService extends AbstractIrodsService {
 		} else if (permission.equals("NONE")) {
 			filePermissionEnumTranslationEnum = FilePermissionEnum.NONE;
 		} else {
-			throw new IllegalArgumentException("unknown permission type:"
-					+ permission);
+			throw new IllegalArgumentException("unknown permission type:" + permission);
 		}
 
 		String myUserNameString = userName.replace(',', '#');
@@ -734,14 +685,13 @@ public class CollectionService extends AbstractIrodsService {
 		try {
 			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
 
-			String decodedPath = DataUtils.buildDecodedPathFromURLPathInfo(
-					path, retrieveEncoding());
+			String decodedPath = DataUtils.buildDecodedPathFromURLPathInfo(path, retrieveEncoding());
 
 			CollectionAclFunctions collectionAclFunctions = getServiceFunctionFactory()
 					.instanceCollectionAclFunctions(irodsAccount);
 			log.info("adding permission");
-			collectionAclFunctions.addPermission(decodedPath, myUserNameString,
-					filePermissionEnumTranslationEnum, recursive);
+			collectionAclFunctions.addPermission(decodedPath, myUserNameString, filePermissionEnumTranslationEnum,
+					recursive);
 			log.info("done");
 
 		} finally {
@@ -777,10 +727,8 @@ public class CollectionService extends AbstractIrodsService {
 	@Path("{path:.*}/acl/{userName}")
 	@Produces({ "application/xml", "application/json" })
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
-	public void deleteCollectionAcl(
-			@HeaderParam("Authorization") final String authorization,
-			@PathParam("path") final String path,
-			@PathParam("userName") final String userName,
+	public void deleteCollectionAcl(@HeaderParam("Authorization") final String authorization,
+			@PathParam("path") final String path, @PathParam("userName") final String userName,
 			@QueryParam("recursive") @DefaultValue("false") final boolean recursive)
 			throws InvalidUserException, FileNotFoundException, JargonException {
 
@@ -807,14 +755,12 @@ public class CollectionService extends AbstractIrodsService {
 		try {
 			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
 
-			String decodedPath = DataUtils.buildDecodedPathFromURLPathInfo(
-					path, retrieveEncoding());
+			String decodedPath = DataUtils.buildDecodedPathFromURLPathInfo(path, retrieveEncoding());
 
 			CollectionAclFunctions collectionAclFunctions = getServiceFunctionFactory()
 					.instanceCollectionAclFunctions(irodsAccount);
 			log.info("removing permission");
-			collectionAclFunctions.deletePermissionForUser(decodedPath,
-					myUserNameString, recursive);
+			collectionAclFunctions.deletePermissionForUser(decodedPath, myUserNameString, recursive);
 			log.info("done");
 
 		} finally {

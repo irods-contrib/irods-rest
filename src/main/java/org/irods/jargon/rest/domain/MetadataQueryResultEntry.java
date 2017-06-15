@@ -4,6 +4,7 @@
 package org.irods.jargon.rest.domain;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -13,7 +14,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * 
  */
 @XmlRootElement(name = "metadataEntry")
-public class MetadataQueryResultEntry extends MetadataEntry {
+public class MetadataQueryResultEntry {
 
 	/***
 	 * Sequence number for this records based on query result
@@ -32,6 +33,67 @@ public class MetadataQueryResultEntry extends MetadataEntry {
 	private int totalRecords = 0;
 
 	/**
+	 * AVU attribute
+	 */
+	private String attribute = "";
+	/**
+	 * AVU value
+	 */
+	private String value = "";
+	/**
+	 * AVU unit
+	 */
+	private String unit = "";
+
+	/**
+	 * @return the attribute
+	 */
+	@XmlElement
+	public String getAttribute() {
+		return attribute;
+	}
+
+	/**
+	 * @return the value
+	 */
+	@XmlElement
+	public String getValue() {
+		return value;
+	}
+
+	/**
+	 * @return the unit
+	 */
+	@XmlElement
+	public String getUnit() {
+		return unit;
+	}
+
+	/**
+	 * @param attribute
+	 *            the attribute to set
+	 */
+	public void setAttribute(final String attribute) {
+		this.attribute = attribute;
+	}
+
+	/**
+	 * @param value
+	 *            the value to set
+	 */
+	public void setValue(final String value) {
+		this.value = value;
+	}
+
+	/**
+	 * @param unit
+	 *            the unit to set
+	 */
+	public void setUnit(final String unit) {
+		this.unit = unit;
+	}
+
+	/**
 	 * Indicates whether this is the last result based on the query or listing
 	 * operation. Many operations in Jargon produce a pageable result set, and
 	 * methods are available to requery at an offset or contine paging results.
@@ -39,7 +101,7 @@ public class MetadataQueryResultEntry extends MetadataEntry {
 	 * @return <code>boolean</code> that will be <code>true</code> if no more
 	 *         results are available.
 	 */
-	@XmlAttribute
+	@XmlAttribute(name = "isLastResult")
 	public boolean isLastResult() {
 		return lastResult;
 	}
@@ -61,7 +123,7 @@ public class MetadataQueryResultEntry extends MetadataEntry {
 	 * @return <code>int</code> with a record sequence number that can be used
 	 *         for setting offsets on subsequent queries.
 	 */
-	@XmlAttribute
+	@XmlAttribute(name = "count")
 	public int getCount() {
 		return count;
 	}
@@ -86,7 +148,7 @@ public class MetadataQueryResultEntry extends MetadataEntry {
 	 * @return <code>int</code> with the total number of records that match this
 	 *         query, not always available and otherwise zero
 	 */
-	@XmlAttribute
+	@XmlAttribute(name = "totalRecords")
 	public int getTotalRecords() {
 		return totalRecords;
 	}

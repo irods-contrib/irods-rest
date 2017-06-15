@@ -22,7 +22,7 @@ import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry.ObjectTyp
 @XmlRootElement(name = "metadataListing")
 public class MetadataListing {
 
-	private List<MetadataQueryResultEntry> metadataEntries = new ArrayList<MetadataQueryResultEntry>();
+	private List<MetadataQueryResultEntry> metadataEntries = new ArrayList<>();
 
 	/**
 	 * Type of iRODS domain object (collection, data object, etc) that this
@@ -50,15 +50,14 @@ public class MetadataListing {
 	 * @param metadataEntries
 	 *            the metadataEntries to set
 	 */
-	public void setMetadataEntries(
-			final List<MetadataQueryResultEntry> metadataEntries) {
+	public void setMetadataEntries(final List<MetadataQueryResultEntry> metadataEntries) {
 		this.metadataEntries = metadataEntries;
 	}
 
 	/**
 	 * @return the objectType
 	 */
-	@XmlAttribute
+	@XmlAttribute(name = "objectType")
 	public CollectionAndDataObjectListingEntry.ObjectType getObjectType() {
 		return objectType;
 	}
@@ -67,8 +66,7 @@ public class MetadataListing {
 	 * @param objectType
 	 *            the objectType to set
 	 */
-	public void setObjectType(
-			final CollectionAndDataObjectListingEntry.ObjectType objectType) {
+	public void setObjectType(final CollectionAndDataObjectListingEntry.ObjectType objectType) {
 		this.objectType = objectType;
 	}
 
