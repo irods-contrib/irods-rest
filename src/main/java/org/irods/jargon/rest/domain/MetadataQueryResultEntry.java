@@ -101,7 +101,7 @@ public class MetadataQueryResultEntry {
 	 * @return <code>boolean</code> that will be <code>true</code> if no more
 	 *         results are available.
 	 */
-	@XmlAttribute(name = "isLastResult")
+	@XmlAttribute(name = "lastResult")
 	public boolean isLastResult() {
 		return lastResult;
 	}

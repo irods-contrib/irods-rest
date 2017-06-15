@@ -22,20 +22,12 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({
-		UserGroupServiceTest.class,
-		UserServiceTest.class,
-		ServerEnvironmentServiceTest.class,
-		CollectionServiceTest.class,
-		DataObjectServiceTest.class,
-		FileContentsServiceTest.class,
+@SuiteClasses({ UserGroupServiceTest.class, UserServiceTest.class, ServerEnvironmentServiceTest.class,
+		CollectionServiceTest.class, DataObjectServiceTest.class, FileContentsServiceTest.class,
 		// FileContentsServiceTicketsTest.class,
-		ServiceFunctionFactoryImplTest.class,
-		CollectionAclFunctionsImplTest.class,
-		DataObjectAclFunctionsImplTest.class,
-		DataObjectAvuFunctionsImplTest.class, RuleFunctionsImplTest.class,
-		RuleServiceTest.class, IrodsCorsFilterTest.class,
-		TemporaryPasswordServiceTest.class, PamAuthTest.class,
+		ServiceFunctionFactoryImplTest.class, CollectionAclFunctionsImplTest.class,
+		DataObjectAclFunctionsImplTest.class, DataObjectAvuFunctionsImplTest.class, RuleFunctionsImplTest.class,
+		RuleServiceTest.class, IrodsCorsFilterTest.class, TemporaryPasswordServiceTest.class, PamAuthTest.class,
 		GenQueryServiceTest.class, // TicketServiceTest.class,
 		ListAllTicketsServiceTest.class })
 public class AllTests {

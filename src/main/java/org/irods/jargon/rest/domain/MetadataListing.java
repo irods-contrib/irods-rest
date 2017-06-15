@@ -19,7 +19,7 @@ import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry.ObjectTyp
  * @author Mike Conway - DICE (www.irods.org)
  * 
  */
-@XmlRootElement(name = "metadataListing")
+@XmlRootElement
 public class MetadataListing {
 
 	private List<MetadataQueryResultEntry> metadataEntries = new ArrayList<>();

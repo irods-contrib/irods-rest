@@ -19,7 +19,7 @@ import org.irods.jargon.core.pub.domain.ObjStat.SpecColType;
  * @author Mike Conway - DICE (www.irods.org)
  * 
  */
-@XmlRootElement(name = "collection")
+@XmlRootElement
 public class CollectionData {
 
 	private int collectionId = 0;
@@ -50,7 +50,7 @@ public class CollectionData {
 	private Date createdAt = new Date();
 	private Date modifiedAt = new Date();
 	private SpecColType specColType = SpecColType.NORMAL;
-	private List<FileListingEntry> children = new ArrayList<FileListingEntry>();
+	private List<FileListingEntry> children = new ArrayList<>();
 
 	/**
 	 * 
