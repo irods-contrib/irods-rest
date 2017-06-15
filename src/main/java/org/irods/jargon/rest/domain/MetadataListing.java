@@ -8,7 +8,6 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
 import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry;
 import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry.ObjectType;
@@ -19,7 +18,7 @@ import org.irods.jargon.core.query.CollectionAndDataObjectListingEntry.ObjectTyp
  * @author Mike Conway - DICE (www.irods.org)
  * 
  */
-@XmlRootElement
+// @XmlRootElement
 public class MetadataListing {
 
 	private List<MetadataQueryResultEntry> metadataEntries = new ArrayList<>();
