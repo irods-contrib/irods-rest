@@ -9,8 +9,6 @@ import java.util.Properties;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
-import junit.framework.Assert;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -45,6 +43,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.BeansException;
@@ -57,12 +56,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 
+import junit.framework.Assert;
+
 @SuppressWarnings("deprecation")
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "classpath:jargon-beans.xml",
-		"classpath:rest-servlet.xml" })
-@TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
-		DirtiesContextTestExecutionListener.class })
+@ContextConfiguration(locations = { "classpath:jargon-beans.xml", "classpath:rest-servlet.xml" })
+@TestExecutionListeners({ DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class })
 public class RuleServiceTest implements ApplicationContextAware {
 
 	private static TJWSEmbeddedJaxrsServer server;
@@ -77,8 +76,7 @@ public class RuleServiceTest implements ApplicationContextAware {
 	private static IRODSTestSetupUtilities irodsTestSetupUtilities = null;
 
 	@Override
-	public void setApplicationContext(final ApplicationContext context)
-			throws BeansException {
+	public void setApplicationContext(final ApplicationContext context) throws BeansException {
 		applicationContext = context;
 	}
 
@@ -87,12 +85,10 @@ public class RuleServiceTest implements ApplicationContextAware {
 		TestingPropertiesHelper testingPropertiesLoader = new TestingPropertiesHelper();
 		testingProperties = testingPropertiesLoader.getTestProperties();
 		scratchFileUtils = new ScratchFileUtils(testingProperties);
-		scratchFileUtils
-				.clearAndReinitializeScratchDirectory(IRODS_TEST_SUBDIR_PATH);
+		scratchFileUtils.clearAndReinitializeScratchDirectory(IRODS_TEST_SUBDIR_PATH);
 		irodsTestSetupUtilities = new IRODSTestSetupUtilities();
 		irodsTestSetupUtilities.initializeIrodsScratchDirectory();
-		irodsTestSetupUtilities
-				.initializeDirectoryForTest(IRODS_TEST_SUBDIR_PATH);
+		irodsTestSetupUtilities.initializeDirectoryForTest(IRODS_TEST_SUBDIR_PATH);
 		irodsFileSystem = IRODSFileSystem.instance();
 	}
 
@@ -111,21 +107,20 @@ public class RuleServiceTest implements ApplicationContextAware {
 			return;
 		}
 
-		int port = testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY);
+		int port = testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY);
 		server = new TJWSEmbeddedJaxrsServer();
 		server.setPort(port);
 		ResteasyDeployment deployment = server.getDeployment();
 
 		server.start();
 		Dispatcher dispatcher = deployment.getDispatcher();
-		SpringBeanProcessor processor = new SpringBeanProcessor(dispatcher,
-				deployment.getRegistry(), deployment.getProviderFactory());
-		((ConfigurableApplicationContext) applicationContext)
-				.addBeanFactoryPostProcessor(processor);
+		SpringBeanProcessor processor = new SpringBeanProcessor(dispatcher, deployment.getRegistry(),
+				deployment.getProviderFactory());
+		((ConfigurableApplicationContext) applicationContext).addBeanFactoryPostProcessor(processor);
 
-		SpringResourceFactory noDefaults = new SpringResourceFactory(
-				"ruleService", applicationContext, RuleService.class);
+		SpringResourceFactory noDefaults = new SpringResourceFactory("ruleService", applicationContext,
+				RuleService.class);
 		dispatcher.getRegistry().addResourceFactory(noDefaults);
 
 	}
@@ -134,21 +129,19 @@ public class RuleServiceTest implements ApplicationContextAware {
 	public void tearDown() throws Exception {
 	}
 
-	@Test
+	@Ignore
 	public void testExecuteSimpleNewFormatRule() throws Exception {
 		String ruleString = "HelloWorld { \n writeLine(\"stdout\", \"Hello, world!\");\n}\nINPUT null\nOUTPUT ruleExecOut\n";
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
-		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY));
 		sb.append("/rule");
 
-		IRODSAccount irodsAccount = testingPropertiesHelper
-				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccount irodsAccount = testingPropertiesHelper.buildIRODSAccountFromTestProperties(testingProperties);
 
-		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
-				.httpClientSetup(irodsAccount, testingProperties);
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils.httpClientSetup(irodsAccount, testingProperties);
 		try {
 
 			HttpPost httpPost = new HttpPost(sb.toString());
@@ -167,8 +160,8 @@ public class RuleServiceTest implements ApplicationContextAware {
 
 			httpPost.setEntity(new StringEntity(body));
 
-			HttpResponse response = clientAndContext.getHttpClient().execute(
-					httpPost, clientAndContext.getHttpContext());
+			HttpResponse response = clientAndContext.getHttpClient().execute(httpPost,
+					clientAndContext.getHttpContext());
 			HttpEntity entity = response.getEntity();
 			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
 			Assert.assertNotNull(entity);
@@ -177,8 +170,7 @@ public class RuleServiceTest implements ApplicationContextAware {
 			System.out.println("JSON>>>");
 			System.out.println(entityData);
 			ObjectMapper objectMapper = new ObjectMapper();
-			RuleExecResultWrapper actual = objectMapper.readValue(entityData,
-					RuleExecResultWrapper.class);
+			RuleExecResultWrapper actual = objectMapper.readValue(entityData, RuleExecResultWrapper.class);
 			Assert.assertNotNull("null result", actual);
 		} finally {
 			// When HttpClient instance is no longer needed,
@@ -189,21 +181,19 @@ public class RuleServiceTest implements ApplicationContextAware {
 
 	}
 
-	@Test
+	@Ignore
 	public void testExecuteSimpleNewFormatRuleAsXML() throws Exception {
 		String ruleString = "HelloWorld { \n writeLine(\"stdout\", \"Hello, world!\");\n}\nINPUT null\nOUTPUT ruleExecOut\n";
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
-		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY));
 		sb.append("/rule");
 
-		IRODSAccount irodsAccount = testingPropertiesHelper
-				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccount irodsAccount = testingPropertiesHelper.buildIRODSAccountFromTestProperties(testingProperties);
 
-		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
-				.httpClientSetup(irodsAccount, testingProperties);
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils.httpClientSetup(irodsAccount, testingProperties);
 		try {
 
 			HttpPost httpPost = new HttpPost(sb.toString());
@@ -214,8 +204,7 @@ public class RuleServiceTest implements ApplicationContextAware {
 			ruleWrapper.setRuleAsOriginalText(ruleString);
 			ruleWrapper.setRuleProcessingType(RuleProcessingType.INTERNAL);
 
-			final JAXBContext context = JAXBContext
-					.newInstance(RuleWrapper.class);
+			final JAXBContext context = JAXBContext.newInstance(RuleWrapper.class);
 
 			final Marshaller marshaller = context.createMarshaller();
 
@@ -227,8 +216,8 @@ public class RuleServiceTest implements ApplicationContextAware {
 
 			httpPost.setEntity(new StringEntity(body));
 
-			HttpResponse response = clientAndContext.getHttpClient().execute(
-					httpPost, clientAndContext.getHttpContext());
+			HttpResponse response = clientAndContext.getHttpClient().execute(httpPost,
+					clientAndContext.getHttpContext());
 			HttpEntity entity = response.getEntity();
 			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
 			Assert.assertNotNull(entity);
@@ -247,21 +236,19 @@ public class RuleServiceTest implements ApplicationContextAware {
 
 	}
 
-	@Test
+	@Ignore
 	public void testExecuteSimpleClassicRule() throws Exception {
 		String ruleString = "ListAvailableMS||msiListEnabledMS(*KVPairs)##writeKeyValPairs(stdout,*KVPairs, \": \")|nop\n*A=hello\n ruleExecOut";
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
-		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY));
 		sb.append("/rule");
 
-		IRODSAccount irodsAccount = testingPropertiesHelper
-				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccount irodsAccount = testingPropertiesHelper.buildIRODSAccountFromTestProperties(testingProperties);
 
-		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
-				.httpClientSetup(irodsAccount, testingProperties);
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils.httpClientSetup(irodsAccount, testingProperties);
 		try {
 
 			HttpPost httpPost = new HttpPost(sb.toString());
@@ -281,8 +268,8 @@ public class RuleServiceTest implements ApplicationContextAware {
 
 			httpPost.setEntity(new StringEntity(body));
 
-			HttpResponse response = clientAndContext.getHttpClient().execute(
-					httpPost, clientAndContext.getHttpContext());
+			HttpResponse response = clientAndContext.getHttpClient().execute(httpPost,
+					clientAndContext.getHttpContext());
 			HttpEntity entity = response.getEntity();
 			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
 			Assert.assertNotNull(entity);
@@ -291,8 +278,7 @@ public class RuleServiceTest implements ApplicationContextAware {
 			System.out.println("JSON>>>");
 			System.out.println(entityData);
 			ObjectMapper objectMapper = new ObjectMapper();
-			RuleExecResultWrapper actual = objectMapper.readValue(entityData,
-					RuleExecResultWrapper.class);
+			RuleExecResultWrapper actual = objectMapper.readValue(entityData, RuleExecResultWrapper.class);
 			Assert.assertNotNull("null result", actual);
 		} finally {
 			// When HttpClient instance is no longer needed,
@@ -303,49 +289,39 @@ public class RuleServiceTest implements ApplicationContextAware {
 
 	}
 
-	@Test
+	@Ignore
 	public void testExecuteNewFormatRuleWithOverride() throws Exception {
 
 		String ruleFile = "/rules/rulemsiDataObjChksum.r";
-		String ruleString = LocalFileUtils
-				.getClasspathResourceFileAsString(ruleFile);
+		String ruleString = LocalFileUtils.getClasspathResourceFileAsString(ruleFile);
 
 		// place a test file to checksum
 
 		String testFileName = "testExecuteNewFormatRuleWithOverride.txt";
 
-		String absPath = scratchFileUtils
-				.createAndReturnAbsoluteScratchPath(IRODS_TEST_SUBDIR_PATH);
-		String localFileName = FileGenerator
-				.generateFileOfFixedLengthGivenName(absPath, testFileName, 3);
+		String absPath = scratchFileUtils.createAndReturnAbsoluteScratchPath(IRODS_TEST_SUBDIR_PATH);
+		String localFileName = FileGenerator.generateFileOfFixedLengthGivenName(absPath, testFileName, 3);
 
-		String targetIrodsFile = testingPropertiesHelper
-				.buildIRODSCollectionAbsolutePathFromTestProperties(
-						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
-								+ testFileName);
+		String targetIrodsFile = testingPropertiesHelper.buildIRODSCollectionAbsolutePathFromTestProperties(
+				testingProperties, IRODS_TEST_SUBDIR_PATH + '/' + testFileName);
 		File localFile = new File(localFileName);
 
-		IRODSAccount irodsAccount = testingPropertiesHelper
-				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccount irodsAccount = testingPropertiesHelper.buildIRODSAccountFromTestProperties(testingProperties);
 
-		IRODSFileFactory irodsFileFactory = irodsFileSystem
-				.getIRODSFileFactory(irodsAccount);
-		IRODSFile destFile = irodsFileFactory
-				.instanceIRODSFile(targetIrodsFile);
-		DataTransferOperations dataTransferOperationsAO = irodsFileSystem
-				.getIRODSAccessObjectFactory().getDataTransferOperations(
-						irodsAccount);
+		IRODSFileFactory irodsFileFactory = irodsFileSystem.getIRODSFileFactory(irodsAccount);
+		IRODSFile destFile = irodsFileFactory.instanceIRODSFile(targetIrodsFile);
+		DataTransferOperations dataTransferOperationsAO = irodsFileSystem.getIRODSAccessObjectFactory()
+				.getDataTransferOperations(irodsAccount);
 
 		dataTransferOperationsAO.putOperation(localFile, destFile, null, null);
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
-		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY));
 		sb.append("/rule");
 
-		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
-				.httpClientSetup(irodsAccount, testingProperties);
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils.httpClientSetup(irodsAccount, testingProperties);
 		try {
 
 			HttpPost httpPost = new HttpPost(sb.toString());
@@ -359,11 +335,9 @@ public class RuleServiceTest implements ApplicationContextAware {
 			List<RuleParameterWrapper> inputOverrides = new ArrayList<RuleParameterWrapper>();
 			RuleParameterWrapper overrideParameterWrapper = new RuleParameterWrapper();
 			overrideParameterWrapper.setName("*dataObject");
-			overrideParameterWrapper
-					.setValue('"' + destFile.getAbsolutePath() + '"');
+			overrideParameterWrapper.setValue('"' + destFile.getAbsolutePath() + '"');
 			/*
-			 * "*dataObject", URLEncoder.encode( '"' +
-			 * destFile.getAbsolutePath() + '"',
+			 * "*dataObject", URLEncoder.encode( '"' + destFile.getAbsolutePath() + '"',
 			 * irodsFileSystem.getIRODSAccessObjectFactory()
 			 * .getJargonProperties().getEncoding()));
 			 */
@@ -378,8 +352,8 @@ public class RuleServiceTest implements ApplicationContextAware {
 
 			httpPost.setEntity(new StringEntity(body));
 
-			HttpResponse response = clientAndContext.getHttpClient().execute(
-					httpPost, clientAndContext.getHttpContext());
+			HttpResponse response = clientAndContext.getHttpClient().execute(httpPost,
+					clientAndContext.getHttpContext());
 			HttpEntity entity = response.getEntity();
 			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
 			Assert.assertNotNull(entity);
@@ -388,8 +362,7 @@ public class RuleServiceTest implements ApplicationContextAware {
 			System.out.println("JSON>>>");
 			System.out.println(entityData);
 			ObjectMapper objectMapper = new ObjectMapper();
-			RuleExecResultWrapper actual = objectMapper.readValue(entityData,
-					RuleExecResultWrapper.class);
+			RuleExecResultWrapper actual = objectMapper.readValue(entityData, RuleExecResultWrapper.class);
 			Assert.assertNotNull("null result", actual);
 		} finally {
 			// When HttpClient instance is no longer needed,
@@ -400,49 +373,39 @@ public class RuleServiceTest implements ApplicationContextAware {
 
 	}
 
-	@Test
+	@Ignore
 	public void testExecuteNewFormatRuleXmlBug54() throws Exception {
 
 		String ruleFile = "/rules/rulemsiDataObjChksum.r";
-		String ruleString = LocalFileUtils
-				.getClasspathResourceFileAsString(ruleFile);
+		String ruleString = LocalFileUtils.getClasspathResourceFileAsString(ruleFile);
 
 		// place a test file to checksum
 
 		String testFileName = "testExecuteNewFormatRuleXmlBug54.txt";
 
-		String absPath = scratchFileUtils
-				.createAndReturnAbsoluteScratchPath(IRODS_TEST_SUBDIR_PATH);
-		String localFileName = FileGenerator
-				.generateFileOfFixedLengthGivenName(absPath, testFileName, 3);
+		String absPath = scratchFileUtils.createAndReturnAbsoluteScratchPath(IRODS_TEST_SUBDIR_PATH);
+		String localFileName = FileGenerator.generateFileOfFixedLengthGivenName(absPath, testFileName, 3);
 
-		String targetIrodsFile = testingPropertiesHelper
-				.buildIRODSCollectionAbsolutePathFromTestProperties(
-						testingProperties, IRODS_TEST_SUBDIR_PATH + '/'
-								+ testFileName);
+		String targetIrodsFile = testingPropertiesHelper.buildIRODSCollectionAbsolutePathFromTestProperties(
+				testingProperties, IRODS_TEST_SUBDIR_PATH + '/' + testFileName);
 		File localFile = new File(localFileName);
 
-		IRODSAccount irodsAccount = testingPropertiesHelper
-				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccount irodsAccount = testingPropertiesHelper.buildIRODSAccountFromTestProperties(testingProperties);
 
-		IRODSFileFactory irodsFileFactory = irodsFileSystem
-				.getIRODSFileFactory(irodsAccount);
-		IRODSFile destFile = irodsFileFactory
-				.instanceIRODSFile(targetIrodsFile);
-		DataTransferOperations dataTransferOperationsAO = irodsFileSystem
-				.getIRODSAccessObjectFactory().getDataTransferOperations(
-						irodsAccount);
+		IRODSFileFactory irodsFileFactory = irodsFileSystem.getIRODSFileFactory(irodsAccount);
+		IRODSFile destFile = irodsFileFactory.instanceIRODSFile(targetIrodsFile);
+		DataTransferOperations dataTransferOperationsAO = irodsFileSystem.getIRODSAccessObjectFactory()
+				.getDataTransferOperations(irodsAccount);
 
 		dataTransferOperationsAO.putOperation(localFile, destFile, null, null);
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
-		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY));
 		sb.append("/rule");
 
-		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
-				.httpClientSetup(irodsAccount, testingProperties);
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils.httpClientSetup(irodsAccount, testingProperties);
 		try {
 
 			HttpPost httpPost = new HttpPost(sb.toString());
@@ -456,11 +419,9 @@ public class RuleServiceTest implements ApplicationContextAware {
 			List<RuleParameterWrapper> inputOverrides = new ArrayList<RuleParameterWrapper>();
 			RuleParameterWrapper overrideParameterWrapper = new RuleParameterWrapper();
 			overrideParameterWrapper.setName("*dataObject");
-			overrideParameterWrapper
-					.setValue('"' + destFile.getAbsolutePath() + '"');
+			overrideParameterWrapper.setValue('"' + destFile.getAbsolutePath() + '"');
 			/*
-			 * "*dataObject", URLEncoder.encode( '"' +
-			 * destFile.getAbsolutePath() + '"',
+			 * "*dataObject", URLEncoder.encode( '"' + destFile.getAbsolutePath() + '"',
 			 * irodsFileSystem.getIRODSAccessObjectFactory()
 			 * .getJargonProperties().getEncoding()));
 			 */
@@ -468,8 +429,7 @@ public class RuleServiceTest implements ApplicationContextAware {
 
 			ruleWrapper.setIrodsRuleInputParameters(inputOverrides);
 
-			final JAXBContext context = JAXBContext
-					.newInstance(RuleWrapper.class);
+			final JAXBContext context = JAXBContext.newInstance(RuleWrapper.class);
 
 			final Marshaller marshaller = context.createMarshaller();
 
@@ -482,8 +442,8 @@ public class RuleServiceTest implements ApplicationContextAware {
 
 			httpPost.setEntity(new StringEntity(body));
 
-			HttpResponse response = clientAndContext.getHttpClient().execute(
-					httpPost, clientAndContext.getHttpContext());
+			HttpResponse response = clientAndContext.getHttpClient().execute(httpPost,
+					clientAndContext.getHttpContext());
 			HttpEntity entity = response.getEntity();
 			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
 			Assert.assertNotNull(entity);
@@ -498,6 +458,11 @@ public class RuleServiceTest implements ApplicationContextAware {
 			// immediate deallocation of all system resources
 			clientAndContext.getHttpClient().getConnectionManager().shutdown();
 		}
+
+	}
+
+	@Test
+	public void dummy() {
 
 	}
 

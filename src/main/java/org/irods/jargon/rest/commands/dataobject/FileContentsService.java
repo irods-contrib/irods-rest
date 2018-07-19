@@ -69,33 +69,28 @@ public class FileContentsService extends AbstractIrodsService {
 	/**
 	 * Do a straight upload of the contents to an iRODS file.
 	 * <p/>
-	 * This POST operation looks for a mulit-part file attachment (a single
-	 * file) with a name of <code>uploadFile</code> in the multipart form data.
-	 * See the companion JUnit test for an Apache HTTP client invocation
-	 * example.
+	 * This POST operation looks for a mulit-part file attachment (a single file)
+	 * with a name of <code>uploadFile</code> in the multipart form data. See the
+	 * companion JUnit test for an Apache HTTP client invocation example.
 	 * 
 	 * @param authorization
 	 *            <code>String</code> with the basic auth header
 	 * @param path
-	 *            <code>String</code> with the iRODS absolute path derived from
-	 *            the URL extra path information
+	 *            <code>String</code> with the iRODS absolute path derived from the
+	 *            URL extra path information
 	 * @param input
-	 *            {@link MultipartFormDataInput} provided by the RESTEasy
-	 *            framework
+	 *            {@link MultipartFormDataInput} provided by the RESTEasy framework
 	 * @return {@link DataObjectData} marshaled in the appropriate format. This
-	 *         reflects the new iRODS file created and can serve as a
-	 *         confirmation
+	 *         reflects the new iRODS file created and can serve as a confirmation
 	 * @throws JargonException
 	 */
 	@POST
 	@Path("{path:.*}")
 	@Consumes("multipart/form-data")
-	@Produces({ "application/xml", "application/json" })
+	@Produces({ "application/json" })
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
-	public DataObjectData uploadFile(
-			@HeaderParam("Authorization") final String authorization,
-			@PathParam("path") final String path,
-			final MultipartFormDataInput input) throws JargonException {
+	public DataObjectData uploadFile(@HeaderParam("Authorization") final String authorization,
+			@PathParam("path") final String path, final MultipartFormDataInput input) throws JargonException {
 
 		log.info("uploadFile()");
 
@@ -110,8 +105,7 @@ public class FileContentsService extends AbstractIrodsService {
 		List<InputPart> inputParts = uploadForm.get("uploadFile");
 
 		if (inputParts == null) {
-			throw new IllegalArgumentException(
-					"uploadedFile missing in form data");
+			throw new IllegalArgumentException("uploadedFile missing in form data");
 		}
 
 		if (inputParts.isEmpty()) {
@@ -125,55 +119,43 @@ public class FileContentsService extends AbstractIrodsService {
 		IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
 
 		/*
-		 * The path param in the URL gives the target file in iRODS, there is
-		 * only one
+		 * The path param in the URL gives the target file in iRODS, there is only one
 		 */
 
-		String decodedPathString = DataUtils.buildDecodedPathFromURLPathInfo(
-				path, retrieveEncoding());
+		String decodedPathString = DataUtils.buildDecodedPathFromURLPathInfo(path, retrieveEncoding());
 
 		try {
 
-			IRODSFile dataFile = getIrodsAccessObjectFactory()
-					.getIRODSFileFactory(irodsAccount).instanceIRODSFile(
-							decodedPathString);
+			IRODSFile dataFile = getIrodsAccessObjectFactory().getIRODSFileFactory(irodsAccount)
+					.instanceIRODSFile(decodedPathString);
 
 			InputPart inputPart = inputParts.get(0);
-			Stream2StreamAO stream2StreamAO = getIrodsAccessObjectFactory()
-					.getStream2StreamAO(irodsAccount);
-			DataObjectAO dataObjectAO = getIrodsAccessObjectFactory()
-					.getDataObjectAO(irodsAccount);
+			Stream2StreamAO stream2StreamAO = getIrodsAccessObjectFactory().getStream2StreamAO(irodsAccount);
+			DataObjectAO dataObjectAO = getIrodsAccessObjectFactory().getDataObjectAO(irodsAccount);
 			log.info("creating target output stream to irods..");
-			OutputStream outputStream = getIrodsAccessObjectFactory()
-					.getIRODSFileFactory(irodsAccount)
+			OutputStream outputStream = getIrodsAccessObjectFactory().getIRODSFileFactory(irodsAccount)
 					.instanceIRODSFileOutputStream(dataFile);
 			// convert the uploaded file to inputstream
-			InputStream inputStream = new BufferedInputStream(
-					inputPart.getBody(InputStream.class, null));
+			InputStream inputStream = new BufferedInputStream(inputPart.getBody(InputStream.class, null));
 
 			if (this.getRestConfiguration().isUtilizePackingStreams()) {
 				log.info("using packing streams scheme");
-				outputStream = new PackingIrodsOutputStream(
-						(IRODSFileOutputStream) outputStream);
-				stream2StreamAO.streamToStreamCopyUsingStandardIO(inputStream,
-						outputStream); // will flush and close
+				outputStream = new PackingIrodsOutputStream((IRODSFileOutputStream) outputStream);
+				stream2StreamAO.streamToStreamCopyUsingStandardIO(inputStream, outputStream); // will flush and close
 
 			} else {
 				log.info("using standard streams scheme");
 				log.info("getting input stream for file...");
 
 				log.info("started stream copy...");
-				stream2StreamAO.streamToStreamCopyUsingStandardIO(inputStream,
-						outputStream);
+				stream2StreamAO.streamToStreamCopyUsingStandardIO(inputStream, outputStream);
 			}
 
 			log.info("stream copy completed...look up resulting iRODS data object to prepare response");
-			DataObject dataObject = dataObjectAO
-					.findByAbsolutePath(decodedPathString);
+			DataObject dataObject = dataObjectAO.findByAbsolutePath(decodedPathString);
 
 			log.info("found dataObject, marshall the data:{}", dataObject);
-			DataObjectData dataObjectData = DataObjectServiceUtils
-					.buildDataObjectValuesFromIrodsData(dataObject);
+			DataObjectData dataObjectData = DataObjectServiceUtils.buildDataObjectValuesFromIrodsData(dataObject);
 
 			log.info("got data object data:{}", dataObjectData);
 
@@ -193,19 +175,17 @@ public class FileContentsService extends AbstractIrodsService {
 	 * @param authorization
 	 *            <code>String</code> with the basic auth header
 	 * @param path
-	 *            <code>String</code> with the iRODS absolute path derived from
-	 *            the URL extra path information
+	 *            <code>String</code> with the iRODS absolute path derived from the
+	 *            URL extra path information
 	 * @return
 	 * @throws JargonException
 	 */
 	@GET
 	@Path("{path:.*}")
 	@Produces(MediaType.APPLICATION_OCTET_STREAM)
-	public void getFile(
-			@HeaderParam("Authorization") final String authorization,
-			@PathParam("path") final String path,
-			@Context final HttpServletResponse response,
-			@Context final HttpServletRequest request) throws JargonException {
+	public void getFile(@HeaderParam("Authorization") final String authorization, @PathParam("path") final String path,
+			@Context final HttpServletResponse response, @Context final HttpServletRequest request)
+			throws JargonException {
 
 		log.info("getFile()");
 
@@ -220,34 +200,28 @@ public class FileContentsService extends AbstractIrodsService {
 		IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
 
 		/*
-		 * The path param in the URL gives the target file in iRODS, there is
-		 * only one
+		 * The path param in the URL gives the target file in iRODS, there is only one
 		 */
 
-		String decodedPathString = DataUtils.buildDecodedPathFromURLPathInfo(
-				path, retrieveEncoding());
+		String decodedPathString = DataUtils.buildDecodedPathFromURLPathInfo(path, retrieveEncoding());
 
 		log.info("decoded path:{}", decodedPathString);
 
 		try {
-			IRODSFile irodsFile = getIrodsAccessObjectFactory()
-					.getIRODSFileFactory(irodsAccount).instanceIRODSFile(
-							decodedPathString);
+			IRODSFile irodsFile = getIrodsAccessObjectFactory().getIRODSFileFactory(irodsAccount)
+					.instanceIRODSFile(decodedPathString);
 
 			if (!irodsFile.exists()) {
 				log.info("file does not exist");
-				throw new WebApplicationException(
-						HttpURLConnection.HTTP_NOT_FOUND);
+				throw new WebApplicationException(HttpURLConnection.HTTP_NOT_FOUND);
 			}
 
-			InputStream input = getIrodsAccessObjectFactory()
-					.getIRODSFileFactory(irodsAccount)
+			InputStream input = getIrodsAccessObjectFactory().getIRODSFileFactory(irodsAccount)
 					.instanceIRODSFileInputStream(irodsFile);
 
 			if (this.getRestConfiguration().isUtilizePackingStreams()) {
 				log.info("utilize packing stream for iRODS input");
-				input = new PackingIrodsInputStream(
-						(IRODSFileInputStream) input);
+				input = new PackingIrodsInputStream((IRODSFileInputStream) input);
 			}
 
 			log.debug("************* all response headers ************");
@@ -256,30 +230,24 @@ public class FileContentsService extends AbstractIrodsService {
 
 			response.setContentType("application/octet-stream");
 			response.setContentLength(contentLength);
-			response.setHeader("Content-disposition", "attachment; filename=\""
-					+ irodsFile.getName() + "\"");
+			response.setHeader("Content-disposition", "attachment; filename=\"" + irodsFile.getName() + "\"");
 
 			// test hack of origin for cors download
 
 			String origin = request.getHeader(CorsHeaders.ORIGIN);
 			if (origin != null) {
 				log.debug("adding an origin header for download per bug #11");
-				response.addHeader(CorsHeaders.ACCESS_CONTROL_ALLOW_ORIGIN,
-						origin);
+				response.addHeader(CorsHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
 			}
 
 			OutputStream output;
 			try {
 				output = new BufferedOutputStream(response.getOutputStream());
 			} catch (IOException ioe) {
-				log.error(
-						"io exception getting output stream to download file",
-						ioe);
-				throw new JargonException("exception downloading iRODS data",
-						ioe);
+				log.error("io exception getting output stream to download file", ioe);
+				throw new JargonException("exception downloading iRODS data", ioe);
 			}
-			Stream2StreamAO stream2StreamAO = getIrodsAccessObjectFactory()
-					.getStream2StreamAO(irodsAccount);
+			Stream2StreamAO stream2StreamAO = getIrodsAccessObjectFactory().getStream2StreamAO(irodsAccount);
 			stream2StreamAO.streamToStreamCopyUsingStandardIO(input, output);
 		} finally {
 			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();

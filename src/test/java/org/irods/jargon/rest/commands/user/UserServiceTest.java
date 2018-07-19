@@ -3,8 +3,6 @@ package org.irods.jargon.rest.commands.user;
 import java.io.File;
 import java.util.Properties;
 
-import junit.framework.Assert;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -46,11 +44,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 
+import junit.framework.Assert;
+
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "classpath:jargon-beans.xml",
-		"classpath:rest-servlet.xml" })
-@TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
-		DirtiesContextTestExecutionListener.class })
+@ContextConfiguration(locations = { "classpath:jargon-beans.xml", "classpath:rest-servlet.xml" })
+@TestExecutionListeners({ DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class })
 public class UserServiceTest implements ApplicationContextAware {
 
 	private static TJWSEmbeddedJaxrsServer server;
@@ -83,21 +81,20 @@ public class UserServiceTest implements ApplicationContextAware {
 			return;
 		}
 
-		int port = testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY);
+		int port = testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY);
 		server = new TJWSEmbeddedJaxrsServer();
 		server.setPort(port);
 		ResteasyDeployment deployment = server.getDeployment();
 
 		server.start();
 		Dispatcher dispatcher = deployment.getDispatcher();
-		SpringBeanProcessor processor = new SpringBeanProcessor(dispatcher,
-				deployment.getRegistry(), deployment.getProviderFactory());
-		((ConfigurableApplicationContext) applicationContext)
-				.addBeanFactoryPostProcessor(processor);
+		SpringBeanProcessor processor = new SpringBeanProcessor(dispatcher, deployment.getRegistry(),
+				deployment.getProviderFactory());
+		((ConfigurableApplicationContext) applicationContext).addBeanFactoryPostProcessor(processor);
 
-		SpringResourceFactory noDefaults = new SpringResourceFactory(
-				"userService", applicationContext, UserService.class);
+		SpringResourceFactory noDefaults = new SpringResourceFactory("userService", applicationContext,
+				UserService.class);
 		dispatcher.getRegistry().addResourceFactory(noDefaults);
 
 	}
@@ -109,36 +106,30 @@ public class UserServiceTest implements ApplicationContextAware {
 	@Test
 	public void testGetUserJSON() throws Exception {
 
-		IRODSAccount irodsAccount = testingPropertiesHelper
-				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccount irodsAccount = testingPropertiesHelper.buildIRODSAccountFromTestProperties(testingProperties);
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
-		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY));
 		sb.append("/user/");
 		sb.append(testingProperties.get(TestingPropertiesHelper.IRODS_USER_KEY));
 		// contentType doesn't really work in test container, set in the header
 		sb.append("?contentType=application/json");
 
-		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
-				.httpClientSetup(irodsAccount, testingProperties);
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils.httpClientSetup(irodsAccount, testingProperties);
 		try {
 
 			HttpGet httpget = new HttpGet(sb.toString());
 			httpget.addHeader("accept", "application/json");
 
-			HttpResponse response = clientAndContext.getHttpClient().execute(
-					httpget, clientAndContext.getHttpContext());
+			HttpResponse response = clientAndContext.getHttpClient().execute(httpget,
+					clientAndContext.getHttpContext());
 			HttpEntity entity = response.getEntity();
 			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
 			Assert.assertNotNull(entity);
 			String entityData = EntityUtils.toString(entity);
-			Assert.assertFalse(
-					"did not get json with user name",
-					entityData.indexOf("\"name\":\""
-							+ testingProperties
-									.get(TestingPropertiesHelper.IRODS_USER_KEY)
-							+ "\"") == -1);
+			Assert.assertFalse("did not get json with user name", entityData.indexOf(
+					"\"name\":\"" + testingProperties.get(TestingPropertiesHelper.IRODS_USER_KEY) + "\"") == -1);
 
 			EntityUtils.consume(entity);
 
@@ -153,36 +144,30 @@ public class UserServiceTest implements ApplicationContextAware {
 
 	public void testGetUserXML() throws Exception {
 
-		IRODSAccount irodsAccount = testingPropertiesHelper
-				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccount irodsAccount = testingPropertiesHelper.buildIRODSAccountFromTestProperties(testingProperties);
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
-		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY));
 		sb.append("/user/");
 		sb.append(testingProperties.get(TestingPropertiesHelper.IRODS_USER_KEY));
 		// contentType doesn't really work in test container, set in the header
 		sb.append("?contentType=application/xml");
 
-		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
-				.httpClientSetup(irodsAccount, testingProperties);
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils.httpClientSetup(irodsAccount, testingProperties);
 		try {
 
 			HttpGet httpget = new HttpGet(sb.toString());
 			httpget.addHeader("accept", "application/xml");
 
-			HttpResponse response = clientAndContext.getHttpClient().execute(
-					httpget, clientAndContext.getHttpContext());
+			HttpResponse response = clientAndContext.getHttpClient().execute(httpget,
+					clientAndContext.getHttpContext());
 			HttpEntity entity = response.getEntity();
 			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
 			Assert.assertNotNull(entity);
 			String entityData = EntityUtils.toString(entity);
-			Assert.assertFalse(
-					"did not get json with user name",
-					entityData.indexOf("name=\""
-							+ testingProperties
-									.get(TestingPropertiesHelper.IRODS_USER_KEY)
-							+ "\"") == -1);
+			Assert.assertFalse("did not get json with user name", entityData
+					.indexOf("name=\"" + testingProperties.get(TestingPropertiesHelper.IRODS_USER_KEY) + "\"") == -1);
 
 			EntityUtils.consume(entity);
 
@@ -197,27 +182,25 @@ public class UserServiceTest implements ApplicationContextAware {
 
 	@Test
 	public void testGetUserNull() throws Exception {
-		IRODSAccount irodsAccount = testingPropertiesHelper
-				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccount irodsAccount = testingPropertiesHelper.buildIRODSAccountFromTestProperties(testingProperties);
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
-		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY));
 		sb.append("/user/");
 
 		// contentType doesn't really work in test container, set in the header
 		sb.append("?contentType=application/xml");
 
-		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
-				.httpClientSetup(irodsAccount, testingProperties);
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils.httpClientSetup(irodsAccount, testingProperties);
 		try {
 
 			HttpGet httpget = new HttpGet(sb.toString());
 			httpget.addHeader("accept", "application/xml");
 
-			HttpResponse response = clientAndContext.getHttpClient().execute(
-					httpget, clientAndContext.getHttpContext());
+			HttpResponse response = clientAndContext.getHttpClient().execute(httpget,
+					clientAndContext.getHttpContext());
 			HttpEntity entity = response.getEntity();
 			Assert.assertEquals(405, response.getStatusLine().getStatusCode());
 			EntityUtils.consume(entity);
@@ -232,24 +215,21 @@ public class UserServiceTest implements ApplicationContextAware {
 
 	@Test
 	public void testGetUserInvalid() throws Exception {
-		IRODSAccount irodsAccount = testingPropertiesHelper
-				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccount irodsAccount = testingPropertiesHelper.buildIRODSAccountFromTestProperties(testingProperties);
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
-		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY));
 		sb.append("/user/iamaninvaliduser");
 
-		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
-				.httpClientSetup(irodsAccount, testingProperties);
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils.httpClientSetup(irodsAccount, testingProperties);
 		try {
 
 			HttpGet httpget = new HttpGet(sb.toString());
-			httpget.addHeader("accept", "application/xml");
 
-			HttpResponse response = clientAndContext.getHttpClient().execute(
-					httpget, clientAndContext.getHttpContext());
+			HttpResponse response = clientAndContext.getHttpClient().execute(httpget,
+					clientAndContext.getHttpContext());
 			HttpEntity entity = response.getEntity();
 			Assert.assertEquals(500, response.getStatusLine().getStatusCode());
 			EntityUtils.consume(entity);
@@ -269,23 +249,20 @@ public class UserServiceTest implements ApplicationContextAware {
 		String testUser = "testAddUserByAdminRest";
 		String testPassword = "test123";
 		String testDn = "testDNForaddubyAdminRest";
-		IRODSAccount irodsAccount = testingPropertiesHelper
-				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccount irodsAccount = testingPropertiesHelper.buildIRODSAccountFromTestProperties(testingProperties);
 
-		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
-				.getIRODSAccessObjectFactory();
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem.getIRODSAccessObjectFactory();
 
 		UserAO userAO = accessObjectFactory.getUserAO(irodsAccount);
 		userAO.deleteUser(testUser);
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
-		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY));
 		sb.append("/user/");
 
-		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
-				.httpClientSetup(irodsAccount, testingProperties);
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils.httpClientSetup(irodsAccount, testingProperties);
 		try {
 
 			HttpPut httpPut = new HttpPut(sb.toString());
@@ -303,24 +280,20 @@ public class UserServiceTest implements ApplicationContextAware {
 
 			httpPut.setEntity(new StringEntity(body));
 
-			HttpResponse response = clientAndContext.getHttpClient().execute(
-					httpPut, clientAndContext.getHttpContext());
+			HttpResponse response = clientAndContext.getHttpClient().execute(httpPut,
+					clientAndContext.getHttpContext());
 			HttpEntity entity = response.getEntity();
 			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
 			String entityData = EntityUtils.toString(entity);
 
 			System.out.println(entityData);
 
-			UserAddActionResponse actual = mapper.readValue(entityData,
-					UserAddActionResponse.class);
+			UserAddActionResponse actual = mapper.readValue(entityData, UserAddActionResponse.class);
 			Assert.assertEquals(testUser, actual.getUserName());
-			Assert.assertEquals(
-					UserAddActionResponse.UserAddActionResponseCode.SUCCESS,
+			Assert.assertEquals(UserAddActionResponse.UserAddActionResponseCode.SUCCESS,
 					actual.getUserAddActionResponse());
-			Assert.assertEquals(
-					UserAddActionResponse.UserAddActionResponseCode.SUCCESS
-							.ordinal(), actual
-							.getUserAddActionResponseNumericCode());
+			Assert.assertEquals(UserAddActionResponse.UserAddActionResponseCode.SUCCESS.ordinal(),
+					actual.getUserAddActionResponseNumericCode());
 
 		} finally {
 			// When HttpClient instance is no longer needed,
@@ -341,24 +314,19 @@ public class UserServiceTest implements ApplicationContextAware {
 		String testUser = "testAddUserByAdminLongDn";
 		String testPassword = "test123";
 		String testDN = "/CN=xxxxxyyxx-64f0-4d49-a0a9-508a8a5328cd/emailAddress=xxxxxxxxxxthismaynotshowup";
-		IRODSAccount irodsAccount = testingPropertiesHelper
-				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccount irodsAccount = testingPropertiesHelper.buildIRODSAccountFromTestProperties(testingProperties);
 
 		IRODSAccount userAccount = testingPropertiesHelper
-				.buildIRODSAccountForIRODSUserFromTestPropertiesForGivenUser(
-						testingProperties, testUser, testPassword);
+				.buildIRODSAccountForIRODSUserFromTestPropertiesForGivenUser(testingProperties, testUser, testPassword);
 
-		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
-				.getIRODSAccessObjectFactory();
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem.getIRODSAccessObjectFactory();
 
 		UserAO userAO = accessObjectFactory.getUserAO(irodsAccount);
 
 		try {
 			userAO.findByName(testUser);
-			String homeDir = MiscIRODSUtils
-					.computeHomeDirectoryForIRODSAccount(userAccount);
-			IRODSFile userHomeDir = irodsFileSystem.getIRODSFileFactory(
-					userAccount).instanceIRODSFile(homeDir);
+			String homeDir = MiscIRODSUtils.computeHomeDirectoryForIRODSAccount(userAccount);
+			IRODSFile userHomeDir = irodsFileSystem.getIRODSFileFactory(userAccount).instanceIRODSFile(homeDir);
 
 			for (File homeDirFile : userHomeDir.listFiles()) {
 				homeDirFile.delete();
@@ -371,12 +339,11 @@ public class UserServiceTest implements ApplicationContextAware {
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
-		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY));
 		sb.append("/user/");
 
-		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
-				.httpClientSetup(irodsAccount, testingProperties);
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils.httpClientSetup(irodsAccount, testingProperties);
 		try {
 
 			HttpPut httpPut = new HttpPut(sb.toString());
@@ -394,24 +361,20 @@ public class UserServiceTest implements ApplicationContextAware {
 
 			httpPut.setEntity(new StringEntity(body));
 
-			HttpResponse response = clientAndContext.getHttpClient().execute(
-					httpPut, clientAndContext.getHttpContext());
+			HttpResponse response = clientAndContext.getHttpClient().execute(httpPut,
+					clientAndContext.getHttpContext());
 			HttpEntity entity = response.getEntity();
 			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
 			String entityData = EntityUtils.toString(entity);
 
 			System.out.println(entityData);
 
-			UserAddActionResponse actual = mapper.readValue(entityData,
-					UserAddActionResponse.class);
+			UserAddActionResponse actual = mapper.readValue(entityData, UserAddActionResponse.class);
 			Assert.assertEquals(testUser, actual.getUserName());
-			Assert.assertEquals(
-					UserAddActionResponse.UserAddActionResponseCode.SUCCESS,
+			Assert.assertEquals(UserAddActionResponse.UserAddActionResponseCode.SUCCESS,
 					actual.getUserAddActionResponse());
-			Assert.assertEquals(
-					UserAddActionResponse.UserAddActionResponseCode.SUCCESS
-							.ordinal(), actual
-							.getUserAddActionResponseNumericCode());
+			Assert.assertEquals(UserAddActionResponse.UserAddActionResponseCode.SUCCESS.ordinal(),
+					actual.getUserAddActionResponseNumericCode());
 
 		} finally {
 			// When HttpClient instance is no longer needed,
@@ -431,11 +394,9 @@ public class UserServiceTest implements ApplicationContextAware {
 
 		String testUser = "testAddUserDuplicateByAdmin";
 		String testPassword = "test123";
-		IRODSAccount irodsAccount = testingPropertiesHelper
-				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccount irodsAccount = testingPropertiesHelper.buildIRODSAccountFromTestProperties(testingProperties);
 
-		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
-				.getIRODSAccessObjectFactory();
+		IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem.getIRODSAccessObjectFactory();
 
 		UserAO userAO = accessObjectFactory.getUserAO(irodsAccount);
 		userAO.deleteUser(testUser);
@@ -446,12 +407,11 @@ public class UserServiceTest implements ApplicationContextAware {
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
-		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY));
 		sb.append("/user/");
 
-		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
-				.httpClientSetup(irodsAccount, testingProperties);
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils.httpClientSetup(irodsAccount, testingProperties);
 		try {
 
 			HttpPut httpPut = new HttpPut(sb.toString());
@@ -469,24 +429,20 @@ public class UserServiceTest implements ApplicationContextAware {
 
 			httpPut.setEntity(new StringEntity(body));
 
-			HttpResponse response = clientAndContext.getHttpClient().execute(
-					httpPut, clientAndContext.getHttpContext());
+			HttpResponse response = clientAndContext.getHttpClient().execute(httpPut,
+					clientAndContext.getHttpContext());
 			HttpEntity entity = response.getEntity();
 			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
 			String entityData = EntityUtils.toString(entity);
 
 			System.out.println(entityData);
 
-			UserAddActionResponse actual = mapper.readValue(entityData,
-					UserAddActionResponse.class);
+			UserAddActionResponse actual = mapper.readValue(entityData, UserAddActionResponse.class);
 			Assert.assertEquals(testUser, actual.getUserName());
-			Assert.assertEquals(
-					UserAddActionResponse.UserAddActionResponseCode.USER_NAME_IS_TAKEN,
+			Assert.assertEquals(UserAddActionResponse.UserAddActionResponseCode.USER_NAME_IS_TAKEN,
 					actual.getUserAddActionResponse());
-			Assert.assertEquals(
-					UserAddActionResponse.UserAddActionResponseCode.USER_NAME_IS_TAKEN
-							.ordinal(), actual
-							.getUserAddActionResponseNumericCode());
+			Assert.assertEquals(UserAddActionResponse.UserAddActionResponseCode.USER_NAME_IS_TAKEN.ordinal(),
+					actual.getUserAddActionResponseNumericCode());
 
 		} finally {
 			// When HttpClient instance is no longer needed,
@@ -499,17 +455,15 @@ public class UserServiceTest implements ApplicationContextAware {
 	@Test
 	public void testAddUserByAdminInvalidMessage() throws Exception {
 
-		IRODSAccount irodsAccount = testingPropertiesHelper
-				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccount irodsAccount = testingPropertiesHelper.buildIRODSAccountFromTestProperties(testingProperties);
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
-		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY));
 		sb.append("/user/");
 
-		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
-				.httpClientSetup(irodsAccount, testingProperties);
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils.httpClientSetup(irodsAccount, testingProperties);
 		try {
 
 			HttpPut httpPut = new HttpPut(sb.toString());
@@ -518,8 +472,8 @@ public class UserServiceTest implements ApplicationContextAware {
 			String body = "I am not valid json";
 			httpPut.setEntity(new StringEntity(body));
 
-			HttpResponse response = clientAndContext.getHttpClient().execute(
-					httpPut, clientAndContext.getHttpContext());
+			HttpResponse response = clientAndContext.getHttpClient().execute(httpPut,
+					clientAndContext.getHttpContext());
 			Assert.assertEquals(400, response.getStatusLine().getStatusCode());
 
 		} finally {
@@ -534,17 +488,15 @@ public class UserServiceTest implements ApplicationContextAware {
 	public void testAddUserByAdminBlankUserName() throws Exception {
 
 		String testPassword = "test123";
-		IRODSAccount irodsAccount = testingPropertiesHelper
-				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccount irodsAccount = testingPropertiesHelper.buildIRODSAccountFromTestProperties(testingProperties);
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
-		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY));
 		sb.append("/user/");
 
-		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
-				.httpClientSetup(irodsAccount, testingProperties);
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils.httpClientSetup(irodsAccount, testingProperties);
 		try {
 
 			HttpPut httpPut = new HttpPut(sb.toString());
@@ -559,20 +511,16 @@ public class UserServiceTest implements ApplicationContextAware {
 			String body = mapper.writeValueAsString(addRequest);
 			httpPut.setEntity(new StringEntity(body));
 
-			HttpResponse response = clientAndContext.getHttpClient().execute(
-					httpPut, clientAndContext.getHttpContext());
+			HttpResponse response = clientAndContext.getHttpClient().execute(httpPut,
+					clientAndContext.getHttpContext());
 			HttpEntity entity = response.getEntity();
 			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
 			String entityData = EntityUtils.toString(entity);
-			UserAddActionResponse actual = mapper.readValue(entityData,
-					UserAddActionResponse.class);
-			Assert.assertEquals(
-					UserAddActionResponse.UserAddActionResponseCode.ATTRIBUTES_MISSING,
+			UserAddActionResponse actual = mapper.readValue(entityData, UserAddActionResponse.class);
+			Assert.assertEquals(UserAddActionResponse.UserAddActionResponseCode.ATTRIBUTES_MISSING,
 					actual.getUserAddActionResponse());
-			Assert.assertEquals(
-					UserAddActionResponse.UserAddActionResponseCode.ATTRIBUTES_MISSING
-							.ordinal(), actual
-							.getUserAddActionResponseNumericCode());
+			Assert.assertEquals(UserAddActionResponse.UserAddActionResponseCode.ATTRIBUTES_MISSING.ordinal(),
+					actual.getUserAddActionResponseNumericCode());
 
 		} finally {
 			// When HttpClient instance is no longer needed,
@@ -586,17 +534,15 @@ public class UserServiceTest implements ApplicationContextAware {
 	public void testAddUserByAdminBlankPassword() throws Exception {
 
 		String testUserName = "test123";
-		IRODSAccount irodsAccount = testingPropertiesHelper
-				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccount irodsAccount = testingPropertiesHelper.buildIRODSAccountFromTestProperties(testingProperties);
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("http://localhost:");
-		sb.append(testingPropertiesHelper.getPropertyValueAsInt(
-				testingProperties, RestTestingProperties.REST_PORT_PROPERTY));
+		sb.append(testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY));
 		sb.append("/user/");
 
-		DefaultHttpClientAndContext clientAndContext = RestAuthUtils
-				.httpClientSetup(irodsAccount, testingProperties);
+		DefaultHttpClientAndContext clientAndContext = RestAuthUtils.httpClientSetup(irodsAccount, testingProperties);
 		try {
 
 			HttpPut httpPut = new HttpPut(sb.toString());
@@ -611,20 +557,16 @@ public class UserServiceTest implements ApplicationContextAware {
 			String body = mapper.writeValueAsString(addRequest);
 			httpPut.setEntity(new StringEntity(body));
 
-			HttpResponse response = clientAndContext.getHttpClient().execute(
-					httpPut, clientAndContext.getHttpContext());
+			HttpResponse response = clientAndContext.getHttpClient().execute(httpPut,
+					clientAndContext.getHttpContext());
 			HttpEntity entity = response.getEntity();
 			Assert.assertEquals(200, response.getStatusLine().getStatusCode());
 			String entityData = EntityUtils.toString(entity);
-			UserAddActionResponse actual = mapper.readValue(entityData,
-					UserAddActionResponse.class);
-			Assert.assertEquals(
-					UserAddActionResponse.UserAddActionResponseCode.ATTRIBUTES_MISSING,
+			UserAddActionResponse actual = mapper.readValue(entityData, UserAddActionResponse.class);
+			Assert.assertEquals(UserAddActionResponse.UserAddActionResponseCode.ATTRIBUTES_MISSING,
 					actual.getUserAddActionResponse());
-			Assert.assertEquals(
-					UserAddActionResponse.UserAddActionResponseCode.ATTRIBUTES_MISSING
-							.ordinal(), actual
-							.getUserAddActionResponseNumericCode());
+			Assert.assertEquals(UserAddActionResponse.UserAddActionResponseCode.ATTRIBUTES_MISSING.ordinal(),
+					actual.getUserAddActionResponseNumericCode());
 
 		} finally {
 			// When HttpClient instance is no longer needed,
@@ -636,8 +578,7 @@ public class UserServiceTest implements ApplicationContextAware {
 	}
 
 	@Override
-	public void setApplicationContext(final ApplicationContext context)
-			throws BeansException {
+	public void setApplicationContext(final ApplicationContext context) throws BeansException {
 		applicationContext = context;
 	}
 

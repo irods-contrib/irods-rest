@@ -67,19 +67,17 @@ public class DataObjectService extends AbstractIrodsService {
 	 * @param authorization
 	 *            <code>String</code> with the basic auth header
 	 * @param path
-	 *            <code>String</code> with the iRODS absolute path derived from
-	 *            the URL extra path information
+	 *            <code>String</code> with the iRODS absolute path derived from the
+	 *            URL extra path information
 	 * @return {@link DataObjectData} marshaled in the appropriate format.
 	 * @throws JargonException
 	 */
 	@GET
 	@Path("{path:.*}")
-	@Produces({ "application/xml", "application/json" })
+	@Produces({ "application/json" })
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
-	public DataObjectData getDataObjectData(
-			@HeaderParam("Authorization") final String authorization,
-			@PathParam("path") final String path) throws JargonException,
-			FileNotFoundException {
+	public DataObjectData getDataObjectData(@HeaderParam("Authorization") final String authorization,
+			@PathParam("path") final String path) throws JargonException, FileNotFoundException {
 
 		log.info("getDataObjectData()");
 
@@ -93,18 +91,14 @@ public class DataObjectService extends AbstractIrodsService {
 
 		try {
 			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
-			DataObjectAO dataObjectAO = getIrodsAccessObjectFactory()
-					.getDataObjectAO(irodsAccount);
+			DataObjectAO dataObjectAO = getIrodsAccessObjectFactory().getDataObjectAO(irodsAccount);
 
-			String decodedPathString = DataUtils
-					.buildDecodedPathFromURLPathInfo(path, retrieveEncoding());
+			String decodedPathString = DataUtils.buildDecodedPathFromURLPathInfo(path, retrieveEncoding());
 			log.info("decoded path:{}", decodedPathString);
-			DataObject dataObject = dataObjectAO
-					.findByAbsolutePath(decodedPathString);
+			DataObject dataObject = dataObjectAO.findByAbsolutePath(decodedPathString);
 
 			log.info("found dataObject, marshall the data:{}", dataObject);
-			DataObjectData dataObjectData = DataObjectServiceUtils
-					.buildDataObjectValuesFromIrodsData(dataObject);
+			DataObjectData dataObjectData = DataObjectServiceUtils.buildDataObjectValuesFromIrodsData(dataObject);
 			log.info("got data object data:{}", dataObjectData);
 
 			return dataObjectData;
@@ -119,20 +113,18 @@ public class DataObjectService extends AbstractIrodsService {
 	 * @param authorization
 	 *            <code>String</code> with the basic auth header
 	 * @param path
-	 *            <code>String</code> with the iRODS absolute path derived from
-	 *            the URL extra path information
+	 *            <code>String</code> with the iRODS absolute path derived from the
+	 *            URL extra path information
 	 * @param force
-	 *            <code>boolean</code> that indicates whether the force option
-	 *            is enabled on deletion
+	 *            <code>boolean</code> that indicates whether the force option is
+	 *            enabled on deletion
 	 * @throws JargonException
 	 */
 	@DELETE
 	@Path("{path:.*}")
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
-	public void removeDataObject(
-			@HeaderParam("Authorization") final String authorization,
-			@PathParam("path") final String path,
-			@QueryParam("force") @DefaultValue("false") final boolean force)
+	public void removeDataObject(@HeaderParam("Authorization") final String authorization,
+			@PathParam("path") final String path, @QueryParam("force") @DefaultValue("false") final boolean force)
 			throws JargonException {
 
 		log.info("removeDataObject()");
@@ -148,15 +140,12 @@ public class DataObjectService extends AbstractIrodsService {
 		try {
 			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
 
-			String decodedPathString = DataUtils
-					.buildDecodedPathFromURLPathInfo(path, retrieveEncoding());
+			String decodedPathString = DataUtils.buildDecodedPathFromURLPathInfo(path, retrieveEncoding());
 
-			IRODSFile dataFile = getIrodsAccessObjectFactory()
-					.getIRODSFileFactory(irodsAccount).instanceIRODSFile(
-							decodedPathString);
+			IRODSFile dataFile = getIrodsAccessObjectFactory().getIRODSFileFactory(irodsAccount)
+					.instanceIRODSFile(decodedPathString);
 
-			log.info("removing directory at path:{}",
-					dataFile.getAbsolutePath());
+			log.info("removing directory at path:{}", dataFile.getAbsolutePath());
 
 			if (force) {
 				log.info("using force option...");
@@ -179,17 +168,16 @@ public class DataObjectService extends AbstractIrodsService {
 	 * @param authorization
 	 *            <code>String</code> with the basic auth header
 	 * @param path
-	 *            <code>String</code> with the iRODS absolute path derived from
-	 *            the URL extra path information
+	 *            <code>String</code> with the iRODS absolute path derived from the
+	 *            URL extra path information
 	 * @return
 	 * @throws JargonException
 	 */
 	@GET
 	@Path("{path:.*}/acl")
-	@Produces({ "application/xml", "application/json" })
+	@Produces({ "application/json" })
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
-	public PermissionListing getDataObjectAcl(
-			@HeaderParam("Authorization") final String authorization,
+	public PermissionListing getDataObjectAcl(@HeaderParam("Authorization") final String authorization,
 			@PathParam("path") final String path) throws JargonException {
 
 		log.info("getDataObjectAcl()");
@@ -203,8 +191,7 @@ public class DataObjectService extends AbstractIrodsService {
 		}
 
 		try {
-			String decodedPathString = DataUtils
-					.buildDecodedPathFromURLPathInfo(path, retrieveEncoding());
+			String decodedPathString = DataUtils.buildDecodedPathFromURLPathInfo(path, retrieveEncoding());
 			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
 
 			DataObjectAclFunctions dataObjectAclFunctions = getServiceFunctionFactory()
@@ -220,17 +207,16 @@ public class DataObjectService extends AbstractIrodsService {
 	 * @param authorization
 	 *            <code>String</code> with the basic auth header
 	 * @param path
-	 *            <code>String</code> with the iRODS absolute path derived from
-	 *            the URL extra path information
+	 *            <code>String</code> with the iRODS absolute path derived from the
+	 *            URL extra path information
 	 * @return
 	 * @throws JargonException
 	 */
 	@GET
 	@Path("{path:.*}/metadata")
-	@Produces({ "application/xml", "application/json" })
+	@Produces({ "application/json" })
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
-	public MetadataListing getDataObjectMetadata(
-			@HeaderParam("Authorization") final String authorization,
+	public MetadataListing getDataObjectMetadata(@HeaderParam("Authorization") final String authorization,
 			@PathParam("path") final String path) throws JargonException {
 
 		log.info("getDataObjectMetadata()");
@@ -243,19 +229,16 @@ public class DataObjectService extends AbstractIrodsService {
 			throw new IllegalArgumentException("null or empty path");
 		}
 
-		String decodedPathString = DataUtils.buildDecodedPathFromURLPathInfo(
-				path, retrieveEncoding());
+		String decodedPathString = DataUtils.buildDecodedPathFromURLPathInfo(path, retrieveEncoding());
 
 		try {
 			log.error("decoded path:{}", decodedPathString);
 			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
 
 			log.info("listing metadata");
-			DataObjectAvuFunctions dataObjectAvuFunctions = this
-					.getServiceFunctionFactory()
+			DataObjectAvuFunctions dataObjectAvuFunctions = this.getServiceFunctionFactory()
 					.instanceDataObjectAvuFunctions(irodsAccount);
-			return dataObjectAvuFunctions
-					.listDataObjectMetadata(decodedPathString);
+			return dataObjectAvuFunctions.listDataObjectMetadata(decodedPathString);
 
 		} finally {
 			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
@@ -263,19 +246,18 @@ public class DataObjectService extends AbstractIrodsService {
 	}
 
 	/**
-	 * Do a bulk metadata add operation for the given data object. This takes a
-	 * list of AVU entries in the PUT request body, and will attempt to add each
-	 * AVU.
+	 * Do a bulk metadata add operation for the given data object. This takes a list
+	 * of AVU entries in the PUT request body, and will attempt to add each AVU.
 	 * <p/>
 	 * A response body will log the disposition of each AVU add attempt, and any
-	 * errors for an individual attempt are noted by the returned status and
-	 * message for each entry. This allows partial success.
+	 * errors for an individual attempt are noted by the returned status and message
+	 * for each entry. This allows partial success.
 	 * 
 	 * @param authorization
 	 *            <code>String</code> with the basic auth header
 	 * @param path
-	 *            <code>String</code> with the iRODS absolute path derived from
-	 *            the URL extra path information
+	 *            <code>String</code> with the iRODS absolute path derived from the
+	 *            URL extra path information
 	 * @param metadataEntries
 	 *            <code>List</code> of {@link MetadataQueryResultEntry} that is
 	 *            derived from the request body
@@ -285,12 +267,11 @@ public class DataObjectService extends AbstractIrodsService {
 	 */
 	@PUT
 	@Path("{path:.*}/metadata")
-	@Consumes({ "application/xml", "application/json" })
-	@Produces({ "application/xml", "application/json" })
+	@Consumes({ "application/json" })
+	@Produces({ "application/json" })
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
 	public List<MetadataOperationResultEntry> addCollectionMetadata(
-			@HeaderParam("Authorization") final String authorization,
-			@PathParam("path") final String path,
+			@HeaderParam("Authorization") final String authorization, @PathParam("path") final String path,
 			final MetadataOperation metadataOperation) throws JargonException {
 
 		log.info("addCollectionMetadata()");
@@ -307,8 +288,7 @@ public class DataObjectService extends AbstractIrodsService {
 			throw new IllegalArgumentException("null metadataOperation");
 		}
 
-		String decodedPathString = DataUtils.buildDecodedPathFromURLPathInfo(
-				path, retrieveEncoding());
+		String decodedPathString = DataUtils.buildDecodedPathFromURLPathInfo(path, retrieveEncoding());
 
 		try {
 			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
@@ -316,15 +296,13 @@ public class DataObjectService extends AbstractIrodsService {
 			log.info("marshalling into AvuData...");
 			List<AvuData> avuDatas = new ArrayList<AvuData>();
 
-			for (MetadataEntry metadataEntry : metadataOperation
-					.getMetadataEntries()) {
-				avuDatas.add(AvuData.instance(metadataEntry.getAttribute(),
-						metadataEntry.getValue(), metadataEntry.getUnit()));
+			for (MetadataEntry metadataEntry : metadataOperation.getMetadataEntries()) {
+				avuDatas.add(AvuData.instance(metadataEntry.getAttribute(), metadataEntry.getValue(),
+						metadataEntry.getUnit()));
 			}
 			DataObjectAvuFunctions dataObjectAvuFunctions = getServiceFunctionFactory()
 					.instanceDataObjectAvuFunctions(irodsAccount);
-			return dataObjectAvuFunctions.addAvuMetadata(decodedPathString,
-					avuDatas);
+			return dataObjectAvuFunctions.addAvuMetadata(decodedPathString, avuDatas);
 
 		} finally {
 			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
@@ -332,32 +310,31 @@ public class DataObjectService extends AbstractIrodsService {
 	}
 
 	/**
-	 * Do a bulk metadata delete operation for the given data object. This takes
-	 * a list of AVU entries in the POST request body, and will attempt to
-	 * delete each AVU.
+	 * Do a bulk metadata delete operation for the given data object. This takes a
+	 * list of AVU entries in the POST request body, and will attempt to delete each
+	 * AVU.
 	 * <p/>
-	 * A response body will log the disposition of each AVU delete attempt, and
-	 * any errors for an individual attempt are noted by the returned status and
-	 * message for each entry. This allows partial success.
+	 * A response body will log the disposition of each AVU delete attempt, and any
+	 * errors for an individual attempt are noted by the returned status and message
+	 * for each entry. This allows partial success.
 	 * <p/>
-	 * Note that this is an idempotent request, so that deletes of non-existent
-	 * AVU data will be gracefully handed.
+	 * Note that this is an idempotent request, so that deletes of non-existent AVU
+	 * data will be gracefully handed.
 	 * <p/>
 	 * A word of explanation is in order, given that the delete operation is
-	 * accomplished with a POST HTTP verb. AVU data is free form and is often
-	 * full of delimiters and slash characters, and of arbitrary size, making
-	 * them unsuitable for inclusion in a URL, even in encoded form. For this
-	 * reason, the operations are expressed by the included request body. HTTP
-	 * DELETE verbs are ambiguous, but the consensus seems to be that DELETE
-	 * verbs should not include a body, and are sometimes treated as a POST
-	 * anyhow. So we had to fudge the 'pure' REST approach to accommodate the
-	 * wide range of AVU data that exists.
+	 * accomplished with a POST HTTP verb. AVU data is free form and is often full
+	 * of delimiters and slash characters, and of arbitrary size, making them
+	 * unsuitable for inclusion in a URL, even in encoded form. For this reason, the
+	 * operations are expressed by the included request body. HTTP DELETE verbs are
+	 * ambiguous, but the consensus seems to be that DELETE verbs should not include
+	 * a body, and are sometimes treated as a POST anyhow. So we had to fudge the
+	 * 'pure' REST approach to accommodate the wide range of AVU data that exists.
 	 * 
 	 * @param authorization
 	 *            <code>String</code> with the basic auth header
 	 * @param path
-	 *            <code>String</code> with the iRODS absolute path derived from
-	 *            the URL extra path information
+	 *            <code>String</code> with the iRODS absolute path derived from the
+	 *            URL extra path information
 	 * @param metadataEntries
 	 *            <code>List</code> of {@link MetadataQueryResultEntry} that is
 	 *            derived from the request body
@@ -367,12 +344,11 @@ public class DataObjectService extends AbstractIrodsService {
 	 */
 	@POST
 	@Path("{path:.*}/metadata")
-	@Consumes({ "application/xml", "application/json" })
-	@Produces({ "application/xml", "application/json" })
+	@Consumes({ "application/json" })
+	@Produces({ "application/json" })
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
 	public List<MetadataOperationResultEntry> deleteDataObjectMetadata(
-			@HeaderParam("Authorization") final String authorization,
-			@PathParam("path") final String path,
+			@HeaderParam("Authorization") final String authorization, @PathParam("path") final String path,
 			final MetadataOperation metadataOperation) throws JargonException {
 
 		log.info("deleteDataObjectMetadata()");
@@ -389,36 +365,31 @@ public class DataObjectService extends AbstractIrodsService {
 			throw new IllegalArgumentException("null metadataOperation");
 		}
 
-		String decodedPathString = DataUtils.buildDecodedPathFromURLPathInfo(
-				path, retrieveEncoding());
+		String decodedPathString = DataUtils.buildDecodedPathFromURLPathInfo(path, retrieveEncoding());
 
 		try {
 			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
-			DataObjectAO dataObjectAO = this.getIrodsAccessObjectFactory()
-					.getDataObjectAO(irodsAccount);
+			DataObjectAO dataObjectAO = this.getIrodsAccessObjectFactory().getDataObjectAO(irodsAccount);
 
 			log.info("marshalling into AvuData...");
 			List<AvuData> avuDatas = new ArrayList<AvuData>();
 			List<MetadataOperationResultEntry> metadataOperationResultEntries = new ArrayList<MetadataOperationResultEntry>();
 
-			for (MetadataEntry metadataEntry : metadataOperation
-					.getMetadataEntries()) {
-				avuDatas.add(AvuData.instance(metadataEntry.getAttribute(),
-						metadataEntry.getValue(), metadataEntry.getUnit()));
+			for (MetadataEntry metadataEntry : metadataOperation.getMetadataEntries()) {
+				avuDatas.add(AvuData.instance(metadataEntry.getAttribute(), metadataEntry.getValue(),
+						metadataEntry.getUnit()));
 			}
 
 			log.info("doing bulk delete operation");
 			List<BulkAVUOperationResponse> bulkAVUOperationResponses = dataObjectAO
-					.deleteBulkAVUMetadataFromDataObject(decodedPathString,
-							avuDatas);
+					.deleteBulkAVUMetadataFromDataObject(decodedPathString, avuDatas);
 			log.info("responses:{}", bulkAVUOperationResponses);
 
 			log.info("marshalling response into rest domain...");
 			MetadataOperationResultEntry resultEntry;
 			for (BulkAVUOperationResponse response : bulkAVUOperationResponses) {
 				resultEntry = new MetadataOperationResultEntry();
-				resultEntry.setAttributeString(response.getAvuData()
-						.getAttribute());
+				resultEntry.setAttributeString(response.getAvuData().getAttribute());
 				resultEntry.setMessage(response.getMessage());
 				resultEntry.setResultStatus(response.getResultStatus());
 				resultEntry.setUnit(response.getAvuData().getUnit());
@@ -439,20 +410,19 @@ public class DataObjectService extends AbstractIrodsService {
 	 * idempotent, so it can be invoked against a data object that already has a
 	 * permission for a user, effectively changing the permission.
 	 * <p/>
-	 * Note that this method returns void, there is no response body, and as
-	 * such it should return an HTTP 204 code
+	 * Note that this method returns void, there is no response body, and as such it
+	 * should return an HTTP 204 code
 	 * 
 	 * @param authorization
 	 *            <code>String</code> with the basic auth header
 	 * @param path
-	 *            <code>String</code> with the absolute path to the iRODS
-	 *            dataObject
+	 *            <code>String</code> with the absolute path to the iRODS dataObject
 	 * @param userName
-	 *            <code>String</code> with the user name, which can be in
-	 *            user,zone format, or can be just the user name. Note the '#'
-	 *            character can be mis-interpreted as an anchor in the path, so
-	 *            the delimiter between user and zone should be a , (comma)
-	 *            character instead of the pound '#' character
+	 *            <code>String</code> with the user name, which can be in user,zone
+	 *            format, or can be just the user name. Note the '#' character can
+	 *            be mis-interpreted as an anchor in the path, so the delimiter
+	 *            between user and zone should be a , (comma) character instead of
+	 *            the pound '#' character
 	 * @param permission
 	 *            <code>String</code> of READ, WRITE, OWN, or NONE
 	 * @throws InvalidUserException
@@ -461,12 +431,10 @@ public class DataObjectService extends AbstractIrodsService {
 	 */
 	@PUT
 	@Path("{path:.*}/acl/{userName}")
-	@Produces({ "application/xml", "application/json" })
+	@Produces({ "application/json" })
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
-	public void addDataObjectAcl(
-			@HeaderParam("Authorization") final String authorization,
-			@PathParam("path") final String path,
-			@PathParam("userName") final String userName,
+	public void addDataObjectAcl(@HeaderParam("Authorization") final String authorization,
+			@PathParam("path") final String path, @PathParam("userName") final String userName,
 			@QueryParam("permission") @DefaultValue("READ") final String permission)
 			throws InvalidUserException, FileNotFoundException, JargonException {
 
@@ -499,8 +467,7 @@ public class DataObjectService extends AbstractIrodsService {
 		} else if (permission.equals("NONE")) {
 			filePermissionEnumTranslationEnum = FilePermissionEnum.NONE;
 		} else {
-			throw new IllegalArgumentException("unknown permission type:"
-					+ permission);
+			throw new IllegalArgumentException("unknown permission type:" + permission);
 		}
 
 		String myUserNameString = userName.replace(',', '#');
@@ -508,14 +475,12 @@ public class DataObjectService extends AbstractIrodsService {
 		try {
 			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
 
-			String decodedPath = DataUtils.buildDecodedPathFromURLPathInfo(
-					path, retrieveEncoding());
+			String decodedPath = DataUtils.buildDecodedPathFromURLPathInfo(path, retrieveEncoding());
 
 			DataObjectAclFunctions dataObjectAclFunctions = getServiceFunctionFactory()
 					.instanceDataObjectAclFunctions(irodsAccount);
 			log.info("adding permission");
-			dataObjectAclFunctions.addPermission(decodedPath, myUserNameString,
-					filePermissionEnumTranslationEnum);
+			dataObjectAclFunctions.addPermission(decodedPath, myUserNameString, filePermissionEnumTranslationEnum);
 			log.info("done");
 
 		} finally {
@@ -525,35 +490,32 @@ public class DataObjectService extends AbstractIrodsService {
 
 	/**
 	 * Delete a permission for a dataObject. This is done as an HTTP DELETE. The
-	 * method is idempotent and can be invoked multiple times, silently ignoring
-	 * an already-deleted permission.
+	 * method is idempotent and can be invoked multiple times, silently ignoring an
+	 * already-deleted permission.
 	 * <p/>
-	 * Note that this method returns void, there is no response body, and as
-	 * such it should return an HTTP 204 code
+	 * Note that this method returns void, there is no response body, and as such it
+	 * should return an HTTP 204 code
 	 * 
 	 * @param authorization
 	 *            <code>String</code> with the basic auth header
 	 * @param path
-	 *            <code>String</code> with the absolute path to the iRODS
-	 *            dataObject
+	 *            <code>String</code> with the absolute path to the iRODS dataObject
 	 * @param userName
-	 *            <code>String</code> with the user name, which can be in
-	 *            user,zone format, or can be just the user name. Note the '#'
-	 *            character can be mis-interpreted as an anchor in the path, so
-	 *            the delimiter between user and zone should be a , (comma)
-	 *            character instead of the pound '#' character
+	 *            <code>String</code> with the user name, which can be in user,zone
+	 *            format, or can be just the user name. Note the '#' character can
+	 *            be mis-interpreted as an anchor in the path, so the delimiter
+	 *            between user and zone should be a , (comma) character instead of
+	 *            the pound '#' character
 	 * @throws InvalidUserException
 	 * @throws FileNotFoundException
 	 * @throws JargonException
 	 */
 	@DELETE
 	@Path("{path:.*}/acl/{userName}")
-	@Produces({ "application/xml", "application/json" })
+	@Produces({ "application/json" })
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
-	public void deleteDataObjectAcl(
-			@HeaderParam("Authorization") final String authorization,
-			@PathParam("path") final String path,
-			@PathParam("userName") final String userName)
+	public void deleteDataObjectAcl(@HeaderParam("Authorization") final String authorization,
+			@PathParam("path") final String path, @PathParam("userName") final String userName)
 			throws InvalidUserException, FileNotFoundException, JargonException {
 
 		log.info("deleteDataObjectAcl()");
@@ -575,14 +537,12 @@ public class DataObjectService extends AbstractIrodsService {
 		try {
 			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
 
-			String decodedPath = DataUtils.buildDecodedPathFromURLPathInfo(
-					path, retrieveEncoding());
+			String decodedPath = DataUtils.buildDecodedPathFromURLPathInfo(path, retrieveEncoding());
 
 			DataObjectAclFunctions dataObjectAclFunctions = getServiceFunctionFactory()
 					.instanceDataObjectAclFunctions(irodsAccount);
 			log.info("deleting permission");
-			dataObjectAclFunctions.deletePermissionForUser(decodedPath,
-					myUserNameString);
+			dataObjectAclFunctions.deletePermissionForUser(decodedPath, myUserNameString);
 			log.info("done");
 
 		} finally {

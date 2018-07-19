@@ -62,30 +62,30 @@ public class CollectionService extends AbstractIrodsService {
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
 	/**
-	 * Retrieve information about a collection, and optionally return a listing
-	 * of data within the collection as xml or json.
+	 * Retrieve information about a collection, and optionally return a listing of
+	 * data within the collection as xml or json.
 	 * 
 	 * @param authorization
 	 *            <code>String</code> with the basic auth header
 	 * @param path
-	 *            <code>String</code> with the iRODS absolute path derived from
-	 *            the URL extra path information
+	 *            <code>String</code> with the iRODS absolute path derived from the
+	 *            URL extra path information
 	 * @param offset
 	 *            <code>int</code> with an optional (default = 0) offset for any
 	 *            listing
 	 * @param isListing
-	 *            <code>boolean</code> with an optional (default=false)
-	 *            parameter that will cause a listing of collection children
+	 *            <code>boolean</code> with an optional (default=false) parameter
+	 *            that will cause a listing of collection children
 	 * @param listingType
-	 *            <code>String</code> that should be 'both', 'data',
-	 *            'collections', indicating what sort of child data to return
+	 *            <code>String</code> that should be 'both', 'data', 'collections',
+	 *            indicating what sort of child data to return
 	 * @return {@link CollectionData} marshaled in the appropriate format.
 	 * 
 	 * @throws JargonException
 	 */
 	@GET
 	@Path("{path:.*}")
-	@Produces({ "application/xml", "application/json" })
+	@Produces({ "application/json" })
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
 	public CollectionData getCollectionData(@HeaderParam("Authorization") final String authorization,
 			@PathParam("path") final String path, @QueryParam("offset") @DefaultValue("0") final int offset,
@@ -186,23 +186,23 @@ public class CollectionService extends AbstractIrodsService {
 	 * Add a new collection (mkdir), based on an HTTP PUT operation using the
 	 * provided path information.
 	 * <p/>
-	 * Note that this operation is idempotent and can be invoked more than once.
-	 * If a directory already exists, it will be silently ignored.
+	 * Note that this operation is idempotent and can be invoked more than once. If
+	 * a directory already exists, it will be silently ignored.
 	 * <p/>
-	 * This method will return basic metadata about the collection that was to
-	 * be created, as in the <code>getCollectionData</code> method.
+	 * This method will return basic metadata about the collection that was to be
+	 * created, as in the <code>getCollectionData</code> method.
 	 * 
 	 * @param authorization
 	 *            <code>String</code> with the basic auth header
 	 * @param path
-	 *            <code>String</code> with the iRODS absolute path derived from
-	 *            the URL extra path information
+	 *            <code>String</code> with the iRODS absolute path derived from the
+	 *            URL extra path information
 	 * @return {@link CollectionData} marshaled in the appropriate format.
 	 * @throws JargonException
 	 */
 	@PUT
 	@Path("{path:.*}")
-	@Produces({ "application/xml", "application/json" })
+	@Produces({ "application/json" })
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
 	public CollectionData addCollection(@HeaderParam("Authorization") final String authorization,
 			@PathParam("path") final String path) throws JargonException {
@@ -261,14 +261,14 @@ public class CollectionService extends AbstractIrodsService {
 	 * @param authorization
 	 *            <code>String</code> with the basic auth header
 	 * @param path
-	 *            <code>String</code> with the iRODS absolute path derived from
-	 *            the URL extra path information
+	 *            <code>String</code> with the iRODS absolute path derived from the
+	 *            URL extra path information
 	 * @return
 	 * @throws JargonException
 	 */
 	@GET
 	@Path("{path:.*}/metadata")
-	@Produces({ "application/xml", "application/json" })
+	@Produces({ "application/json" })
 	// @Mapped(namespaceMap = { @XmlNsMap(namespace =
 	// "http://irods.org/irods-rest", jsonName = "irods-rest") })
 	public MetadataListing getCollectionMetadata(@HeaderParam("Authorization") final String authorization,
@@ -327,32 +327,31 @@ public class CollectionService extends AbstractIrodsService {
 	}
 
 	/**
-	 * Do a bulk metadata delete operation for the given collection. This takes
-	 * a list of AVU entries in the POST request body, and will attempt to
-	 * delete each AVU.
+	 * Do a bulk metadata delete operation for the given collection. This takes a
+	 * list of AVU entries in the POST request body, and will attempt to delete each
+	 * AVU.
 	 * <p/>
-	 * A response body will log the disposition of each AVU delete attempt, and
-	 * any errors for an individual attempt are noted by the returned status and
-	 * message for each entry. This allows partial success.
+	 * A response body will log the disposition of each AVU delete attempt, and any
+	 * errors for an individual attempt are noted by the returned status and message
+	 * for each entry. This allows partial success.
 	 * <p/>
-	 * Note that this is an idempotent request, so that deletes of non-existent
-	 * AVU data will be gracefully handed.
+	 * Note that this is an idempotent request, so that deletes of non-existent AVU
+	 * data will be gracefully handed.
 	 * <p/>
 	 * A word of explanation is in order, given that the delete operation is
-	 * accomplished with a POST HTTP verb. AVU data is free form and is often
-	 * full of delimiters and slash characters, and of arbitrary size, making
-	 * them unsuitable for inclusion in a URL, even in encoded form. For this
-	 * reason, the operations are expressed by the included request body. HTTP
-	 * DELETE verbs are ambiguous, but the consensus seems to be that DELETE
-	 * verbs should not include a body, and are sometimes treated as a POST
-	 * anyhow. So we had to fudge the 'pure' REST approach to accommodate the
-	 * wide range of AVU data that exists.
+	 * accomplished with a POST HTTP verb. AVU data is free form and is often full
+	 * of delimiters and slash characters, and of arbitrary size, making them
+	 * unsuitable for inclusion in a URL, even in encoded form. For this reason, the
+	 * operations are expressed by the included request body. HTTP DELETE verbs are
+	 * ambiguous, but the consensus seems to be that DELETE verbs should not include
+	 * a body, and are sometimes treated as a POST anyhow. So we had to fudge the
+	 * 'pure' REST approach to accommodate the wide range of AVU data that exists.
 	 * 
 	 * @param authorization
 	 *            <code>String</code> with the basic auth header
 	 * @param path
-	 *            <code>String</code> with the iRODS absolute path derived from
-	 *            the URL extra path information
+	 *            <code>String</code> with the iRODS absolute path derived from the
+	 *            URL extra path information
 	 * @param metadataEntries
 	 *            <code>List</code> of {@link MetadataQueryResultEntry} that is
 	 *            derived from the request body
@@ -362,8 +361,8 @@ public class CollectionService extends AbstractIrodsService {
 	 */
 	@POST
 	@Path("{path:.*}/metadata")
-	@Consumes({ "application/xml", "application/json" })
-	@Produces({ "application/xml", "application/json" })
+	@Consumes({ "application/json" })
+	@Produces({ "application/json" })
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
 	public List<MetadataOperationResultEntry> deleteCollectionMetadata(
 			@HeaderParam("Authorization") final String authorization, @PathParam("path") final String path,
@@ -424,19 +423,18 @@ public class CollectionService extends AbstractIrodsService {
 	}
 
 	/**
-	 * Do a bulk metadata add operation for the given collection. This takes a
-	 * list of AVU entries in the PUT request body, and will attempt to add each
-	 * AVU.
+	 * Do a bulk metadata add operation for the given collection. This takes a list
+	 * of AVU entries in the PUT request body, and will attempt to add each AVU.
 	 * <p/>
 	 * A response body will log the disposition of each AVU add attempt, and any
-	 * errors for an individual attempt are noted by the returned status and
-	 * message for each entry. This allows partial success.
+	 * errors for an individual attempt are noted by the returned status and message
+	 * for each entry. This allows partial success.
 	 * 
 	 * @param authorization
 	 *            <code>String</code> with the basic auth header
 	 * @param path
-	 *            <code>String</code> with the iRODS absolute path derived from
-	 *            the URL extra path information
+	 *            <code>String</code> with the iRODS absolute path derived from the
+	 *            URL extra path information
 	 * @param metadataEntries
 	 *            <code>List</code> of {@link MetadataQueryResultEntry} that is
 	 *            derived from the request body
@@ -446,8 +444,8 @@ public class CollectionService extends AbstractIrodsService {
 	 */
 	@PUT
 	@Path("{path:.*}/metadata")
-	@Consumes({ "application/xml", "application/json" })
-	@Produces({ "application/xml", "application/json" })
+	@Consumes({ "application/json" })
+	@Produces({ "application/json" })
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
 	public List<MetadataOperationResultEntry> addCollectionMetadata(
 			@HeaderParam("Authorization") final String authorization, @PathParam("path") final String path,
@@ -511,20 +509,20 @@ public class CollectionService extends AbstractIrodsService {
 	 * Delete the given collection. This is equivalent to a rmdir command. A
 	 * parameter is available to do the operation with the force option enabled.
 	 * <p/>
-	 * This is an idempotent method, and if there is not a diretory to delete,
-	 * it will silently ignore this.
+	 * This is an idempotent method, and if there is not a diretory to delete, it
+	 * will silently ignore this.
 	 * <p/>
-	 * Note that there is no need to return a body, so this method will return
-	 * an HTTP 204 with no body information
+	 * Note that there is no need to return a body, so this method will return an
+	 * HTTP 204 with no body information
 	 * 
 	 * @param authorization
 	 *            <code>String</code> with the basic auth header
 	 * @param path
-	 *            <code>String</code> with the iRODS absolute path derived from
-	 *            the URL extra path information
+	 *            <code>String</code> with the iRODS absolute path derived from the
+	 *            URL extra path information
 	 * @param force
-	 *            <code>boolean</code> that indicates whether the force option
-	 *            is enabled on deletion
+	 *            <code>boolean</code> that indicates whether the force option is
+	 *            enabled on deletion
 	 * @throws JargonException
 	 */
 	@DELETE
@@ -575,14 +573,14 @@ public class CollectionService extends AbstractIrodsService {
 	 * @param authorization
 	 *            <code>String</code> with the basic auth header
 	 * @param path
-	 *            <code>String</code> with the iRODS absolute path derived from
-	 *            the URL extra path information
+	 *            <code>String</code> with the iRODS absolute path derived from the
+	 *            URL extra path information
 	 * @return
 	 * @throws JargonException
 	 */
 	@GET
 	@Path("{path:.*}/acl")
-	@Produces({ "application/xml", "application/json" })
+	@Produces({ "application/json" })
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
 	public PermissionListing getCollectionAcl(@HeaderParam("Authorization") final String authorization,
 			@PathParam("path") final String path) throws FileNotFoundException, JargonException {
@@ -615,23 +613,22 @@ public class CollectionService extends AbstractIrodsService {
 	 * idempotent, so it can be invoked against a collection that already has a
 	 * permission for a user.
 	 * <p/>
-	 * Note that this method returns void, there is no response body, and as
-	 * such it should return an HTTP 204 code
+	 * Note that this method returns void, there is no response body, and as such it
+	 * should return an HTTP 204 code
 	 * 
 	 * @param authorization
 	 *            <code>String</code> with the basic auth header
 	 * @param path
-	 *            <code>String</code> with the absolute path to the iRODS
-	 *            collection
+	 *            <code>String</code> with the absolute path to the iRODS collection
 	 * @param userName
-	 *            <code>String</code> with the user name, which can be in
-	 *            user,zone format, or can be just the user name. Note the '#'
-	 *            character can be mis-interpreted as an anchor in the path, so
-	 *            the delimiter between user and zone should be a , (comma)
-	 *            character instead of the pound '#' character
+	 *            <code>String</code> with the user name, which can be in user,zone
+	 *            format, or can be just the user name. Note the '#' character can
+	 *            be mis-interpreted as an anchor in the path, so the delimiter
+	 *            between user and zone should be a , (comma) character instead of
+	 *            the pound '#' character
 	 * @param recursive
-	 *            <code>boolean</code> that indicates the permission should be
-	 *            set recursively
+	 *            <code>boolean</code> that indicates the permission should be set
+	 *            recursively
 	 * @param permission
 	 *            <code>String</code> of READ, WRITE, OWN, or NONE
 	 * @throws InvalidUserException
@@ -640,7 +637,7 @@ public class CollectionService extends AbstractIrodsService {
 	 */
 	@PUT
 	@Path("{path:.*}/acl/{userName}")
-	@Produces({ "application/xml", "application/json" })
+	@Produces({ "application/json" })
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
 	public void addCollectionAcl(@HeaderParam("Authorization") final String authorization,
 			@PathParam("path") final String path, @PathParam("userName") final String userName,
@@ -708,24 +705,23 @@ public class CollectionService extends AbstractIrodsService {
 	 * @param authorization
 	 *            <code>String</code> with the basic auth header
 	 * @param path
-	 *            <code>String</code> with the absolute path to the iRODS
-	 *            collection
+	 *            <code>String</code> with the absolute path to the iRODS collection
 	 * @param userName
-	 *            <code>String</code> with the user name, which can be in
-	 *            user,zone format, or can be just the user name. Note the '#'
-	 *            character can be mis-interpreted as an anchor in the path, so
-	 *            the delimiter between user and zone should be a , (comma)
-	 *            character instead of the pound '#' character
+	 *            <code>String</code> with the user name, which can be in user,zone
+	 *            format, or can be just the user name. Note the '#' character can
+	 *            be mis-interpreted as an anchor in the path, so the delimiter
+	 *            between user and zone should be a , (comma) character instead of
+	 *            the pound '#' character
 	 * @param recursive
-	 *            <code>boolean</code> that indicates the permission should be
-	 *            set recursively
+	 *            <code>boolean</code> that indicates the permission should be set
+	 *            recursively
 	 * @throws InvalidUserException
 	 * @throws FileNotFoundException
 	 * @throws JargonException
 	 */
 	@DELETE
 	@Path("{path:.*}/acl/{userName}")
-	@Produces({ "application/xml", "application/json" })
+	@Produces({ "application/json" })
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
 	public void deleteCollectionAcl(@HeaderParam("Authorization") final String authorization,
 			@PathParam("path") final String path, @PathParam("userName") final String userName,
@@ -747,8 +743,8 @@ public class CollectionService extends AbstractIrodsService {
 		}
 
 		/*
-		 * User name comes in delim with , instead of # between user and zone so
-		 * as not to be misinterpreted as an anchor
+		 * User name comes in delim with , instead of # between user and zone so as not
+		 * to be misinterpreted as an anchor
 		 */
 		String myUserNameString = userName.replace(',', '#');
 

@@ -3,9 +3,9 @@
  */
 package org.irods.jargon.rest.commands.query;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.ArrayList;
 
 import javax.inject.Named;
 import javax.ws.rs.Consumes;
@@ -20,6 +20,7 @@ import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.core.pub.IRODSGenQueryExecutor;
 import org.irods.jargon.core.query.GenQueryBuilderException;
+import org.irods.jargon.core.query.GenQueryField.SelectFieldTypes;
 import org.irods.jargon.core.query.GenQueryOrderByField.OrderByType;
 import org.irods.jargon.core.query.IRODSGenQueryBuilder;
 import org.irods.jargon.core.query.IRODSGenQueryFromBuilder;
@@ -28,7 +29,6 @@ import org.irods.jargon.core.query.IRODSQueryResultSetInterface;
 import org.irods.jargon.core.query.JargonQueryException;
 import org.irods.jargon.core.query.QueryConditionOperators;
 import org.irods.jargon.core.query.RodsGenQueryEnum;
-import org.irods.jargon.core.query.GenQueryField.SelectFieldTypes;
 import org.irods.jargon.rest.commands.AbstractIrodsService;
 import org.irods.jargon.rest.domain.GenQueryColumn;
 import org.irods.jargon.rest.domain.GenQueryCondition;
@@ -52,8 +52,8 @@ import org.slf4j.LoggerFactory;
 public class GenQueryService extends AbstractIrodsService {
 
 	/**
-	 * A <code>HashMap</code> used to look up RodGenQueryEnum values from the
-	 * string representation.
+	 * A <code>HashMap</code> used to look up RodGenQueryEnum values from the string
+	 * representation.
 	 */
 	// Reverse-lookup map for a RodsGenQueryEnum from a value
 	private static final Map<String, RodsGenQueryEnum> genQueryFieldsLookup = new HashMap<String, RodsGenQueryEnum>();
@@ -69,10 +69,10 @@ public class GenQueryService extends AbstractIrodsService {
 
 	/**
 	 * 
-	 * Returns the GenQueryResponseData for the request provided in requestData.
-	 * The request and response can be presented in either XML format
-	 * (application/xml) or JSON format (application/json) depending on the
-	 * Accept and Content-Type headers sent in the request.
+	 * Returns the GenQueryResponseData for the request provided in requestData. The
+	 * request and response can be presented in either XML format (application/xml)
+	 * or JSON format (application/json) depending on the Accept and Content-Type
+	 * headers sent in the request.
 	 * 
 	 * The following is a sample request and response in XML format.
 	 * 
@@ -121,7 +121,7 @@ public class GenQueryService extends AbstractIrodsService {
 	 *   </row> 
 	 * </ns2:results>
 	 *}
-	 *</pre>
+	 * </pre>
 	 *
 	 * @param authorization
 	 * @param requestData
@@ -131,13 +131,12 @@ public class GenQueryService extends AbstractIrodsService {
 	 * @throws JargonQueryException
 	 */
 	@POST
-	@Consumes({ "application/xml", "application/json" })
-	@Produces({ "application/xml", "application/json" })
+	@Consumes({ "application/json" })
+	@Produces({ "application/json" })
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
-	public GenQueryResponseData getGenQueryData(
-			@HeaderParam("Authorization") final String authorization,
-			final GenQueryRequestData requestData) throws JargonException,
-			GenQueryBuilderException, JargonQueryException {
+	public GenQueryResponseData getGenQueryData(@HeaderParam("Authorization") final String authorization,
+			final GenQueryRequestData requestData)
+			throws JargonException, GenQueryBuilderException, JargonQueryException {
 
 		log.info("getGenQueryData()");
 		if (authorization == null || authorization.isEmpty()) {
@@ -148,11 +147,9 @@ public class GenQueryService extends AbstractIrodsService {
 			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
 
 			IRODSFileSystem irodsFileSystem = IRODSFileSystem.instance();
-			IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
-					.getIRODSAccessObjectFactory();
+			IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem.getIRODSAccessObjectFactory();
 
-			IRODSGenQueryExecutor irodsGenQueryExecutor = accessObjectFactory
-					.getIRODSGenQueryExecutor(irodsAccount);
+			IRODSGenQueryExecutor irodsGenQueryExecutor = accessObjectFactory.getIRODSGenQueryExecutor(irodsAccount);
 
 			IRODSGenQueryBuilder builder = new IRODSGenQueryBuilder(true, null);
 
@@ -160,53 +157,49 @@ public class GenQueryService extends AbstractIrodsService {
 			for (GenQuerySelect selectField : requestData.getSelectFieldList()) {
 
 				// look up the Jargon enum for the select field
-				RodsGenQueryEnum rodsGenQueryEnum = translateQueryColumnToEnum(selectField
-						.getColumn());
+				RodsGenQueryEnum rodsGenQueryEnum = translateQueryColumnToEnum(selectField.getColumn());
 
 				// if aggregateType attribute is missing or the empty string,
 				// consider this as a non-aggregate field
-				if (selectField.getAggregateType() == null
-						|| selectField.getAggregateType().equals("")) {
+				if (selectField.getAggregateType() == null || selectField.getAggregateType().equals("")) {
 					builder.addSelectAsGenQueryValue(rodsGenQueryEnum);
 				} else {
 					builder.addSelectAsAgregateGenQueryValue(rodsGenQueryEnum,
-							SelectFieldTypes.valueOf(selectField
-									.getAggregateType().toUpperCase()));
+							SelectFieldTypes.valueOf(selectField.getAggregateType().toUpperCase()));
 				}
 			}
 
 			// Update the query builder for the condition fields.
-			for (GenQueryCondition condition : requestData
-					.getQueryConditionList()) {
+			for (GenQueryCondition condition : requestData.getQueryConditionList()) {
 
 				// look up the Jargon enum for the condition field
-				RodsGenQueryEnum rodsGenQueryEnum = translateQueryColumnToEnum(condition
-						.getColumn());
-				
+				RodsGenQueryEnum rodsGenQueryEnum = translateQueryColumnToEnum(condition.getColumn());
+
 				// Must treat "in" clause Differently from others.
 				if (condition.getOperator().equalsIgnoreCase("IN")) {
-					
-					if (condition.getValueList() == null || condition.getValueList().getValues() == null || condition.getValueList().getValues().size() == 0) {
+
+					if (condition.getValueList() == null || condition.getValueList().getValues() == null
+							|| condition.getValueList().getValues().size() == 0) {
 						throw new IllegalArgumentException("Condition (IN) must have a value_list.");
 					} else if (condition.getValue() != null) {
-						throw new IllegalArgumentException("Condition (IN) should have a value_list and not a simple value.");
+						throw new IllegalArgumentException(
+								"Condition (IN) should have a value_list and not a simple value.");
 					}
 
-                    ArrayList<String> valueList = condition.getValueList().getValues();
+					ArrayList<String> valueList = condition.getValueList().getValues();
 
-					builder.addConditionAsMultiValueCondition(
-							rodsGenQueryEnum,
-							QueryConditionOperators.valueOf(condition.getOperator().toUpperCase()),
-							valueList);
+					builder.addConditionAsMultiValueCondition(rodsGenQueryEnum,
+							QueryConditionOperators.valueOf(condition.getOperator().toUpperCase()), valueList);
 				} else {
 					if (condition.getValue() == null) {
-						throw new IllegalArgumentException("Condition " + condition.getOperator().toUpperCase() + " must have a value");
+						throw new IllegalArgumentException(
+								"Condition " + condition.getOperator().toUpperCase() + " must have a value");
 					} else if (condition.getValueList() != null) {
-						throw new IllegalArgumentException("Condition " + condition.getOperator().toUpperCase() + " should not have a value_list.");
+						throw new IllegalArgumentException("Condition " + condition.getOperator().toUpperCase()
+								+ " should not have a value_list.");
 					}
-					
-					builder.addConditionAsGenQueryField(
-							rodsGenQueryEnum,
+
+					builder.addConditionAsGenQueryField(rodsGenQueryEnum,
 							QueryConditionOperators.valueOf(condition.getOperator().toUpperCase()),
 							condition.getValue());
 				}
@@ -216,26 +209,21 @@ public class GenQueryService extends AbstractIrodsService {
 			for (GenQueryOrderBy orderBy : requestData.getOrderByList()) {
 
 				// look up the Jargon enum for the condition field
-				RodsGenQueryEnum rodsGenQueryEnum = translateQueryColumnToEnum(orderBy
-						.getColumn());
+				RodsGenQueryEnum rodsGenQueryEnum = translateQueryColumnToEnum(orderBy.getColumn());
 
-				builder.addOrderByGenQueryField(rodsGenQueryEnum,
-						OrderByType.valueOf(orderBy.getOrderByType()));
+				builder.addOrderByGenQueryField(rodsGenQueryEnum, OrderByType.valueOf(orderBy.getOrderByType()));
 
 			}
 
-			IRODSGenQueryFromBuilder query = builder
-					.exportIRODSQueryFromBuilder(requestData.getCount());
+			IRODSGenQueryFromBuilder query = builder.exportIRODSQueryFromBuilder(requestData.getCount());
 
 			// Execute the query. If the zone is not provided use the default.
 			IRODSQueryResultSetInterface resultSet;
 			if (requestData.getZone() == null || requestData.getZone() == "") {
-				resultSet = irodsGenQueryExecutor
-						.executeIRODSQueryAndCloseResult(query, 0);
+				resultSet = irodsGenQueryExecutor.executeIRODSQueryAndCloseResult(query, 0);
 			} else {
-				resultSet = irodsGenQueryExecutor
-						.executeIRODSQueryAndCloseResultInZone(query, 0,
-								requestData.getZone());
+				resultSet = irodsGenQueryExecutor.executeIRODSQueryAndCloseResultInZone(query, 0,
+						requestData.getZone());
 			}
 
 			// Build up the response
@@ -245,13 +233,10 @@ public class GenQueryService extends AbstractIrodsService {
 				GenQueryRow row = new GenQueryRow();
 
 				int i = 0;
-				for (GenQuerySelect selectField : requestData
-						.getSelectFieldList()) {
+				for (GenQuerySelect selectField : requestData.getSelectFieldList()) {
 					String selectColumn = selectField.getColumn();
-					if (selectField.getAggregateType() != null
-							&& selectField.getAggregateType() != "") {
-						selectColumn = selectField.getAggregateType() + "("
-								+ selectColumn + ")";
+					if (selectField.getAggregateType() != null && selectField.getAggregateType() != "") {
+						selectColumn = selectField.getAggregateType() + "(" + selectColumn + ")";
 					}
 					selectColumn = selectColumn.toUpperCase();
 
@@ -269,7 +254,7 @@ public class GenQueryService extends AbstractIrodsService {
 
 			return responseData;
 		} finally {
-			//getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
+			// getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
 		}
 	}
 
@@ -281,15 +266,12 @@ public class GenQueryService extends AbstractIrodsService {
 	 * @throws GenQueryBuilderException
 	 *             if an enumeration does not exist for the query column.
 	 */
-	private static RodsGenQueryEnum translateQueryColumnToEnum(
-			String queryColumn) throws GenQueryBuilderException {
+	private static RodsGenQueryEnum translateQueryColumnToEnum(String queryColumn) throws GenQueryBuilderException {
 
 		// look up the Jargon enum for the select field
-		RodsGenQueryEnum rodsGenQueryEnum = genQueryFieldsLookup
-				.get(queryColumn.toUpperCase());
+		RodsGenQueryEnum rodsGenQueryEnum = genQueryFieldsLookup.get(queryColumn.toUpperCase());
 		if (rodsGenQueryEnum == null) {
-			throw new GenQueryBuilderException("Invalid query column "
-					+ queryColumn);
+			throw new GenQueryBuilderException("Invalid query column " + queryColumn);
 		}
 		return rodsGenQueryEnum;
 	}

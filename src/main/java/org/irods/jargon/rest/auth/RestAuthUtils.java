@@ -21,6 +21,7 @@ import org.irods.jargon.core.exception.JargonException;
 import org.irods.jargon.rest.configuration.RestConfiguration;
 import org.irods.jargon.rest.exception.IrodsRestException;
 import org.irods.jargon.rest.utils.RestTestingProperties;
+import org.irods.jargon.testutils.TestConfigurationException;
 import org.irods.jargon.testutils.TestingPropertiesHelper;
 import org.irods.jargon.testutils.TestingUtilsException;
 import org.slf4j.Logger;
@@ -34,8 +35,7 @@ public class RestAuthUtils {
 
 	private static Logger log = LoggerFactory.getLogger(RestAuthUtils.class);
 
-	public static String basicAuthTokenFromIRODSAccount(
-			final IRODSAccount irodsAccount) {
+	public static String basicAuthTokenFromIRODSAccount(final IRODSAccount irodsAccount) {
 		if (irodsAccount == null) {
 			throw new IllegalArgumentException("null irodsAccount");
 		}
@@ -61,8 +61,7 @@ public class RestAuthUtils {
 	 * @return
 	 * @throws JargonException
 	 */
-	public static IRODSAccount getIRODSAccountFromBasicAuthValues(
-			final String basicAuthData,
+	public static IRODSAccount getIRODSAccountFromBasicAuthValues(final String basicAuthData,
 			final RestConfiguration restConfiguration) throws JargonException {
 
 		log.info("getIRODSAccountFromBasicAuthValues");
@@ -97,16 +96,13 @@ public class RestAuthUtils {
 		log.info("restConfiguration:{}", restConfiguration);
 
 		AuthScheme authScheme;
-		if (restConfiguration.getAuthType() == null
-				|| restConfiguration.getAuthType().isEmpty()) {
+		if (restConfiguration.getAuthType() == null || restConfiguration.getAuthType().isEmpty()) {
 			log.info("unspecified authType, use STANDARD");
 			authScheme = AuthScheme.STANDARD;
-		} else if (restConfiguration.getAuthType().equals(
-				AuthScheme.STANDARD.toString())) {
+		} else if (restConfiguration.getAuthType().equals(AuthScheme.STANDARD.toString())) {
 			log.info("using standard auth");
 			authScheme = AuthScheme.STANDARD;
-		} else if (restConfiguration.getAuthType().equals(
-				AuthScheme.PAM.toString())) {
+		} else if (restConfiguration.getAuthType().equals(AuthScheme.PAM.toString())) {
 			log.info("using PAM");
 			authScheme = AuthScheme.PAM;
 		} else {
@@ -123,8 +119,7 @@ public class RestAuthUtils {
 		if (userId.startsWith(AuthScheme.STANDARD.toString())) {
 			log.info("authScheme override to Standard");
 			authScheme = AuthScheme.STANDARD;
-			userId = userId
-					.substring(AuthScheme.STANDARD.toString().length() + 1);
+			userId = userId.substring(AuthScheme.STANDARD.toString().length() + 1);
 		} else if (userId.startsWith(AuthScheme.PAM.toString())) {
 			log.info("authScheme override to PAM");
 			authScheme = AuthScheme.PAM;
@@ -133,35 +128,29 @@ public class RestAuthUtils {
 
 		log.debug("userId:{}", userId);
 
-		return IRODSAccount.instance(restConfiguration.getIrodsHost(),
-				restConfiguration.getIrodsPort(), userId, credentials[1], "",
-				restConfiguration.getIrodsZone(),
-				restConfiguration.getDefaultStorageResource(), authScheme);
+		return IRODSAccount.instance(restConfiguration.getIrodsHost(), restConfiguration.getIrodsPort(), userId,
+				credentials[1], "", restConfiguration.getIrodsZone(), restConfiguration.getDefaultStorageResource(),
+				authScheme);
 
 	}
-	
+
 	/**
-     * Create an <code>IRODSAccount</code> suitable for anonymous access.
-     *
-     * @param restConfiguration
-     * @return <code>IRODSAccount</code> suitable for anonymous access
-     * @throws JargonException
-     */
-    public static IRODSAccount instanceForAnonymous(final RestConfiguration restConfiguration) throws JargonException {
-    	
-    	if (restConfiguration == null) {
-    		throw new IllegalArgumentException("null restConfiguration");
-    	}
-    	
-    	return IRODSAccount.instance(
-    			restConfiguration.getIrodsHost(), 
-    			restConfiguration.getIrodsPort(), 
-    			IRODSAccount.PUBLIC_USERNAME, 
-    			"anonymous", 
-    			"", 
-    			restConfiguration.getIrodsZone(), 
-    			restConfiguration.getDefaultStorageResource());
-    }
+	 * Create an <code>IRODSAccount</code> suitable for anonymous access.
+	 *
+	 * @param restConfiguration
+	 * @return <code>IRODSAccount</code> suitable for anonymous access
+	 * @throws JargonException
+	 */
+	public static IRODSAccount instanceForAnonymous(final RestConfiguration restConfiguration) throws JargonException {
+
+		if (restConfiguration == null) {
+			throw new IllegalArgumentException("null restConfiguration");
+		}
+
+		return IRODSAccount.instance(restConfiguration.getIrodsHost(), restConfiguration.getIrodsPort(),
+				IRODSAccount.PUBLIC_USERNAME, "anonymous", "", restConfiguration.getIrodsZone(),
+				restConfiguration.getDefaultStorageResource());
+	}
 
 	/**
 	 * Return boilerplate http client for testing that uses basic auth
@@ -170,10 +159,10 @@ public class RestAuthUtils {
 	 * @param testingProperties
 	 * @return
 	 * @throws TestingUtilsException
+	 * @throws TestConfigurationException
 	 */
-	public static DefaultHttpClientAndContext httpClientSetup(
-			final IRODSAccount irodsAccount, final Properties testingProperties)
-			throws TestingUtilsException {
+	public static DefaultHttpClientAndContext httpClientSetup(final IRODSAccount irodsAccount,
+			final Properties testingProperties) throws TestingUtilsException, TestConfigurationException {
 
 		if (irodsAccount == null) {
 			throw new IllegalArgumentException("null irodsAccount");
@@ -184,17 +173,14 @@ public class RestAuthUtils {
 		}
 
 		TestingPropertiesHelper testingPropertiesHelper = new TestingPropertiesHelper();
-		HttpHost targetHost = new HttpHost("localhost",
-				testingPropertiesHelper.getPropertyValueAsInt(
-						testingProperties,
-						RestTestingProperties.REST_PORT_PROPERTY), "http");
+		HttpHost targetHost = new HttpHost("localhost", testingPropertiesHelper.getPropertyValueAsInt(testingProperties,
+				RestTestingProperties.REST_PORT_PROPERTY), "http");
 
 		DefaultHttpClient httpclient = new DefaultHttpClient();
 		log.info("UserName={} password={}", irodsAccount.getUserName(), irodsAccount.getPassword());
 		httpclient.getCredentialsProvider().setCredentials(
 				new AuthScope(targetHost.getHostName(), targetHost.getPort()),
-				new UsernamePasswordCredentials(irodsAccount.getUserName(),
-						irodsAccount.getPassword()));
+				new UsernamePasswordCredentials(irodsAccount.getUserName(), irodsAccount.getPassword()));
 		// Create AuthCache instance
 		AuthCache authCache = new BasicAuthCache();
 		// Generate BASIC scheme object and add it to the local

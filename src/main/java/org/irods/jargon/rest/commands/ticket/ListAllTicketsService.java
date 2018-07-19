@@ -37,13 +37,11 @@ import org.jboss.resteasy.annotations.providers.jaxb.json.XmlNsMap;
 @Path("/listAllTickets")
 public class ListAllTicketsService extends AbstractIrodsService {
 
-	
 	@GET
-	@Produces({ "application/xml", "application/json" })
+	@Produces({ "application/json" })
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
-	public ListTicketResponseData listTicket(
-			@HeaderParam("Authorization") final String authorization) throws JargonException,
-			GenQueryBuilderException, JargonQueryException {
+	public ListTicketResponseData listTicket(@HeaderParam("Authorization") final String authorization)
+			throws JargonException, GenQueryBuilderException, JargonQueryException {
 
 		System.out.println("List All Tickets Ran!!!");
 		if (authorization == null || authorization.isEmpty()) {
@@ -53,53 +51,47 @@ public class ListAllTicketsService extends AbstractIrodsService {
 		try {
 			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
 			IRODSFileSystem irodsFileSystem = IRODSFileSystem.instance();
-			IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem
-					.getIRODSAccessObjectFactory();
+			IRODSAccessObjectFactory accessObjectFactory = irodsFileSystem.getIRODSAccessObjectFactory();
 			TicketServiceFactoryImpl ticketServiceFactory = new TicketServiceFactoryImpl(accessObjectFactory);
 			TicketAdminService ticketService = ticketServiceFactory.instanceTicketAdminService(irodsAccount);
 
 			ListTicketResponseData responseData = new ListTicketResponseData();
-			
+
 			List<Ticket> ticketList = ticketService.listAllTickets(0);
 			ArrayList<TicketData> ticketDataList = new ArrayList<TicketData>();
 			for (Ticket ticket : ticketList) {
-				
+
 				TicketData currentTicket = new TicketData(ticket);
-				
+
 				// retrieve and set the user, group and host restrictions
 				currentTicket.setGroupRestrictions((ArrayList<String>) ticketService
-						.listAllGroupRestrictionsForSpecifiedTicket(
-								currentTicket.getTicketString(), 0));
+						.listAllGroupRestrictionsForSpecifiedTicket(currentTicket.getTicketString(), 0));
 				currentTicket.setUserRestrictions((ArrayList<String>) ticketService
-						.listAllUserRestrictionsForSpecifiedTicket(
-								currentTicket.getTicketString(), 0));
+						.listAllUserRestrictionsForSpecifiedTicket(currentTicket.getTicketString(), 0));
 				currentTicket.setHostRestrictions((ArrayList<String>) ticketService
-						.listAllHostRestrictionsForSpecifiedTicket(
-								currentTicket.getTicketString(), 0));
-				
-				// Because of a Jargon issue 172, the irodsAbsolutePath is not being set.  Do another query for this.
+						.listAllHostRestrictionsForSpecifiedTicket(currentTicket.getTicketString(), 0));
+
+				// Because of a Jargon issue 172, the irodsAbsolutePath is not being set. Do
+				// another query for this.
 				try {
 					currentTicket.setIrodsAbsolutePath(ticketService
-							.getTicketForSpecifiedTicketString(
-									currentTicket.getTicketString())
-							.getIrodsAbsolutePath());
+							.getTicketForSpecifiedTicketString(currentTicket.getTicketString()).getIrodsAbsolutePath());
 				} catch (DataNotFoundException e) {
-					//  The ticket is no longer associated with a data object.  Just keep the path empty.
+					// The ticket is no longer associated with a data object. Just keep the path
+					// empty.
 				}
-				
+
 				ticketDataList.add(currentTicket);
 			}
 			responseData.setTickets(ticketDataList);
-			
+
 			return responseData;
-			
+
 		} catch (NumberFormatException nfe) {
 			throw new JargonException("Cannot convert restrictionValue to integer or long", nfe);
 		} finally {
 			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();
 		}
 	}
-
-
 
 }

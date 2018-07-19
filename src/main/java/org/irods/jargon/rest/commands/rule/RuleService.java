@@ -33,13 +33,12 @@ public class RuleService extends AbstractIrodsService {
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
 	/**
-	 * Do a bulk metadata add operation for the given data object. This takes a
-	 * list of AVU entries in the PUT request body, and will attempt to add each
-	 * AVU.
+	 * Do a bulk metadata add operation for the given data object. This takes a list
+	 * of AVU entries in the PUT request body, and will attempt to add each AVU.
 	 * <p/>
 	 * A response body will log the disposition of each AVU add attempt, and any
-	 * errors for an individual attempt are noted by the returned status and
-	 * message for each entry. This allows partial success.
+	 * errors for an individual attempt are noted by the returned status and message
+	 * for each entry. This allows partial success.
 	 * 
 	 * @param authorization
 	 *            <code>String</code> with the basic auth header
@@ -48,11 +47,10 @@ public class RuleService extends AbstractIrodsService {
 	 * @throws JargonException
 	 */
 	@POST
-	@Consumes({ "application/xml", "application/json" })
-	@Produces({ "application/xml", "application/json" })
+	@Consumes({ "application/json" })
+	@Produces({ "application/json" })
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
-	public RuleExecResultWrapper executeRule(
-			@HeaderParam("Authorization") final String authorization,
+	public RuleExecResultWrapper executeRule(@HeaderParam("Authorization") final String authorization,
 			final RuleWrapper ruleWrapper) throws JargonException {
 
 		log.info("addCollectionMetadata()");
@@ -67,13 +65,10 @@ public class RuleService extends AbstractIrodsService {
 
 		try {
 			IRODSAccount irodsAccount = retrieveIrodsAccountFromAuthentication(authorization);
-			RuleFunctions ruleFunctions = this.getServiceFunctionFactory()
-					.instanceRuleFunctions(irodsAccount);
+			RuleFunctions ruleFunctions = this.getServiceFunctionFactory().instanceRuleFunctions(irodsAccount);
 			log.info("executing...");
-			return ruleFunctions.executeRule(
-					ruleWrapper.getRuleAsOriginalText(),
-					ruleWrapper.getIrodsRuleInputParameters(),
-					ruleWrapper.getRuleProcessingType());
+			return ruleFunctions.executeRule(ruleWrapper.getRuleAsOriginalText(),
+					ruleWrapper.getIrodsRuleInputParameters(), ruleWrapper.getRuleProcessingType());
 
 		} finally {
 			getIrodsAccessObjectFactory().closeSessionAndEatExceptions();

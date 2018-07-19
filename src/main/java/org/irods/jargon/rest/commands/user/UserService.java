@@ -44,13 +44,12 @@ public class UserService extends AbstractIrodsService {
 
 	@GET
 	@Path("/{userName}")
-	@Produces({ "application/xml", "application/json" })
+	@Produces({ "application/json" })
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
-	public UserData getUser(
-			@HeaderParam("Authorization") final String authorization,
-			@PathParam("userName") final String userName, @QueryParam("admin") @DefaultValue("false") final boolean isAdmin)
-			throws JargonException {
-		
+	public UserData getUser(@HeaderParam("Authorization") final String authorization,
+			@PathParam("userName") final String userName,
+			@QueryParam("admin") @DefaultValue("false") final boolean isAdmin) throws JargonException {
+
 		log.info("getUser()");
 
 		if (authorization == null || authorization.isEmpty()) {
@@ -64,15 +63,13 @@ public class UserService extends AbstractIrodsService {
 		if (getIrodsAccessObjectFactory() == null) {
 			throw new IllegalArgumentException("null irodsAccessObjectFactory");
 		}
-		
+
 		log.info("as admin?:{}", isAdmin);
 
 		try {
-			IRODSAccount irodsAccount = RestAuthUtils
-					.getIRODSAccountFromBasicAuthValues(authorization,
-							getRestConfiguration());
-			UserAO userAO = getIrodsAccessObjectFactory().getUserAO(
-					irodsAccount);
+			IRODSAccount irodsAccount = RestAuthUtils.getIRODSAccountFromBasicAuthValues(authorization,
+					getRestConfiguration());
+			UserAO userAO = getIrodsAccessObjectFactory().getUserAO(irodsAccount);
 			log.info("looking up user with name:{}", userName);
 			User user = userAO.findByName(userName);
 			log.info("user found:{}", user);
@@ -85,9 +82,9 @@ public class UserService extends AbstractIrodsService {
 
 	/**
 	 * Add a user and set the password based on a {@link UserAddByAdminRequest},
-	 * which is expected as a JSON structure in the PUT message body. This
-	 * method will return a JSON structure reflecting
-	 * {@link UserAddActionResponse} with error or success details.
+	 * which is expected as a JSON structure in the PUT message body. This method
+	 * will return a JSON structure reflecting {@link UserAddActionResponse} with
+	 * error or success details.
 	 * <p/>
 	 * In iRODS, this method will add the user and set a temporary password as
 	 * described in the JSON request.
@@ -105,8 +102,7 @@ public class UserService extends AbstractIrodsService {
 	@PUT
 	@Consumes("application/json")
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
-	public UserAddActionResponse addUser(
-			@HeaderParam("Authorization") final String authorization,
+	public UserAddActionResponse addUser(@HeaderParam("Authorization") final String authorization,
 			final UserAddByAdminRequest userAddByAdminRequest) {
 		log.info("addUser()");
 		UserAddActionResponse response = new UserAddActionResponse();
@@ -120,16 +116,14 @@ public class UserService extends AbstractIrodsService {
 
 		log.info("userAddByAdminRequest:{}", userAddByAdminRequest);
 
-		if (userAddByAdminRequest.getUserName() == null
-				|| userAddByAdminRequest.getUserName().isEmpty()) {
+		if (userAddByAdminRequest.getUserName() == null || userAddByAdminRequest.getUserName().isEmpty()) {
 			log.error("user name missing");
 			response.setMessage("User name is missing in the request");
 			response.setUserAddActionResponse(UserAddActionResponseCode.ATTRIBUTES_MISSING);
 			return response;
 		}
 
-		if (userAddByAdminRequest.getTempPassword() == null
-				|| userAddByAdminRequest.getTempPassword().isEmpty()) {
+		if (userAddByAdminRequest.getTempPassword() == null || userAddByAdminRequest.getTempPassword().isEmpty()) {
 			log.error("temp password is missing");
 			response.setMessage("temp password is missing in the request");
 			response.setUserName(userAddByAdminRequest.getUserName());
@@ -138,12 +132,10 @@ public class UserService extends AbstractIrodsService {
 		}
 
 		try {
-			IRODSAccount irodsAccount = RestAuthUtils
-					.getIRODSAccountFromBasicAuthValues(authorization,
-							getRestConfiguration());
+			IRODSAccount irodsAccount = RestAuthUtils.getIRODSAccountFromBasicAuthValues(authorization,
+					getRestConfiguration());
 
-			UserAO userAO = getIrodsAccessObjectFactory().getUserAO(
-					irodsAccount);
+			UserAO userAO = getIrodsAccessObjectFactory().getUserAO(irodsAccount);
 
 			log.info("adding user based on:{}", userAddByAdminRequest);
 			User user = new User();
@@ -153,18 +145,15 @@ public class UserService extends AbstractIrodsService {
 			userAO.addUser(user);
 			log.info("user added... set the password");
 
-			userAO.changeAUserPasswordByAnAdmin(user.getName(),
-					userAddByAdminRequest.getTempPassword());
+			userAO.changeAUserPasswordByAnAdmin(user.getName(), userAddByAdminRequest.getTempPassword());
 			log.info("password was set to requested value");
 
 			response.setMessage("success");
 			response.setUserName(userAddByAdminRequest.getUserName());
 			response.setUserAddActionResponse(UserAddActionResponseCode.SUCCESS);
-			response.setIrodsEnv(ConfigurationUtils
-					.buildIrodsEnvForConfigAndUser(getRestConfiguration(),
-							user.getNameWithZone()));
-			response.setWebAccessURL(getRestConfiguration()
-					.getWebInterfaceURL());
+			response.setIrodsEnv(
+					ConfigurationUtils.buildIrodsEnvForConfigAndUser(getRestConfiguration(), user.getNameWithZone()));
+			response.setWebAccessURL(getRestConfiguration().getWebInterfaceURL());
 			return response;
 		} catch (DuplicateDataException dde) {
 			log.error("duplicate data for user add", dde);

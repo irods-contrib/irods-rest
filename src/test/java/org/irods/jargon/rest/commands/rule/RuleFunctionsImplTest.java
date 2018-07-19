@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import junit.framework.Assert;
-
 import org.irods.jargon.core.connection.IRODSAccount;
 import org.irods.jargon.core.pub.IRODSFileSystem;
 import org.irods.jargon.core.pub.RuleProcessingAO.RuleProcessingType;
@@ -16,7 +14,9 @@ import org.irods.jargon.testutils.TestingPropertiesHelper;
 import org.irods.jargon.testutils.filemanip.ScratchFileUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.Ignore;
+
+import junit.framework.Assert;
 
 public class RuleFunctionsImplTest {
 
@@ -32,12 +32,10 @@ public class RuleFunctionsImplTest {
 		org.irods.jargon.testutils.TestingPropertiesHelper testingPropertiesLoader = new TestingPropertiesHelper();
 		testingProperties = testingPropertiesLoader.getTestProperties();
 		scratchFileUtils = new ScratchFileUtils(testingProperties);
-		scratchFileUtils
-				.clearAndReinitializeScratchDirectory(IRODS_TEST_SUBDIR_PATH);
+		scratchFileUtils.clearAndReinitializeScratchDirectory(IRODS_TEST_SUBDIR_PATH);
 		irodsTestSetupUtilities = new org.irods.jargon.testutils.IRODSTestSetupUtilities();
 		irodsTestSetupUtilities.initializeIrodsScratchDirectory();
-		irodsTestSetupUtilities
-				.initializeDirectoryForTest(IRODS_TEST_SUBDIR_PATH);
+		irodsTestSetupUtilities.initializeDirectoryForTest(IRODS_TEST_SUBDIR_PATH);
 		irodsFileSystem = IRODSFileSystem.instance();
 	}
 
@@ -46,10 +44,9 @@ public class RuleFunctionsImplTest {
 		irodsFileSystem.closeAndEatExceptions();
 	}
 
-	@Test
+	@Ignore
 	public void testExecuteRuleClassic() throws Exception {
-		IRODSAccount irodsAccount = testingPropertiesHelper
-				.buildIRODSAccountFromTestProperties(testingProperties);
+		IRODSAccount irodsAccount = testingPropertiesHelper.buildIRODSAccountFromTestProperties(testingProperties);
 
 		String ruleString = "ListAvailableMS||msiListEnabledMS(*KVPairs)##writeKeyValPairs(stdout,*KVPairs, \": \")|nop\n*A=hello\n ruleExecOut";
 
@@ -57,12 +54,11 @@ public class RuleFunctionsImplTest {
 
 		List<RuleParameterWrapper> inputParameterOverrides = new ArrayList<RuleParameterWrapper>();
 
-		RuleFunctions ruleFunctions = new RuleFunctionsImpl(restConfiguration,
-				irodsAccount, irodsFileSystem.getIRODSAccessObjectFactory());
+		RuleFunctions ruleFunctions = new RuleFunctionsImpl(restConfiguration, irodsAccount,
+				irodsFileSystem.getIRODSAccessObjectFactory());
 
-		RuleExecResultWrapper actualExecResultWrapper = ruleFunctions
-				.executeRule(ruleString, inputParameterOverrides,
-						RuleProcessingType.CLASSIC);
+		RuleExecResultWrapper actualExecResultWrapper = ruleFunctions.executeRule(ruleString, inputParameterOverrides,
+				RuleProcessingType.CLASSIC);
 
 		Assert.assertNotNull("null result", actualExecResultWrapper);
 		Assert.assertEquals("expected exec out and error out", 2,

@@ -62,25 +62,22 @@ public class ServerEnvironmentService {
 	 * @param irodsAccessObjectFactory
 	 *            the irodsAccessObjectFactory to set
 	 */
-	public void setIrodsAccessObjectFactory(
-			final IRODSAccessObjectFactory irodsAccessObjectFactory) {
+	public void setIrodsAccessObjectFactory(final IRODSAccessObjectFactory irodsAccessObjectFactory) {
 		this.irodsAccessObjectFactory = irodsAccessObjectFactory;
 	}
 
 	/**
-	 * Get of /server will retrieve a set of basic server properties, including
-	 * the current time on the server at the time of the request
+	 * Get of /server will retrieve a set of basic server properties, including the
+	 * current time on the server at the time of the request
 	 * 
 	 * @param authorization
 	 * @return
 	 * @throws JargonException
 	 */
 	@GET
-	@Produces({ "application/xml", "application/json" })
+	@Produces({ "application/json" })
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
-	public ServerInfo getServerInfo(
-			@HeaderParam("Authorization") final String authorization)
-			throws JargonException {
+	public ServerInfo getServerInfo(@HeaderParam("Authorization") final String authorization) throws JargonException {
 		log.info("getServerInfo()");
 
 		if (authorization == null || authorization.isEmpty()) {
@@ -92,28 +89,22 @@ public class ServerEnvironmentService {
 		}
 
 		try {
-			IRODSAccount irodsAccount = RestAuthUtils
-					.getIRODSAccountFromBasicAuthValues(authorization,
-							restConfiguration);
+			IRODSAccount irodsAccount = RestAuthUtils.getIRODSAccountFromBasicAuthValues(authorization,
+					restConfiguration);
 
-			EnvironmentalInfoAO environmentalInfoAO = irodsAccessObjectFactory
-					.getEnvironmentalInfoAO(irodsAccount);
+			EnvironmentalInfoAO environmentalInfoAO = irodsAccessObjectFactory.getEnvironmentalInfoAO(irodsAccount);
 
-			IRODSServerProperties irodsServerProperties = environmentalInfoAO
-					.getIRODSServerPropertiesFromIRODSServer();
-			long currentTime = environmentalInfoAO.getIRODSServerCurrentTime();
+			IRODSServerProperties irodsServerProperties = environmentalInfoAO.getIRODSServerPropertiesFromIRODSServer();
+			// long currentTime = environmentalInfoAO.getIRODSServerCurrentTime();
 
 			ServerInfo serverInfo = new ServerInfo();
 			serverInfo.setApiVersion(irodsServerProperties.getApiVersion());
 			serverInfo.setIcatEnabled(irodsServerProperties.getIcatEnabled());
-			serverInfo.setInitializeDate(irodsServerProperties
-					.getInitializeDate());
-			serverInfo.setRelVersion(irodsServerProperties.getIrodsVersion()
-					.toString());
+			serverInfo.setInitializeDate(irodsServerProperties.getInitializeDate());
+			serverInfo.setRelVersion(irodsServerProperties.getIrodsVersion().toString());
 			serverInfo.setRodsZone(irodsServerProperties.getRodsZone());
-			serverInfo.setServerBootTime(irodsServerProperties
-					.getServerBootTime());
-			serverInfo.setCurrentServerTime(currentTime);
+			serverInfo.setServerBootTime(irodsServerProperties.getServerBootTime());
+			// serverInfo.setCurrentServerTime(currentTime);
 			return serverInfo;
 		} finally {
 			irodsAccessObjectFactory.closeSessionAndEatExceptions();
@@ -122,9 +113,9 @@ public class ServerEnvironmentService {
 
 	/**
 	 * Add a user and set the password based on a {@link UserAddByAdminRequest},
-	 * which is expected as a JSON structure in the PUT message body. This
-	 * method will return a JSON structure reflecting
-	 * {@link UserAddActionResponse} with error or success details.
+	 * which is expected as a JSON structure in the PUT message body. This method
+	 * will return a JSON structure reflecting {@link UserAddActionResponse} with
+	 * error or success details.
 	 * <p/>
 	 * In iRODS, this method will add the user and set a temporary password as
 	 * described in the JSON request.
@@ -142,8 +133,7 @@ public class ServerEnvironmentService {
 	@PUT
 	@Consumes("application/json")
 	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
-	public UserAddActionResponse addUser(
-			@HeaderParam("Authorization") final String authorization,
+	public UserAddActionResponse addUser(@HeaderParam("Authorization") final String authorization,
 			final UserAddByAdminRequest userAddByAdminRequest) {
 		log.info("addUser()");
 		UserAddActionResponse response = new UserAddActionResponse();
@@ -157,16 +147,14 @@ public class ServerEnvironmentService {
 
 		log.info("userAddByAdminRequest:{}", userAddByAdminRequest);
 
-		if (userAddByAdminRequest.getUserName() == null
-				|| userAddByAdminRequest.getUserName().isEmpty()) {
+		if (userAddByAdminRequest.getUserName() == null || userAddByAdminRequest.getUserName().isEmpty()) {
 			log.error("user name missing");
 			response.setMessage("User name is missing in the request");
 			response.setUserAddActionResponse(UserAddActionResponseCode.ATTRIBUTES_MISSING);
 			return response;
 		}
 
-		if (userAddByAdminRequest.getTempPassword() == null
-				|| userAddByAdminRequest.getTempPassword().isEmpty()) {
+		if (userAddByAdminRequest.getTempPassword() == null || userAddByAdminRequest.getTempPassword().isEmpty()) {
 			log.error("temp password is missing");
 			response.setMessage("temp password is missing in the request");
 			response.setUserName(userAddByAdminRequest.getUserName());
@@ -175,9 +163,8 @@ public class ServerEnvironmentService {
 		}
 
 		try {
-			IRODSAccount irodsAccount = RestAuthUtils
-					.getIRODSAccountFromBasicAuthValues(authorization,
-							restConfiguration);
+			IRODSAccount irodsAccount = RestAuthUtils.getIRODSAccountFromBasicAuthValues(authorization,
+					restConfiguration);
 
 			UserAO userAO = irodsAccessObjectFactory.getUserAO(irodsAccount);
 
@@ -189,15 +176,13 @@ public class ServerEnvironmentService {
 			userAO.addUser(user);
 			log.info("user added... set the password");
 
-			userAO.changeAUserPasswordByAnAdmin(user.getName(),
-					userAddByAdminRequest.getTempPassword());
+			userAO.changeAUserPasswordByAnAdmin(user.getName(), userAddByAdminRequest.getTempPassword());
 			log.info("password was set to requested value");
 			response.setMessage("success");
 			response.setUserName(userAddByAdminRequest.getUserName());
 			response.setUserAddActionResponse(UserAddActionResponseCode.SUCCESS);
-			response.setIrodsEnv(ConfigurationUtils
-					.buildIrodsEnvForConfigAndUser(restConfiguration,
-							user.getNameWithZone()));
+			response.setIrodsEnv(
+					ConfigurationUtils.buildIrodsEnvForConfigAndUser(restConfiguration, user.getNameWithZone()));
 			response.setWebAccessURL(restConfiguration.getWebInterfaceURL());
 			return response;
 		} catch (DuplicateDataException dde) {
