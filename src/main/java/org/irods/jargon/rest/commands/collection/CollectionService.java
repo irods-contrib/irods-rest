@@ -44,8 +44,6 @@ import org.irods.jargon.rest.domain.MetadataOperationResultEntry;
 import org.irods.jargon.rest.domain.MetadataQueryResultEntry;
 import org.irods.jargon.rest.domain.PermissionListing;
 import org.irods.jargon.rest.utils.DataUtils;
-import org.jboss.resteasy.annotations.providers.jaxb.json.Mapped;
-import org.jboss.resteasy.annotations.providers.jaxb.json.XmlNsMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,7 +84,8 @@ public class CollectionService extends AbstractIrodsService {
 	@GET
 	@Path("{path:.*}")
 	@Produces({ "application/json" })
-	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	// @Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest",
+	// jsonName = "irods-rest") })
 	public CollectionData getCollectionData(@HeaderParam("Authorization") final String authorization,
 			@PathParam("path") final String path, @QueryParam("offset") @DefaultValue("0") final int offset,
 			@QueryParam("listing") @DefaultValue("false") final boolean isListing,
@@ -203,7 +202,8 @@ public class CollectionService extends AbstractIrodsService {
 	@PUT
 	@Path("{path:.*}")
 	@Produces({ "application/json" })
-	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	// @Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest",
+	// jsonName = "irods-rest") })
 	public CollectionData addCollection(@HeaderParam("Authorization") final String authorization,
 			@PathParam("path") final String path) throws JargonException {
 
@@ -363,7 +363,8 @@ public class CollectionService extends AbstractIrodsService {
 	@Path("{path:.*}/metadata")
 	@Consumes({ "application/json" })
 	@Produces({ "application/json" })
-	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	// @Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest",
+	// jsonName = "irods-rest") })
 	public List<MetadataOperationResultEntry> deleteCollectionMetadata(
 			@HeaderParam("Authorization") final String authorization, @PathParam("path") final String path,
 			final MetadataOperation metadataOperation) throws JargonException {
@@ -446,7 +447,8 @@ public class CollectionService extends AbstractIrodsService {
 	@Path("{path:.*}/metadata")
 	@Consumes({ "application/json" })
 	@Produces({ "application/json" })
-	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	// @Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest",
+	// jsonName = "irods-rest") })
 	public List<MetadataOperationResultEntry> addCollectionMetadata(
 			@HeaderParam("Authorization") final String authorization, @PathParam("path") final String path,
 			final MetadataOperation metadataOperation) throws JargonException {
@@ -527,7 +529,8 @@ public class CollectionService extends AbstractIrodsService {
 	 */
 	@DELETE
 	@Path("{path:.*}")
-	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	// @Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest",
+	// jsonName = "irods-rest") })
 	public void removeCollection(@HeaderParam("Authorization") final String authorization,
 			@PathParam("path") final String path, @QueryParam("force") @DefaultValue("false") final boolean force)
 			throws JargonException {
@@ -581,7 +584,8 @@ public class CollectionService extends AbstractIrodsService {
 	@GET
 	@Path("{path:.*}/acl")
 	@Produces({ "application/json" })
-	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	// @Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest",
+	// jsonName = "irods-rest") })
 	public PermissionListing getCollectionAcl(@HeaderParam("Authorization") final String authorization,
 			@PathParam("path") final String path) throws FileNotFoundException, JargonException {
 
@@ -638,7 +642,8 @@ public class CollectionService extends AbstractIrodsService {
 	@PUT
 	@Path("{path:.*}/acl/{userName}")
 	@Produces({ "application/json" })
-	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	// @Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest",
+	// jsonName = "irods-rest") })
 	public void addCollectionAcl(@HeaderParam("Authorization") final String authorization,
 			@PathParam("path") final String path, @PathParam("userName") final String userName,
 			@QueryParam("recursive") @DefaultValue("false") final boolean recursive,
@@ -722,7 +727,8 @@ public class CollectionService extends AbstractIrodsService {
 	@DELETE
 	@Path("{path:.*}/acl/{userName}")
 	@Produces({ "application/json" })
-	@Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest", jsonName = "irods-rest") })
+	// @Mapped(namespaceMap = { @XmlNsMap(namespace = "http://irods.org/irods-rest",
+	// jsonName = "irods-rest") })
 	public void deleteCollectionAcl(@HeaderParam("Authorization") final String authorization,
 			@PathParam("path") final String path, @PathParam("userName") final String userName,
 			@QueryParam("recursive") @DefaultValue("false") final boolean recursive)
