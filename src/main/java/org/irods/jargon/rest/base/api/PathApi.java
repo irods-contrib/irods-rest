@@ -18,6 +18,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponses;
+
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 import java.util.List;
