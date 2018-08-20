@@ -1,6 +1,0 @@
-http://blog.comsysto.com/category/lean-java/resteasy/
-
-
-nice tutorial on cors and jquery
-
-http://www.html5rocks.com/en/tutorials/cors/
