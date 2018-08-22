@@ -3,15 +3,13 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.irods</groupId>
 	<artifactId>irods-rest</artifactId>
-	<version>4.3.1.0-SNAPSHOT</version>
 	<parent>
 		<groupId>org.irods</groupId>
 		<artifactId>jargon-pom</artifactId>
 		<version>4.3.1.0-SNAPSHOT</version>
 	</parent>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<name>irods-rest</name>
 	<description>REST API for iRODS based on Jargon</description>
 	<url>https://github.com/DICE-UNC/irods-rest</url>
@@ -45,6 +43,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
 		<swagger.version>2.7.0</swagger.version>
+		<springfox-version>2.7.0</springfox-version>
 	</properties>
 	<repositories>
 		<repository>
@@ -140,6 +139,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.irods.jargon</groupId>
+			<artifactId>jargon-pool </artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.irods.jargon</groupId>
 			<artifactId>jargon-ticket</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -214,7 +218,10 @@
 		<dependency>
 			<groupId>com.github.joschi.jackson</groupId>
 			<artifactId>jackson-datatype-threetenbp</artifactId>
-			<version>2.6.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-pool2</artifactId>
 		</dependency>
 
 	</dependencies>
@@ -414,6 +421,6 @@
 				</configuration>
 			</plugin>
 		</plugins>
-		
+
 	</build>
 </project>
