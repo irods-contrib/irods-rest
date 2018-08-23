@@ -4,13 +4,14 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-@SpringBootApplication
+@SpringBootApplication(exclude = { HibernateJpaAutoConfiguration.class} )
 @EnableSwagger2
-@ComponentScan(basePackages = { "org.irods.jargon.rest.base", "org.irods.jargon.rest.base.api", "org.irods.jargon.rest.base.configuration" })
+@ComponentScan(basePackages = { "io.swagger", "io.swagger.api", "org.irods.jargon.rest.base", "org.irods.jargon.rest.base.api", "org.irods.jargon.rest.base.configuration" })
 public class Swagger2SpringBoot implements CommandLineRunner {
 
     @Override
