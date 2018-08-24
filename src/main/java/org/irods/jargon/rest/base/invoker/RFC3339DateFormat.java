@@ -1,4 +1,4 @@
-package org.irods.jargon.rest.base;
+package org.irods.jargon.rest.base.invoker;
 
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import com.fasterxml.jackson.databind.util.ISO8601Utils;

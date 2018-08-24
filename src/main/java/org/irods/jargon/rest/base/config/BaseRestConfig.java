@@ -1,7 +1,5 @@
-/**
- * 
- */
-package org.irods.jargon.rest.base.configuration;
+package org.irods.jargon.rest.base.config;
+
 
 import org.irods.jargon.core.connection.AuthScheme;
 import org.springframework.beans.factory.annotation.Value;

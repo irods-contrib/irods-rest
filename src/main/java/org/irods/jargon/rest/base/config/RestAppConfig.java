@@ -1,7 +1,7 @@
+package org.irods.jargon.rest.base.config;
 /**
  * 
  */
-package org.irods.jargon.rest.base.configuration;
 
 import org.irods.jargon.core.connection.ClientServerNegotiationPolicy.SslNegotiationPolicy;
 import org.irods.jargon.core.connection.IRODSSession;
@@ -31,10 +31,9 @@ public class RestAppConfig {
 	private BaseRestConfig baseRestConfig;
 	
 	@Bean
-	public IRODSSession irodsSession(JargonProperties jargonProperties, CachedIrodsProtocolManager cachedIrodsProtocolManger) {
+	public IRODSSession irodsSession(JargonProperties jargonProperties) {
 		IRODSSession irodsSession = new IRODSSession();
 		irodsSession.setJargonProperties(jargonProperties);
-		irodsSession.setIrodsConnectionManager(cachedIrodsProtocolManger);
 		return irodsSession;
 	}
 	
@@ -52,7 +51,10 @@ public class RestAppConfig {
 	
 	@Bean
 	public JargonKeyedPoolConfig jargonKeyedPoolConfig() {
-		return new JargonKeyedPoolConfig();
+		JargonKeyedPoolConfig config = new JargonKeyedPoolConfig();
+		config.setJmxNameBase("irods-rest-base-pool");
+		config.setJmxNamePrefix("base-rest");
+		return config;
 	}
 	
 	@Bean

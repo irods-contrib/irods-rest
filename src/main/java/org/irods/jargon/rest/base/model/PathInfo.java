@@ -1,15 +1,13 @@
 package org.irods.jargon.rest.base.model;
 
 import java.util.Objects;
-
-import javax.validation.constraints.NotNull;
-
-import org.springframework.validation.annotation.Validated;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
+import org.springframework.validation.annotation.Validated;
+import javax.validation.Valid;
+import javax.validation.constraints.*;
 
 /**
  * PathInfo
@@ -38,7 +36,7 @@ public class PathInfo   {
    * Get absolutePath
    * @return absolutePath
   **/
-  @io.swagger.annotations.ApiModelProperty(example = "/zone/home/user/file1", required = true, value = "")
+  @ApiModelProperty(example = "/zone/home/user/file1", required = true, value = "")
   @NotNull
 
 
@@ -59,7 +57,7 @@ public class PathInfo   {
    * Get name
    * @return name
   **/
-  @io.swagger.annotations.ApiModelProperty(example = "file1", required = true, value = "")
+  @ApiModelProperty(example = "file1", required = true, value = "")
   @NotNull
 
 
