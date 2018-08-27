@@ -54,6 +54,7 @@ public class RestAppConfig {
 		JargonKeyedPoolConfig config = new JargonKeyedPoolConfig();
 		config.setJmxNameBase("irods-rest-base-pool");
 		config.setJmxNamePrefix("base-rest");
+		//config.setJmxEnabled(false);
 		return config;
 	}
 	
