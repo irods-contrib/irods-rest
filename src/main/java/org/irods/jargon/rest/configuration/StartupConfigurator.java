@@ -7,6 +7,7 @@ import org.irods.jargon.core.connection.ClientServerNegotiationPolicy;
 import org.irods.jargon.core.connection.ClientServerNegotiationPolicy.SslNegotiationPolicy;
 import org.irods.jargon.core.connection.IRODSSession;
 import org.irods.jargon.core.connection.SettableJargonProperties;
+import org.irods.jargon.core.connection.SettableJargonPropertiesMBean;
 import org.irods.jargon.core.pub.IRODSAccessObjectFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,7 +81,7 @@ public class StartupConfigurator {
 
 		log.info("configuration with:{}", restConfiguration);
 
-		SettableJargonProperties props = new SettableJargonProperties(
+		SettableJargonPropertiesMBean props = new SettableJargonProperties(
 				irodsSession.getJargonProperties());
 		props.setComputeChecksumAfterTransfer(restConfiguration
 				.isComputeChecksum());
