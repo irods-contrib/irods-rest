@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.irods</groupId>
@@ -11,7 +12,7 @@
 	<url>https://github.com/DICE-UNC/irods-rest</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<jargon.version>4.3.0.1-SNAPSHOT</jargon.version>
+		<jargon.version>4.3.1.0-SNAPSHOT</jargon.version>
 		<resteasy.version>3.0.12.Final</resteasy.version>
 		<spring.core.version>3.1.0.RELEASE</spring.core.version>
 		<spring.security.version>3.1.0.RELEASE</spring.security.version>
@@ -245,11 +246,14 @@
 				<artifactId>resteasy-jsapi</artifactId>
 				<version>${resteasy.version}</version>
 			</dependency>
+			<!-- https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api -->
 			<dependency>
 				<groupId>javax.servlet</groupId>
-				<artifactId>servlet-api</artifactId>
-				<version>2.5</version>
+				<artifactId>javax.servlet-api</artifactId>
+				<version>3.1.0</version>
+				<scope>provided</scope>
 			</dependency>
+
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-test</artifactId>
@@ -301,7 +305,7 @@
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
+			<artifactId>javax.servlet-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -410,15 +414,20 @@
 						<phase>generate-sources</phase>
 						<configuration>
 							<tasks>
-								<property name="src.dir" value="${project.build.sourceDirectory}" />
-								<property name="package.dir" value="org/irods/jargon/rest/utils" />
-								<property name="package.name" value="org.irods.jargon.rest.utils" />
-								<property name="buildtime" value="${maven.build.timestamp}" />
+								<property name="src.dir"
+									value="${project.build.sourceDirectory}" />
+								<property name="package.dir"
+									value="org/irods/jargon/rest/utils" />
+								<property name="package.name"
+									value="org.irods.jargon.rest.utils" />
+								<property name="buildtime"
+									value="${maven.build.timestamp}" />
 
 								<echo file="${src.dir}/${package.dir}/RestVersion.java"
 									message="package ${package.name};${line.separator}" />
 								<echo file="${src.dir}/${package.dir}/RestVersion.java"
-									append="true" message="public final class RestVersion {${line.separator}" />
+									append="true"
+									message="public final class RestVersion {${line.separator}" />
 								<echo file="${src.dir}/${package.dir}/RestVersion.java"
 									append="true"
 									message=" public static String VERSION=&quot;${pom.version}&quot;;${line.separator}" />
@@ -436,10 +445,13 @@
 						<phase>validate</phase>
 						<configuration>
 							<tasks>
-								<delete file="${basedir}/src/test/resources/testing.properties" />
-								<touch file="${basedir}/src/test/resources/testing.properties"
+								<delete
+									file="${basedir}/src/test/resources/testing.properties" />
+								<touch
+									file="${basedir}/src/test/resources/testing.properties"
 									mkdirs="true" />
-								<echo file="${basedir}/src/test/resources/testing.properties"
+								<echo
+									file="${basedir}/src/test/resources/testing.properties"
 									append="true">
 									test.data.directory=${jargon.test.data.directory}
 									test.irods.admin=${jargon.test.irods.admin}
@@ -505,7 +517,8 @@
 								<touch
 									file="${basedir}/src/test/resources/test-irods-rest.properties"
 									mkdirs="true" />
-								<echo file="${basedir}/src/test/resources/test-irods-rest.properties"
+								<echo
+									file="${basedir}/src/test/resources/test-irods-rest.properties"
 									append="true">
 									irods.host=${jargon.test.irods.host}
 									irods.port=${jargon.test.irods.port}

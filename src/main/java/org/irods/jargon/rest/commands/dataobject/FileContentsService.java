@@ -73,13 +73,11 @@ public class FileContentsService extends AbstractIrodsService {
 	 * with a name of <code>uploadFile</code> in the multipart form data. See the
 	 * companion JUnit test for an Apache HTTP client invocation example.
 	 * 
-	 * @param authorization
-	 *            <code>String</code> with the basic auth header
-	 * @param path
-	 *            <code>String</code> with the iRODS absolute path derived from the
-	 *            URL extra path information
-	 * @param input
-	 *            {@link MultipartFormDataInput} provided by the RESTEasy framework
+	 * @param authorization <code>String</code> with the basic auth header
+	 * @param path          <code>String</code> with the iRODS absolute path derived
+	 *                      from the URL extra path information
+	 * @param input         {@link MultipartFormDataInput} provided by the RESTEasy
+	 *                      framework
 	 * @return {@link DataObjectData} marshaled in the appropriate format. This
 	 *         reflects the new iRODS file created and can serve as a confirmation
 	 * @throws JargonException
@@ -172,11 +170,9 @@ public class FileContentsService extends AbstractIrodsService {
 	/**
 	 * Download the iRODS file data to the client
 	 * 
-	 * @param authorization
-	 *            <code>String</code> with the basic auth header
-	 * @param path
-	 *            <code>String</code> with the iRODS absolute path derived from the
-	 *            URL extra path information
+	 * @param authorization <code>String</code> with the basic auth header
+	 * @param path          <code>String</code> with the iRODS absolute path derived
+	 *                      from the URL extra path information
 	 * @return
 	 * @throws JargonException
 	 */
@@ -226,10 +222,15 @@ public class FileContentsService extends AbstractIrodsService {
 
 			log.debug("************* all response headers ************");
 
-			int contentLength = (int) irodsFile.length();
-
 			response.setContentType("application/octet-stream");
-			response.setContentLength(contentLength);
+			long length = irodsFile.length();
+
+			if (length <= Integer.MAX_VALUE) {
+				response.setContentLength((int) length);
+			} else {
+				response.addHeader("Content-Length", Long.toString(length));
+			}
+
 			response.setHeader("Content-disposition", "attachment; filename=\"" + irodsFile.getName() + "\"");
 
 			// test hack of origin for cors download
