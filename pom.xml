@@ -14,7 +14,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jargon.version>4.3.1.0-SNAPSHOT</jargon.version>
 		<resteasy.version>3.0.12.Final</resteasy.version>
-		<spring.core.version>3.1.0.RELEASE</spring.core.version>
+		<spring.core.version>5.2.0.RELEASE</spring.core.version>
 		<spring.security.version>3.1.0.RELEASE</spring.security.version>
 		<java.version>1.8</java.version>
 	</properties>
