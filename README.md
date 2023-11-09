@@ -1,3 +1,11 @@
+Note: This repository has been deprecated and archived.
+
+Please find the new HTTP API implementation at:
+
+https://github.com/irods/irods_client_http_api
+
+----
+
 # Project: iRODS Rest API
 ## Date: 1/25/2017
 ## Release Version: 4.1.10-0-RC1
